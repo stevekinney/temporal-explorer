@@ -55,7 +55,9 @@ function normalizeString(value: string, runId: string): string {
   return value;
 }
 
-function isLongLike(value: object): value is { toString: () => string } {
+type LongLike = { low: number; high: number; unsigned: boolean; toString(): string };
+
+function isLongLike(value: object): value is LongLike {
   const constructorName = (value as { constructor?: { name?: unknown } }).constructor?.name;
   return constructorName === 'Long';
 }
@@ -143,8 +145,17 @@ function normalizeValue(value: unknown, runId: string, key?: string): unknown {
   return value;
 }
 
+function isHistoryJson(value: unknown): value is TemporalHistoryJson {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 function normalizeHistory(history: TemporalHistoryJson, runId: string): TemporalHistoryJson {
-  const normalized = normalizeValue(history, runId) as TemporalHistoryJson;
+  const normalized = normalizeValue(history, runId);
+
+  if (!isHistoryJson(normalized)) {
+    throw new Error('normalizeValue did not return an object for a history input.');
+  }
+
   const events = normalized.events ?? [];
 
   for (const event of events) {
@@ -168,10 +179,23 @@ function countEventTypes(history: TemporalHistoryJson): Record<string, number> {
   );
 }
 
-async function readRootPackageJson(): Promise<{ devDependencies?: Record<string, string> }> {
-  return (await Bun.file(new URL('../../package.json', import.meta.url)).json()) as {
-    devDependencies?: Record<string, string>;
-  };
+async function readRootPackageJson(): Promise<{ devDependencies: Record<string, string> }> {
+  const parsed: unknown = await Bun.file(new URL('../../package.json', import.meta.url)).json();
+  const devDependencies: Record<string, string> = {};
+
+  if (typeof parsed === 'object' && parsed !== null && 'devDependencies' in parsed) {
+    const raw = parsed.devDependencies;
+
+    if (typeof raw === 'object' && raw !== null) {
+      for (const [name, version] of Object.entries(raw)) {
+        if (typeof version === 'string') {
+          devDependencies[name] = version;
+        }
+      }
+    }
+  }
+
+  return { devDependencies };
 }
 
 async function generateHistory(): Promise<HistoryGenerationResult> {
@@ -207,7 +231,12 @@ async function generateHistory(): Promise<HistoryGenerationResult> {
       };
     });
 
-    const rawHistory = toJsonCompatible(history) as TemporalHistoryJson;
+    const rawHistory = toJsonCompatible(history);
+
+    if (!isHistoryJson(rawHistory)) {
+      throw new Error('Fetched history did not serialize to an object.');
+    }
+
     const normalizedHistory = normalizeHistory(rawHistory, runId);
     const historyText = await createStableJson(normalizedHistory);
     const eventTypes = countEventTypes(normalizedHistory);
@@ -218,7 +247,7 @@ async function generateHistory(): Promise<HistoryGenerationResult> {
       history: 'success',
       generatedBy: 'scripts/fixtures/generate-histories.ts',
       generationCommand: 'bun run fixtures:generate-histories',
-      temporalSdkVersion: packageJson.devDependencies?.['@temporalio/client'] ?? 'unknown',
+      temporalSdkVersion: packageJson.devDependencies['@temporalio/client'] ?? 'unknown',
       testEnvironment: 'TestWorkflowEnvironment.createTimeSkipping',
       workflowType: 'basicOrderWorkflow',
       workflowId,
@@ -256,9 +285,15 @@ async function assertUnchanged(url: URL, expectedText: string): Promise<void> {
   const actualText = await existingFile.text();
 
   if (actualText !== expectedText) {
-    const firstDifference = [...actualText].findIndex(
-      (character, index) => character !== expectedText[index],
-    );
+    const comparableLength = Math.min(actualText.length, expectedText.length);
+    let firstDifference = comparableLength;
+
+    for (let index = 0; index < comparableLength; index += 1) {
+      if (actualText[index] !== expectedText[index]) {
+        firstDifference = index;
+        break;
+      }
+    }
     const start = Math.max(0, firstDifference - 120);
     const end = firstDifference + 240;
     const actualContext = actualText.slice(start, end);
