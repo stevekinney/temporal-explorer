@@ -1,0 +1,12 @@
+{
+  "extends": "@repo/typescript-configuration/library.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": ["bun"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "coverage", "dist"]
+}

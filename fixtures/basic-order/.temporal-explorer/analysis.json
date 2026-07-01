@@ -1,0 +1,292 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:../../fixtures/basic-order",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "../../fixtures/basic-order",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/basic-order-workflow.ts": "fa291a75ed0b979092485ed9cdb29934dcf20c4ff51b8c08f31c8495d4f042ed"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "../../fixtures/basic-order",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 200
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 344
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:basicOrderWorkflow",
+      "name": "basicOrderWorkflow",
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 368
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 799
+        },
+        "symbolName": "basicOrderWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "basicOrderWorkflow:arg:0:input",
+            "display": "OrderInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/basic-order-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 42,
+                "offset": 409
+              },
+              "end": {
+                "line": 16,
+                "column": 59,
+                "offset": 426
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "basicOrderWorkflow:result",
+          "display": "Promise<OrderResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:basicOrderWorkflow:validateOrder:0",
+          "kind": "activity",
+          "name": "validateOrder",
+          "source": {
+            "path": "src/workflows/basic-order-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 17,
+              "column": 39,
+              "offset": 490
+            },
+            "end": {
+              "line": 17,
+              "column": 70,
+              "offset": 521
+            },
+            "symbolName": "validateOrder"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:basicOrderWorkflow:chargeCard:1",
+          "kind": "activity",
+          "name": "chargeCard",
+          "source": {
+            "path": "src/workflows/basic-order-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 18,
+              "column": 40,
+              "offset": 562
+            },
+            "end": {
+              "line": 18,
+              "column": 68,
+              "offset": 590
+            },
+            "symbolName": "chargeCard"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:basicOrderWorkflow:shipOrder:2",
+          "kind": "activity",
+          "name": "shipOrder",
+          "source": {
+            "path": "src/workflows/basic-order-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 42,
+              "offset": 633
+            },
+            "end": {
+              "line": 19,
+              "column": 69,
+              "offset": 660
+            },
+            "symbolName": "shipOrder"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:validateOrder",
+      "name": "validateOrder",
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 39,
+          "offset": 490
+        },
+        "end": {
+          "line": 17,
+          "column": 70,
+          "offset": 521
+        },
+        "symbolName": "validateOrder"
+      },
+      "implementationSource": {
+        "path": "src/activities/order-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 1,
+          "offset": 403
+        },
+        "end": {
+          "line": 31,
+          "column": 2,
+          "offset": 552
+        },
+        "symbolName": "validateOrder"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:chargeCard",
+      "name": "chargeCard",
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 40,
+          "offset": 562
+        },
+        "end": {
+          "line": 18,
+          "column": 68,
+          "offset": 590
+        },
+        "symbolName": "chargeCard"
+      },
+      "implementationSource": {
+        "path": "src/activities/order-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 33,
+          "column": 1,
+          "offset": 554
+        },
+        "end": {
+          "line": 37,
+          "column": 2,
+          "offset": 708
+        },
+        "symbolName": "chargeCard"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:shipOrder",
+      "name": "shipOrder",
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 42,
+          "offset": 633
+        },
+        "end": {
+          "line": 19,
+          "column": 69,
+          "offset": 660
+        },
+        "symbolName": "shipOrder"
+      },
+      "implementationSource": {
+        "path": "src/activities/order-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 39,
+          "column": 1,
+          "offset": 710
+        },
+        "end": {
+          "line": 43,
+          "column": 2,
+          "offset": 858
+        },
+        "symbolName": "shipOrder"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

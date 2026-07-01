@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:basicOrderWorkflow:trace:success:success-run-id",
+  "staticAnalysisId": "analysis:../../fixtures/basic-order",
+  "runtimeTraceId": "trace:success:success-run-id",
+  "workflow": "basicOrderWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:basicOrderWorkflow",
+      "kind": "workflow",
+      "name": "basicOrderWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 368
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 799
+        },
+        "symbolName": "basicOrderWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:basicOrderWorkflow:validateOrder:0",
+      "kind": "activity",
+      "name": "validateOrder",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 39,
+          "offset": 490
+        },
+        "end": {
+          "line": 17,
+          "column": 70,
+          "offset": 521
+        },
+        "symbolName": "validateOrder"
+      }
+    },
+    {
+      "id": "activity-call:basicOrderWorkflow:chargeCard:1",
+      "kind": "activity",
+      "name": "chargeCard",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 40,
+          "offset": 562
+        },
+        "end": {
+          "line": 18,
+          "column": 68,
+          "offset": 590
+        },
+        "symbolName": "chargeCard"
+      }
+    },
+    {
+      "id": "activity-call:basicOrderWorkflow:shipOrder:2",
+      "kind": "activity",
+      "name": "shipOrder",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/basic-order-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 42,
+          "offset": 633
+        },
+        "end": {
+          "line": 19,
+          "column": 69,
+          "offset": 660
+        },
+        "symbolName": "shipOrder"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:basicOrderWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to basicOrderWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type basicOrderWorkflow matched static Workflow basicOrderWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:basicOrderWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/basic-order-workflow.ts:16.",
+          "staticNodeId": "workflow:basicOrderWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:basicOrderWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to basicOrderWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type basicOrderWorkflow matched static Workflow basicOrderWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:basicOrderWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/basic-order-workflow.ts:16.",
+          "staticNodeId": "workflow:basicOrderWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:validateOrder:5",
+      "staticNodeId": "activity-call:basicOrderWorkflow:validateOrder:0",
+      "confidence": "exact",
+      "reason": "Activity validateOrder matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type validateOrder matched static Activity command validateOrder.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:basicOrderWorkflow:validateOrder:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:basicOrderWorkflow:validateOrder:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/basic-order-workflow.ts:17.",
+          "staticNodeId": "activity-call:basicOrderWorkflow:validateOrder:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:chargeCard:11",
+      "staticNodeId": "activity-call:basicOrderWorkflow:chargeCard:1",
+      "confidence": "exact",
+      "reason": "Activity chargeCard matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type chargeCard matched static Activity command chargeCard.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:basicOrderWorkflow:chargeCard:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:basicOrderWorkflow:chargeCard:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/basic-order-workflow.ts:18.",
+          "staticNodeId": "activity-call:basicOrderWorkflow:chargeCard:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:shipOrder:17",
+      "staticNodeId": "activity-call:basicOrderWorkflow:shipOrder:2",
+      "confidence": "exact",
+      "reason": "Activity shipOrder matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type shipOrder matched static Activity command shipOrder.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:basicOrderWorkflow:shipOrder:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:basicOrderWorkflow:shipOrder:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/basic-order-workflow.ts:19.",
+          "staticNodeId": "activity-call:basicOrderWorkflow:shipOrder:2"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 4,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 3,
+      "observed": 3,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

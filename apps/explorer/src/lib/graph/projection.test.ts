@@ -1,0 +1,188 @@
+import { describe, expect, it } from 'bun:test';
+
+import type {
+  ExecutionOverlayDocument,
+  RuntimeNodeMapping,
+  RuntimeOperation,
+  RuntimeTraceDocument,
+} from '@temporal-explorer/schemas';
+
+import { loadExplorerArtifacts } from '../server/artifacts';
+import {
+  buildGraphProjection,
+  formatEventReferences,
+  runtimeStateToken,
+  sourceText,
+} from './projection';
+import { operationLabel } from './projection-helpers';
+import {
+  commandState,
+  operationState,
+  runtimeOperationRowState,
+  workflowState,
+} from './runtime-state';
+
+const fixtureRoot = new URL('../../../../../fixtures/basic-order/', import.meta.url).pathname;
+
+function isActivityOperation(
+  operation: RuntimeOperation,
+): operation is Extract<RuntimeOperation, { kind: 'activity' }> {
+  return operation.kind === 'activity';
+}
+
+describe('explorer graph projection', () => {
+  it('projects graph nodes and timeline rows from validated artifacts', async () => {
+    const artifacts = await loadExplorerArtifacts(fixtureRoot);
+    const workflow = artifacts.analysis.workflows[0];
+    const trace = artifacts.traces[0];
+    const overlay = artifacts.overlays[0];
+
+    if (!workflow) throw new Error('Expected a Workflow fixture.');
+
+    const projection = buildGraphProjection({ workflow, trace, overlay });
+
+    expect(projection.nodes.map((node) => node.label)).toEqual([
+      'basicOrderWorkflow',
+      'validateOrder',
+      'chargeCard',
+      'shipOrder',
+    ]);
+    expect(projection.edges.map((edge) => edge.label)).toEqual([
+      'Activity 1',
+      'Activity 2',
+      'Activity 3',
+    ]);
+    expect(projection.timelineRows.map((row) => row.entry.label)).toContain(
+      'validateOrder scheduled',
+    );
+    expect(
+      projection.timelineRows.find((row) => row.entry.label === 'chargeCard scheduled')
+        ?.graphNodeId,
+    ).toBe('activity-call:basicOrderWorkflow:chargeCard:1');
+    expect(
+      projection.nodesById.get('activity-call:basicOrderWorkflow:validateOrder:0')?.sourceText,
+    ).toBe('src/workflows/basic-order-workflow.ts:17');
+  });
+
+  it('projects runtime-only nodes for unmapped operations', async () => {
+    const artifacts = await loadExplorerArtifacts(fixtureRoot);
+    const workflow = artifacts.analysis.workflows[0];
+    const trace = structuredClone(artifacts.traces[0]) as RuntimeTraceDocument | undefined;
+    const overlay = artifacts.overlays[0];
+    const firstActivity = trace?.operations.find(isActivityOperation);
+
+    if (!workflow || !trace || !firstActivity) {
+      throw new Error('Expected graph projection fixtures.');
+    }
+
+    const extraActivity: RuntimeOperation = {
+      ...firstActivity,
+      id: 'activity:unmappedActivity:99',
+      activityType: 'unmappedActivity',
+      activityId: 'unmapped-activity',
+      eventReferences: [{ eventId: 99, eventType: 'ActivityTaskScheduled' }],
+    };
+    const unmappedOperation: RuntimeOperation = {
+      id: 'unmapped:timer:100',
+      kind: 'unmapped',
+      eventReferences: [{ eventId: 100, eventType: 'TimerFired' }],
+      reason: 'Timer mapping is outside the MVP slice.',
+    };
+    trace.operations.push(extraActivity, unmappedOperation);
+
+    const projection = buildGraphProjection({ workflow, trace, overlay });
+
+    expect(
+      projection.nodes.filter((node) => node.kind === 'runtime').map((node) => node.label),
+    ).toEqual(['unmappedActivity', 'Unmapped history operation']);
+    expect(
+      projection.runtimeOperationRows.find((row) => row.operation.id === extraActivity.id)
+        ?.sourceText,
+    ).toBe('not resolved');
+    expect(operationLabel({ ...firstActivity, activityType: 'displayActivity' })).toBe(
+      'displayActivity',
+    );
+    expect(
+      operationLabel({
+        id: 'workflow:failed',
+        kind: 'workflow-lifecycle',
+        status: 'failed',
+        eventReferences: [{ eventId: 7, eventType: 'WorkflowExecutionFailed' }],
+        payloadReferences: [],
+      }),
+    ).toBe('Workflow failed');
+  });
+
+  it('formats graph runtime state helpers', async () => {
+    const artifacts = await loadExplorerArtifacts(fixtureRoot);
+    const workflow = artifacts.analysis.workflows[0];
+    const trace = artifacts.traces[0];
+    const overlay = structuredClone(artifacts.overlays[0]) as ExecutionOverlayDocument | undefined;
+    const command = workflow?.temporalCommands[0];
+    const activity = trace?.operations.find(isActivityOperation);
+
+    if (!workflow || !trace || !overlay || !command || !activity) {
+      throw new Error('Expected graph state fixtures.');
+    }
+
+    const unmappedOperation: RuntimeOperation = {
+      id: 'unmapped:history:1',
+      kind: 'unmapped',
+      eventReferences: [{ eventId: 1, eventType: 'UnknownEventType999' }],
+      reason: 'Unknown history event.',
+    };
+    const mappingWithoutStaticNode: RuntimeNodeMapping = {
+      runtimeOperationId: unmappedOperation.id,
+      confidence: 'unknown',
+      reason: 'No static node was available.',
+      evidence: [],
+    };
+    const ambiguousMapping: RuntimeNodeMapping = {
+      runtimeOperationId: activity.id,
+      staticNodeId: command.id,
+      confidence: 'ambiguous',
+      reason: 'Multiple candidates were available.',
+      evidence: [],
+    };
+
+    overlay.staticNodes = overlay.staticNodes.map((node) =>
+      node.id === command.id ? { ...node, observed: false } : node,
+    );
+
+    const firstAttempt = activity.attempts[0];
+
+    if (!firstAttempt) {
+      throw new Error('Expected an Activity attempt fixture.');
+    }
+
+    expect(sourceText(undefined)).toBe('not resolved');
+    expect(formatEventReferences([{ eventId: 3, eventType: 'ActivityTaskStarted' }])).toBe(
+      'Event 3 ActivityTaskStarted',
+    );
+    expect(runtimeStateToken('not taken')).toBe('not-taken');
+    expect(operationState(undefined)).toBe('not taken');
+    expect(operationState(unmappedOperation)).toBe('unmapped');
+    expect(operationState({ ...activity, attempts: [...activity.attempts, firstAttempt] })).toBe(
+      'retried',
+    );
+    expect(
+      operationState({
+        id: 'workflow:canceled',
+        kind: 'workflow-lifecycle',
+        status: 'canceled',
+        eventReferences: [{ eventId: 8, eventType: 'WorkflowExecutionCanceled' }],
+        payloadReferences: [],
+      }),
+    ).toBe('canceled');
+    expect(workflowState(undefined)).toBe('not taken');
+    expect(workflowState({ ...trace, execution: { ...trace.execution, status: 'running' } })).toBe(
+      'pending',
+    );
+    expect(
+      workflowState({ ...trace, execution: { ...trace.execution, status: 'terminated' } }),
+    ).toBe('canceled');
+    expect(runtimeOperationRowState(mappingWithoutStaticNode, unmappedOperation)).toBe('unmapped');
+    expect(runtimeOperationRowState(ambiguousMapping, activity)).toBe('ambiguous');
+    expect(commandState(command, overlay, trace.operations, new Map())).toBe('not taken');
+  });
+});

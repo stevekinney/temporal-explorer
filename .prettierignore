@@ -1,6 +1,7 @@
 # Build artifacts
 dist/
 build/
+.svelte-kit/
 coverage/
 
 # Package management

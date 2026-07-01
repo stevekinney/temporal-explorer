@@ -1,0 +1,41 @@
+{
+  "name": "@temporal-explorer/explorer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "clean": "rm -rf .svelte-kit build coverage dist",
+    "dev": "vite dev",
+    "lint": "oxlint --type-aware --tsconfig ./tsconfig.json",
+    "lint:fix": "oxlint --fix --type-aware --tsconfig ./tsconfig.json",
+    "preview": "vite preview",
+    "sync": "svelte-kit sync",
+    "test": "bun test",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@lostgradient/cinder": "^0.4.1",
+    "@temporal-explorer/schemas": "workspace:*",
+    "@xyflow/svelte": "^1.6.1",
+    "elkjs": "^0.11.1",
+    "lucide-svelte": "^0.577.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-configuration": "workspace:*",
+    "@sveltejs/adapter-node": "^5.5.7",
+    "@sveltejs/kit": "^2.68.0",
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@types/bun": "^1.3.14",
+    "@types/node": "^26.0.1",
+    "oxlint": "^1.72.0",
+    "svelte": "^5.56.4",
+    "svelte-check": "^4.7.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.2",
+    "vitest": "^4.1.9"
+  }
+}

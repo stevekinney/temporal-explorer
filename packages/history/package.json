@@ -1,0 +1,25 @@
+{
+  "name": "@temporal-explorer/history",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --target=bun --outdir=dist --entry-naming index.js",
+    "clean": "rm -rf dist coverage",
+    "lint": "oxlint --type-aware --tsconfig ./tsconfig.json",
+    "lint:fix": "oxlint --fix --type-aware --tsconfig ./tsconfig.json",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@temporal-explorer/schemas": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-configuration": "workspace:*",
+    "@types/bun": "^1.3.14",
+    "oxlint": "^1.72.0"
+  }
+}
