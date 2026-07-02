@@ -1,199 +1,149 @@
-# Project Name
+# Temporal Workflow Explorer
 
-A Turborepo monorepo powered by [Bun](https://bun.sh).
+A local-first developer tool that explains Temporal TypeScript Workflows from
+two directions: static source analysis answers _what can this Workflow do?_,
+and runtime Event History analysis answers _what did this specific Workflow
+Execution actually do?_
 
-## Prerequisites
-
-- [Bun](https://bun.sh) (v1.3.0 or later)
-
-## Getting Started
-
-```bash
-bun create turbo my-project
-cd my-project
+```text
+Explain this Temporal Workflow execution using the source code as the map.
 ```
 
-Or clone and install manually:
+Everything runs locally. Source code, Event Histories, and payloads never
+leave your machine, and payload previews are redacted by default.
+
+## Quick Start
 
 ```bash
-bun install
+bun add -d temporal-explorer
+
+# Inspect a conventional Temporal TypeScript project with no configuration
+bunx temporal-explorer list
+bunx temporal-explorer show orderWorkflow
+
+# Import an Event History and explain the execution against the source
+bunx temporal-explorer history import --file history.json
+bunx temporal-explorer trace orderWorkflow --history history
+bunx temporal-explorer report --trace history
+
+# Generate committable docs, SDK-oriented declarations, and CI diagnostics
+bunx temporal-explorer docs
+bunx temporal-explorer types
+bunx temporal-explorer check
+
+# Open the local artifact-driven explorer UI
+bunx temporal-explorer open
 ```
 
-## What's Inside
+## What It Does
 
-### Apps
+- **Static analysis** discovers Workflows, Activities, Signals, Queries,
+  Updates (with validators), timers, conditions, child Workflows, external
+  Workflow signals, cancellation scopes, `continueAsNew`, versioning patches,
+  and dynamic Activity dispatch — each with source locations and an explicit
+  confidence level. Determinism problems (nondeterministic APIs, Node imports
+  in Workflow code, Query handler mutations, duplicate message names) surface
+  as diagnostics with stable codes.
+- **Event History import** collapses raw events into semantic runtime
+  operations: Activity executions with true attempt counts, Signal
+  deliveries, timer outcomes, Update lifecycles, child Workflows, markers,
+  cancellations, and continue-as-new rollovers.
+- **The execution overlay** joins both sides: every runtime operation maps to
+  a static node with recorded evidence, or is explicitly unmapped. Skipped
+  branches, retried Activities, canceled timers, and executed version
+  branches are all visible. Optional `--replay` uses the Temporal SDK replayer
+  to resolve dynamic dispatch with higher confidence.
+- **Generated documentation** is deterministic and safe to commit: Markdown
+  pages, Mermaid diagrams, and real `.d.ts` declaration files that preserve
+  imports of your own types.
+- **Live connections** (optional) list Workflow Executions and fetch Event
+  Histories from configured Temporal instances into the same artifact model
+  as file imports.
+- **Aggregate analysis** summarizes many executions: retry hot spots, failure
+  counts, message frequencies, timer outcomes, hot paths, and rare branches.
+- **The local UI** (`temporal-explorer open`) renders validated JSON
+  artifacts: workflow overviews, message surfaces, an interactive Svelte
+  Flow + ELK graph, semantic timelines, and a source-aware trace inspector.
 
-- **`apps/server`** -- Example Bun server application
+## Configuration (optional)
 
-### Packages
+Conventional projects need no configuration. When defaults are wrong, create
+`temporal-explorer.config.ts`:
 
-- **`packages/shared`** -- Shared utilities (internal package, no build step)
-- **`packages/typescript-configuration`** -- Shared TypeScript compiler options
+```ts
+import { defineConfig } from 'temporal-explorer';
 
-### Core Tools
+export default defineConfig({
+  temporal: { workflowGlobs: ['src/workflows/**/*.ts'] },
+  diagnostics: { TEA_DYNAMIC_ACTIVITY_CALL: 'error' },
+  connections: {
+    local: { address: 'localhost:7233', namespace: 'default' },
+  },
+  history: {
+    payloads: { decode: false, redact: ['password', 'token'], maxPreviewBytes: 2048 },
+  },
+});
+```
 
-- [Turborepo](https://turbo.build/repo) -- Monorepo task orchestration with caching
-- [Bun](https://bun.sh) -- Runtime, bundler, test runner, and package manager
-- [TypeScript](https://www.typescriptlang.org/) -- Static type checking
-- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) -- Fast Rust-based linter
-- [Prettier](https://prettier.io/) -- Code formatting
-- [Lefthook](https://lefthook.dev/) -- Git hooks
+## Library Usage
+
+Everything the CLI does is a typed library function first:
+
+```ts
+import {
+  analyzeWorkflowFiles,
+  createExecutionOverlay,
+  importHistoryFromFile,
+} from 'temporal-explorer';
+
+const analysis = await analyzeWorkflowFiles({
+  projectRoot: process.cwd(),
+  tsconfig: 'tsconfig.json',
+  workflowFiles: ['src/workflows/order.workflow.ts'],
+});
+const trace = await importHistoryFromFile({ file: 'history.json' });
+const overlay = createExecutionOverlay({
+  analysis: analysis.value,
+  trace: trace.value,
+  workflowName: 'orderWorkflow',
+});
+```
+
+See `examples/` for runnable direct-file, Event History, and project-level
+usage.
+
+## Artifacts Are the Contract
+
+Every artifact (`temporal-analysis/v1`, `temporal-trace/v1`,
+`temporal-overlay/v1`) is schema-validated before it is written, and JSON
+Schema documents are checked in under `packages/schemas/json-schema/` for
+non-TypeScript tools. See `docs/schema-compatibility.md`.
+
+## Repository Layout
+
+| Workspace            | Purpose                                         |
+| -------------------- | ----------------------------------------------- |
+| `apps/explorer`      | SvelteKit local UI (Cinder + Svelte Flow + ELK) |
+| `packages/api`       | Public library surface                          |
+| `packages/cli`       | `temporal-explorer` command layer               |
+| `packages/schemas`   | Zod artifact schemas + JSON Schema emission     |
+| `packages/analyzer`  | ts-morph static analysis                        |
+| `packages/history`   | Event History parsing + live connections        |
+| `packages/mapper`    | Source-to-runtime overlay + aggregate analysis  |
+| `packages/renderers` | Markdown, Mermaid, and `.d.ts` renderers        |
+| `fixtures/`          | Real generated fixture projects and histories   |
 
 ## Development
 
 ```bash
-bun run dev         # Start dev servers (via turbo)
-bun run build       # Build all workspaces
-bun run test        # Run all tests
-bun run lint        # Lint all workspaces
-bun run typecheck   # Type check all workspaces
-bun run format      # Format all files
-bun run validate    # Full validation (lint + typecheck + test)
-bun run clean       # Clean build artifacts
+bun install
+bun run validate                     # typecheck + lint + test + build + format
+bun run fixtures:generate-histories  # regenerate fixture histories (real Temporal runs)
+bun run fixtures:regenerate-artifacts
+bun run test:live                    # live-connection integration tests (starts a dev server)
+bun run ui:e2e                       # Playwright gates for the local UI
+bun run release:dry-run              # build dist bundles and pack the tarball
 ```
 
-### Filtering by Workspace
-
-Run tasks for a specific workspace using turbo's `--filter` flag:
-
-```bash
-bunx turbo run build --filter=@repo/server
-bunx turbo run test --filter=@repo/shared
-```
-
-## Project Structure
-
-```
-apps/
-  server/                   # Example Bun application
-    src/                    # Application source code
-    scripts/build.ts        # Build script using Bun.build
-    package.json
-    tsconfig.json
-packages/
-  shared/                   # Shared internal package
-    src/                    # Library source code
-    package.json            # Exports TypeScript directly (no build)
-    tsconfig.json
-  typescript-configuration/ # Shared tsconfig files
-    base.json               # Base compiler options
-    server.json             # Bun server apps
-    library.json            # Runtime-agnostic libraries
-turbo.json                  # Task pipeline configuration
-package.json                # Workspace root
-```
-
-## Adding a New Workspace
-
-### New Package
-
-Create a directory in `packages/` with a `package.json`:
-
-```json
-{
-  "name": "@repo/my-package",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {
-    "lint": "oxlint --type-aware --tsconfig ./tsconfig.json",
-    "lint:fix": "oxlint --fix --type-aware --tsconfig ./tsconfig.json",
-    "test": "bun test",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "@repo/typescript-configuration": "workspace:*",
-    "@types/bun": "^1.3.14",
-    "oxlint": "^1.70.0"
-  }
-}
-```
-
-Add a `tsconfig.json` extending the shared config:
-
-```json
-{
-  "extends": "@repo/typescript-configuration/library.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "paths": { "@/*": ["./src/*"] }
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "coverage"]
-}
-```
-
-Then run `bun install` to link the workspace.
-
-### New App
-
-Same pattern but in `apps/`, extending `server.json` instead of `library.json`, and with additional scripts for `build`, `clean`, `dev`, and `start`.
-
-## Cross-Workspace Dependencies
-
-Use the `workspace:*` protocol in `package.json`:
-
-```json
-{
-  "dependencies": {
-    "@repo/shared": "workspace:*"
-  }
-}
-```
-
-Then import normally:
-
-```typescript
-import { greet } from '@repo/shared';
-```
-
-## Internal Packages Pattern
-
-Packages in `packages/` export TypeScript source directly -- no build step needed. The consuming application's bundler handles transpilation. This means:
-
-- Changes are reflected immediately (no rebuild required)
-- TypeScript types are available without generating declarations
-- The turbo pipeline is simpler (fewer build tasks)
-
-## Git Hooks
-
-Hooks are configured in `lefthook.yml` and implemented as Bun TypeScript files
-under `scripts/hooks/`. Lefthook is installed via the `prepare` script on
-`bun install`.
-
-- `pre-commit`: formats staged files with Prettier, runs `oxlint --fix` on them,
-  blocks staged conflict markers, then checks that `bun.lock` is staged when a
-  `package.json` changes. Fast by design — typecheck and tests are deferred to
-  pre-push. Skipped during merge/rebase.
-- `pre-push`: runs `bun run validate` (lint, typecheck, test, build, and format
-  check across all workspaces via turbo). The full gate before code leaves your
-  machine. Skipped in CI.
-- `post-checkout`: installs deps when dependencies changed; surfaces config
-  changes across workspaces.
-- `post-merge`: installs/cleans when dependencies or config changed; flags
-  leftover conflict markers.
-
-Hooks print only when something fails, so clean commits and pushes stay quiet.
-Use `--no-verify` to bypass hooks (not recommended; CI will catch you anyway).
-
-## TypeScript Path Aliases
-
-Each workspace supports the `@/*` path alias pointing to its own `src/` directory:
-
-```typescript
-import { something } from '@/utilities';
-// Resolves to ./src/utilities
-```
-
-## Template Bootstrap
-
-When you create a new project with `bun create`, setup scripts automatically:
-
-1. Set the package name from the directory name
-2. Copy `.env.example` to `.env`
-3. Write any available API keys to `.env`
-4. Initialize git hooks
-5. Clean up the setup scripts
+Implementation history, decisions, and verification logs live under
+`docs/implementation/`.
