@@ -1,0 +1,2939 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:largeWorkflow:trace:complete:complete-run-id",
+  "staticAnalysisId": "analysis:large",
+  "runtimeTraceId": "trace:complete:complete-run-id",
+  "workflow": "largeWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:largeWorkflow",
+      "kind": "workflow",
+      "name": "largeWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 12,
+          "column": 1,
+          "offset": 402
+        },
+        "end": {
+          "line": 144,
+          "column": 2,
+          "offset": 6964
+        },
+        "symbolName": "largeWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step00:1",
+      "kind": "activity",
+      "name": "step00",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 30,
+          "offset": 702
+        },
+        "end": {
+          "line": 21,
+          "column": 62,
+          "offset": 734
+        },
+        "symbolName": "step00"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step01:2",
+      "kind": "activity",
+      "name": "step01",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 30,
+          "offset": 806
+        },
+        "end": {
+          "line": 23,
+          "column": 62,
+          "offset": 838
+        },
+        "symbolName": "step01"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step02:3",
+      "kind": "activity",
+      "name": "step02",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 30,
+          "offset": 910
+        },
+        "end": {
+          "line": 25,
+          "column": 62,
+          "offset": 942
+        },
+        "symbolName": "step02"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step03:4",
+      "kind": "activity",
+      "name": "step03",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 27,
+          "column": 30,
+          "offset": 1014
+        },
+        "end": {
+          "line": 27,
+          "column": 62,
+          "offset": 1046
+        },
+        "symbolName": "step03"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step04:5",
+      "kind": "activity",
+      "name": "step04",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 29,
+          "column": 30,
+          "offset": 1118
+        },
+        "end": {
+          "line": 29,
+          "column": 62,
+          "offset": 1150
+        },
+        "symbolName": "step04"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step05:6",
+      "kind": "activity",
+      "name": "step05",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 30,
+          "offset": 1222
+        },
+        "end": {
+          "line": 31,
+          "column": 62,
+          "offset": 1254
+        },
+        "symbolName": "step05"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step06:7",
+      "kind": "activity",
+      "name": "step06",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 33,
+          "column": 30,
+          "offset": 1326
+        },
+        "end": {
+          "line": 33,
+          "column": 62,
+          "offset": 1358
+        },
+        "symbolName": "step06"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step07:8",
+      "kind": "activity",
+      "name": "step07",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 35,
+          "column": 30,
+          "offset": 1430
+        },
+        "end": {
+          "line": 35,
+          "column": 62,
+          "offset": 1462
+        },
+        "symbolName": "step07"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step08:9",
+      "kind": "activity",
+      "name": "step08",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 37,
+          "column": 30,
+          "offset": 1534
+        },
+        "end": {
+          "line": 37,
+          "column": 62,
+          "offset": 1566
+        },
+        "symbolName": "step08"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step09:10",
+      "kind": "activity",
+      "name": "step09",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 39,
+          "column": 30,
+          "offset": 1638
+        },
+        "end": {
+          "line": 39,
+          "column": 62,
+          "offset": 1670
+        },
+        "symbolName": "step09"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step10:11",
+      "kind": "activity",
+      "name": "step10",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 41,
+          "column": 30,
+          "offset": 1742
+        },
+        "end": {
+          "line": 41,
+          "column": 62,
+          "offset": 1774
+        },
+        "symbolName": "step10"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step11:12",
+      "kind": "activity",
+      "name": "step11",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 43,
+          "column": 30,
+          "offset": 1846
+        },
+        "end": {
+          "line": 43,
+          "column": 62,
+          "offset": 1878
+        },
+        "symbolName": "step11"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step12:13",
+      "kind": "activity",
+      "name": "step12",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 45,
+          "column": 30,
+          "offset": 1950
+        },
+        "end": {
+          "line": 45,
+          "column": 62,
+          "offset": 1982
+        },
+        "symbolName": "step12"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step13:14",
+      "kind": "activity",
+      "name": "step13",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 47,
+          "column": 30,
+          "offset": 2054
+        },
+        "end": {
+          "line": 47,
+          "column": 62,
+          "offset": 2086
+        },
+        "symbolName": "step13"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step14:15",
+      "kind": "activity",
+      "name": "step14",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 49,
+          "column": 30,
+          "offset": 2158
+        },
+        "end": {
+          "line": 49,
+          "column": 62,
+          "offset": 2190
+        },
+        "symbolName": "step14"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step15:16",
+      "kind": "activity",
+      "name": "step15",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 51,
+          "column": 30,
+          "offset": 2262
+        },
+        "end": {
+          "line": 51,
+          "column": 62,
+          "offset": 2294
+        },
+        "symbolName": "step15"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step16:17",
+      "kind": "activity",
+      "name": "step16",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 53,
+          "column": 30,
+          "offset": 2366
+        },
+        "end": {
+          "line": 53,
+          "column": 62,
+          "offset": 2398
+        },
+        "symbolName": "step16"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step17:18",
+      "kind": "activity",
+      "name": "step17",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 55,
+          "column": 30,
+          "offset": 2470
+        },
+        "end": {
+          "line": 55,
+          "column": 62,
+          "offset": 2502
+        },
+        "symbolName": "step17"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step18:19",
+      "kind": "activity",
+      "name": "step18",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 57,
+          "column": 30,
+          "offset": 2574
+        },
+        "end": {
+          "line": 57,
+          "column": 62,
+          "offset": 2606
+        },
+        "symbolName": "step18"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step19:20",
+      "kind": "activity",
+      "name": "step19",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 59,
+          "column": 30,
+          "offset": 2678
+        },
+        "end": {
+          "line": 59,
+          "column": 62,
+          "offset": 2710
+        },
+        "symbolName": "step19"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step20:21",
+      "kind": "activity",
+      "name": "step20",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 61,
+          "column": 30,
+          "offset": 2782
+        },
+        "end": {
+          "line": 61,
+          "column": 62,
+          "offset": 2814
+        },
+        "symbolName": "step20"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step21:22",
+      "kind": "activity",
+      "name": "step21",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 63,
+          "column": 30,
+          "offset": 2886
+        },
+        "end": {
+          "line": 63,
+          "column": 62,
+          "offset": 2918
+        },
+        "symbolName": "step21"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step22:23",
+      "kind": "activity",
+      "name": "step22",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 65,
+          "column": 30,
+          "offset": 2990
+        },
+        "end": {
+          "line": 65,
+          "column": 62,
+          "offset": 3022
+        },
+        "symbolName": "step22"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step23:24",
+      "kind": "activity",
+      "name": "step23",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 67,
+          "column": 30,
+          "offset": 3094
+        },
+        "end": {
+          "line": 67,
+          "column": 62,
+          "offset": 3126
+        },
+        "symbolName": "step23"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step24:25",
+      "kind": "activity",
+      "name": "step24",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 69,
+          "column": 30,
+          "offset": 3198
+        },
+        "end": {
+          "line": 69,
+          "column": 62,
+          "offset": 3230
+        },
+        "symbolName": "step24"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step25:26",
+      "kind": "activity",
+      "name": "step25",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 71,
+          "column": 30,
+          "offset": 3302
+        },
+        "end": {
+          "line": 71,
+          "column": 62,
+          "offset": 3334
+        },
+        "symbolName": "step25"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step26:27",
+      "kind": "activity",
+      "name": "step26",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 73,
+          "column": 30,
+          "offset": 3406
+        },
+        "end": {
+          "line": 73,
+          "column": 62,
+          "offset": 3438
+        },
+        "symbolName": "step26"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step27:28",
+      "kind": "activity",
+      "name": "step27",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 75,
+          "column": 30,
+          "offset": 3510
+        },
+        "end": {
+          "line": 75,
+          "column": 62,
+          "offset": 3542
+        },
+        "symbolName": "step27"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step28:29",
+      "kind": "activity",
+      "name": "step28",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 77,
+          "column": 30,
+          "offset": 3614
+        },
+        "end": {
+          "line": 77,
+          "column": 62,
+          "offset": 3646
+        },
+        "symbolName": "step28"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step29:30",
+      "kind": "activity",
+      "name": "step29",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 79,
+          "column": 30,
+          "offset": 3718
+        },
+        "end": {
+          "line": 79,
+          "column": 62,
+          "offset": 3750
+        },
+        "symbolName": "step29"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step30:32",
+      "kind": "activity",
+      "name": "step30",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 82,
+          "column": 30,
+          "offset": 3849
+        },
+        "end": {
+          "line": 82,
+          "column": 62,
+          "offset": 3881
+        },
+        "symbolName": "step30"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step31:33",
+      "kind": "activity",
+      "name": "step31",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 84,
+          "column": 30,
+          "offset": 3953
+        },
+        "end": {
+          "line": 84,
+          "column": 62,
+          "offset": 3985
+        },
+        "symbolName": "step31"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step32:34",
+      "kind": "activity",
+      "name": "step32",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 86,
+          "column": 30,
+          "offset": 4057
+        },
+        "end": {
+          "line": 86,
+          "column": 62,
+          "offset": 4089
+        },
+        "symbolName": "step32"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step33:35",
+      "kind": "activity",
+      "name": "step33",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 88,
+          "column": 30,
+          "offset": 4161
+        },
+        "end": {
+          "line": 88,
+          "column": 62,
+          "offset": 4193
+        },
+        "symbolName": "step33"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step34:36",
+      "kind": "activity",
+      "name": "step34",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 90,
+          "column": 30,
+          "offset": 4265
+        },
+        "end": {
+          "line": 90,
+          "column": 62,
+          "offset": 4297
+        },
+        "symbolName": "step34"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step35:37",
+      "kind": "activity",
+      "name": "step35",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 92,
+          "column": 30,
+          "offset": 4369
+        },
+        "end": {
+          "line": 92,
+          "column": 62,
+          "offset": 4401
+        },
+        "symbolName": "step35"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step36:38",
+      "kind": "activity",
+      "name": "step36",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 94,
+          "column": 30,
+          "offset": 4473
+        },
+        "end": {
+          "line": 94,
+          "column": 62,
+          "offset": 4505
+        },
+        "symbolName": "step36"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step37:39",
+      "kind": "activity",
+      "name": "step37",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 96,
+          "column": 30,
+          "offset": 4577
+        },
+        "end": {
+          "line": 96,
+          "column": 62,
+          "offset": 4609
+        },
+        "symbolName": "step37"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step38:40",
+      "kind": "activity",
+      "name": "step38",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 98,
+          "column": 30,
+          "offset": 4681
+        },
+        "end": {
+          "line": 98,
+          "column": 62,
+          "offset": 4713
+        },
+        "symbolName": "step38"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step39:41",
+      "kind": "activity",
+      "name": "step39",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 100,
+          "column": 30,
+          "offset": 4785
+        },
+        "end": {
+          "line": 100,
+          "column": 62,
+          "offset": 4817
+        },
+        "symbolName": "step39"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step40:42",
+      "kind": "activity",
+      "name": "step40",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 102,
+          "column": 30,
+          "offset": 4889
+        },
+        "end": {
+          "line": 102,
+          "column": 62,
+          "offset": 4921
+        },
+        "symbolName": "step40"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step41:43",
+      "kind": "activity",
+      "name": "step41",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 104,
+          "column": 30,
+          "offset": 4993
+        },
+        "end": {
+          "line": 104,
+          "column": 62,
+          "offset": 5025
+        },
+        "symbolName": "step41"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step42:44",
+      "kind": "activity",
+      "name": "step42",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 106,
+          "column": 30,
+          "offset": 5097
+        },
+        "end": {
+          "line": 106,
+          "column": 62,
+          "offset": 5129
+        },
+        "symbolName": "step42"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step43:45",
+      "kind": "activity",
+      "name": "step43",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 108,
+          "column": 30,
+          "offset": 5201
+        },
+        "end": {
+          "line": 108,
+          "column": 62,
+          "offset": 5233
+        },
+        "symbolName": "step43"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step44:46",
+      "kind": "activity",
+      "name": "step44",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 110,
+          "column": 30,
+          "offset": 5305
+        },
+        "end": {
+          "line": 110,
+          "column": 62,
+          "offset": 5337
+        },
+        "symbolName": "step44"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step45:47",
+      "kind": "activity",
+      "name": "step45",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 112,
+          "column": 30,
+          "offset": 5409
+        },
+        "end": {
+          "line": 112,
+          "column": 62,
+          "offset": 5441
+        },
+        "symbolName": "step45"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step46:48",
+      "kind": "activity",
+      "name": "step46",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 114,
+          "column": 30,
+          "offset": 5513
+        },
+        "end": {
+          "line": 114,
+          "column": 62,
+          "offset": 5545
+        },
+        "symbolName": "step46"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step47:49",
+      "kind": "activity",
+      "name": "step47",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 116,
+          "column": 30,
+          "offset": 5617
+        },
+        "end": {
+          "line": 116,
+          "column": 62,
+          "offset": 5649
+        },
+        "symbolName": "step47"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step48:50",
+      "kind": "activity",
+      "name": "step48",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 118,
+          "column": 30,
+          "offset": 5721
+        },
+        "end": {
+          "line": 118,
+          "column": 62,
+          "offset": 5753
+        },
+        "symbolName": "step48"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step49:51",
+      "kind": "activity",
+      "name": "step49",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 120,
+          "column": 30,
+          "offset": 5825
+        },
+        "end": {
+          "line": 120,
+          "column": 62,
+          "offset": 5857
+        },
+        "symbolName": "step49"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step50:52",
+      "kind": "activity",
+      "name": "step50",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 122,
+          "column": 30,
+          "offset": 5929
+        },
+        "end": {
+          "line": 122,
+          "column": 62,
+          "offset": 5961
+        },
+        "symbolName": "step50"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step51:53",
+      "kind": "activity",
+      "name": "step51",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 124,
+          "column": 30,
+          "offset": 6033
+        },
+        "end": {
+          "line": 124,
+          "column": 62,
+          "offset": 6065
+        },
+        "symbolName": "step51"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step52:54",
+      "kind": "activity",
+      "name": "step52",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 126,
+          "column": 30,
+          "offset": 6137
+        },
+        "end": {
+          "line": 126,
+          "column": 62,
+          "offset": 6169
+        },
+        "symbolName": "step52"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step53:55",
+      "kind": "activity",
+      "name": "step53",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 128,
+          "column": 30,
+          "offset": 6241
+        },
+        "end": {
+          "line": 128,
+          "column": 62,
+          "offset": 6273
+        },
+        "symbolName": "step53"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step54:56",
+      "kind": "activity",
+      "name": "step54",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 130,
+          "column": 30,
+          "offset": 6345
+        },
+        "end": {
+          "line": 130,
+          "column": 62,
+          "offset": 6377
+        },
+        "symbolName": "step54"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step55:57",
+      "kind": "activity",
+      "name": "step55",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 132,
+          "column": 30,
+          "offset": 6449
+        },
+        "end": {
+          "line": 132,
+          "column": 62,
+          "offset": 6481
+        },
+        "symbolName": "step55"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step56:58",
+      "kind": "activity",
+      "name": "step56",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 134,
+          "column": 30,
+          "offset": 6553
+        },
+        "end": {
+          "line": 134,
+          "column": 62,
+          "offset": 6585
+        },
+        "symbolName": "step56"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step57:59",
+      "kind": "activity",
+      "name": "step57",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 136,
+          "column": 30,
+          "offset": 6657
+        },
+        "end": {
+          "line": 136,
+          "column": 62,
+          "offset": 6689
+        },
+        "symbolName": "step57"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step58:60",
+      "kind": "activity",
+      "name": "step58",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 138,
+          "column": 30,
+          "offset": 6761
+        },
+        "end": {
+          "line": 138,
+          "column": 62,
+          "offset": 6793
+        },
+        "symbolName": "step58"
+      }
+    },
+    {
+      "id": "activity-call:largeWorkflow:step59:61",
+      "kind": "activity",
+      "name": "step59",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 140,
+          "column": 30,
+          "offset": 6865
+        },
+        "end": {
+          "line": 140,
+          "column": 62,
+          "offset": 6897
+        },
+        "symbolName": "step59"
+      }
+    },
+    {
+      "id": "timer:largeWorkflow:31",
+      "kind": "timer",
+      "name": "'1 second'",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 81,
+          "column": 9,
+          "offset": 3801
+        },
+        "end": {
+          "line": 81,
+          "column": 26,
+          "offset": 3818
+        }
+      }
+    },
+    {
+      "id": "condition:largeWorkflow:0",
+      "kind": "condition",
+      "name": "() => pausedBy !== undefined",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 8,
+          "offset": 595
+        },
+        "end": {
+          "line": 18,
+          "column": 47,
+          "offset": 634
+        }
+      }
+    },
+    {
+      "id": "signal:largeWorkflow:pause",
+      "kind": "signal",
+      "name": "pause",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/large-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 28,
+          "offset": 267
+        },
+        "end": {
+          "line": 6,
+          "column": 59,
+          "offset": 298
+        },
+        "symbolName": "pause"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:largeWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to largeWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type largeWorkflow matched static Workflow largeWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:largeWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/large-workflow.ts:12.",
+          "staticNodeId": "workflow:largeWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:largeWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to largeWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type largeWorkflow matched static Workflow largeWorkflow.",
+          "eventIds": [370],
+          "staticNodeId": "workflow:largeWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/large-workflow.ts:12.",
+          "staticNodeId": "workflow:largeWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step00:5",
+      "staticNodeId": "activity-call:largeWorkflow:step00:1",
+      "confidence": "exact",
+      "reason": "Activity step00 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step00 matched static Activity command step00.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:largeWorkflow:step00:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:largeWorkflow:step00:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:21.",
+          "staticNodeId": "activity-call:largeWorkflow:step00:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step01:11",
+      "staticNodeId": "activity-call:largeWorkflow:step01:2",
+      "confidence": "exact",
+      "reason": "Activity step01 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step01 matched static Activity command step01.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:largeWorkflow:step01:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:largeWorkflow:step01:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:23.",
+          "staticNodeId": "activity-call:largeWorkflow:step01:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step02:17",
+      "staticNodeId": "activity-call:largeWorkflow:step02:3",
+      "confidence": "exact",
+      "reason": "Activity step02 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step02 matched static Activity command step02.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:largeWorkflow:step02:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:largeWorkflow:step02:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:25.",
+          "staticNodeId": "activity-call:largeWorkflow:step02:3"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step03:23",
+      "staticNodeId": "activity-call:largeWorkflow:step03:4",
+      "confidence": "exact",
+      "reason": "Activity step03 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step03 matched static Activity command step03.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:largeWorkflow:step03:4"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 4.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:largeWorkflow:step03:4"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:27.",
+          "staticNodeId": "activity-call:largeWorkflow:step03:4"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step04:29",
+      "staticNodeId": "activity-call:largeWorkflow:step04:5",
+      "confidence": "exact",
+      "reason": "Activity step04 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step04 matched static Activity command step04.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:largeWorkflow:step04:5"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 5.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:largeWorkflow:step04:5"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:29.",
+          "staticNodeId": "activity-call:largeWorkflow:step04:5"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step05:35",
+      "staticNodeId": "activity-call:largeWorkflow:step05:6",
+      "confidence": "exact",
+      "reason": "Activity step05 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step05 matched static Activity command step05.",
+          "eventIds": [35, 36, 37],
+          "staticNodeId": "activity-call:largeWorkflow:step05:6"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 6.",
+          "eventIds": [35, 36, 37],
+          "staticNodeId": "activity-call:largeWorkflow:step05:6"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:31.",
+          "staticNodeId": "activity-call:largeWorkflow:step05:6"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step06:41",
+      "staticNodeId": "activity-call:largeWorkflow:step06:7",
+      "confidence": "exact",
+      "reason": "Activity step06 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step06 matched static Activity command step06.",
+          "eventIds": [41, 42, 43],
+          "staticNodeId": "activity-call:largeWorkflow:step06:7"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 7.",
+          "eventIds": [41, 42, 43],
+          "staticNodeId": "activity-call:largeWorkflow:step06:7"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:33.",
+          "staticNodeId": "activity-call:largeWorkflow:step06:7"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step07:47",
+      "staticNodeId": "activity-call:largeWorkflow:step07:8",
+      "confidence": "exact",
+      "reason": "Activity step07 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step07 matched static Activity command step07.",
+          "eventIds": [47, 48, 49],
+          "staticNodeId": "activity-call:largeWorkflow:step07:8"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 8.",
+          "eventIds": [47, 48, 49],
+          "staticNodeId": "activity-call:largeWorkflow:step07:8"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:35.",
+          "staticNodeId": "activity-call:largeWorkflow:step07:8"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step08:53",
+      "staticNodeId": "activity-call:largeWorkflow:step08:9",
+      "confidence": "exact",
+      "reason": "Activity step08 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step08 matched static Activity command step08.",
+          "eventIds": [53, 54, 55],
+          "staticNodeId": "activity-call:largeWorkflow:step08:9"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 9.",
+          "eventIds": [53, 54, 55],
+          "staticNodeId": "activity-call:largeWorkflow:step08:9"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:37.",
+          "staticNodeId": "activity-call:largeWorkflow:step08:9"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step09:59",
+      "staticNodeId": "activity-call:largeWorkflow:step09:10",
+      "confidence": "exact",
+      "reason": "Activity step09 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step09 matched static Activity command step09.",
+          "eventIds": [59, 60, 61],
+          "staticNodeId": "activity-call:largeWorkflow:step09:10"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 10.",
+          "eventIds": [59, 60, 61],
+          "staticNodeId": "activity-call:largeWorkflow:step09:10"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:39.",
+          "staticNodeId": "activity-call:largeWorkflow:step09:10"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step10:65",
+      "staticNodeId": "activity-call:largeWorkflow:step10:11",
+      "confidence": "exact",
+      "reason": "Activity step10 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step10 matched static Activity command step10.",
+          "eventIds": [65, 66, 67],
+          "staticNodeId": "activity-call:largeWorkflow:step10:11"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 11.",
+          "eventIds": [65, 66, 67],
+          "staticNodeId": "activity-call:largeWorkflow:step10:11"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:41.",
+          "staticNodeId": "activity-call:largeWorkflow:step10:11"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step11:71",
+      "staticNodeId": "activity-call:largeWorkflow:step11:12",
+      "confidence": "exact",
+      "reason": "Activity step11 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step11 matched static Activity command step11.",
+          "eventIds": [71, 72, 73],
+          "staticNodeId": "activity-call:largeWorkflow:step11:12"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 12.",
+          "eventIds": [71, 72, 73],
+          "staticNodeId": "activity-call:largeWorkflow:step11:12"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:43.",
+          "staticNodeId": "activity-call:largeWorkflow:step11:12"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step12:77",
+      "staticNodeId": "activity-call:largeWorkflow:step12:13",
+      "confidence": "exact",
+      "reason": "Activity step12 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step12 matched static Activity command step12.",
+          "eventIds": [77, 78, 79],
+          "staticNodeId": "activity-call:largeWorkflow:step12:13"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 13.",
+          "eventIds": [77, 78, 79],
+          "staticNodeId": "activity-call:largeWorkflow:step12:13"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:45.",
+          "staticNodeId": "activity-call:largeWorkflow:step12:13"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step13:83",
+      "staticNodeId": "activity-call:largeWorkflow:step13:14",
+      "confidence": "exact",
+      "reason": "Activity step13 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step13 matched static Activity command step13.",
+          "eventIds": [83, 84, 85],
+          "staticNodeId": "activity-call:largeWorkflow:step13:14"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 14.",
+          "eventIds": [83, 84, 85],
+          "staticNodeId": "activity-call:largeWorkflow:step13:14"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:47.",
+          "staticNodeId": "activity-call:largeWorkflow:step13:14"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step14:89",
+      "staticNodeId": "activity-call:largeWorkflow:step14:15",
+      "confidence": "exact",
+      "reason": "Activity step14 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step14 matched static Activity command step14.",
+          "eventIds": [89, 90, 91],
+          "staticNodeId": "activity-call:largeWorkflow:step14:15"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 15.",
+          "eventIds": [89, 90, 91],
+          "staticNodeId": "activity-call:largeWorkflow:step14:15"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:49.",
+          "staticNodeId": "activity-call:largeWorkflow:step14:15"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step15:95",
+      "staticNodeId": "activity-call:largeWorkflow:step15:16",
+      "confidence": "exact",
+      "reason": "Activity step15 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step15 matched static Activity command step15.",
+          "eventIds": [95, 96, 97],
+          "staticNodeId": "activity-call:largeWorkflow:step15:16"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 16.",
+          "eventIds": [95, 96, 97],
+          "staticNodeId": "activity-call:largeWorkflow:step15:16"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:51.",
+          "staticNodeId": "activity-call:largeWorkflow:step15:16"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step16:101",
+      "staticNodeId": "activity-call:largeWorkflow:step16:17",
+      "confidence": "exact",
+      "reason": "Activity step16 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step16 matched static Activity command step16.",
+          "eventIds": [101, 102, 103],
+          "staticNodeId": "activity-call:largeWorkflow:step16:17"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 17.",
+          "eventIds": [101, 102, 103],
+          "staticNodeId": "activity-call:largeWorkflow:step16:17"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:53.",
+          "staticNodeId": "activity-call:largeWorkflow:step16:17"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step17:107",
+      "staticNodeId": "activity-call:largeWorkflow:step17:18",
+      "confidence": "exact",
+      "reason": "Activity step17 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step17 matched static Activity command step17.",
+          "eventIds": [107, 108, 109],
+          "staticNodeId": "activity-call:largeWorkflow:step17:18"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 18.",
+          "eventIds": [107, 108, 109],
+          "staticNodeId": "activity-call:largeWorkflow:step17:18"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:55.",
+          "staticNodeId": "activity-call:largeWorkflow:step17:18"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step18:113",
+      "staticNodeId": "activity-call:largeWorkflow:step18:19",
+      "confidence": "exact",
+      "reason": "Activity step18 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step18 matched static Activity command step18.",
+          "eventIds": [113, 114, 115],
+          "staticNodeId": "activity-call:largeWorkflow:step18:19"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 19.",
+          "eventIds": [113, 114, 115],
+          "staticNodeId": "activity-call:largeWorkflow:step18:19"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:57.",
+          "staticNodeId": "activity-call:largeWorkflow:step18:19"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step19:119",
+      "staticNodeId": "activity-call:largeWorkflow:step19:20",
+      "confidence": "exact",
+      "reason": "Activity step19 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step19 matched static Activity command step19.",
+          "eventIds": [119, 120, 121],
+          "staticNodeId": "activity-call:largeWorkflow:step19:20"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 20.",
+          "eventIds": [119, 120, 121],
+          "staticNodeId": "activity-call:largeWorkflow:step19:20"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:59.",
+          "staticNodeId": "activity-call:largeWorkflow:step19:20"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step20:125",
+      "staticNodeId": "activity-call:largeWorkflow:step20:21",
+      "confidence": "exact",
+      "reason": "Activity step20 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step20 matched static Activity command step20.",
+          "eventIds": [125, 126, 127],
+          "staticNodeId": "activity-call:largeWorkflow:step20:21"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 21.",
+          "eventIds": [125, 126, 127],
+          "staticNodeId": "activity-call:largeWorkflow:step20:21"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:61.",
+          "staticNodeId": "activity-call:largeWorkflow:step20:21"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step21:131",
+      "staticNodeId": "activity-call:largeWorkflow:step21:22",
+      "confidence": "exact",
+      "reason": "Activity step21 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step21 matched static Activity command step21.",
+          "eventIds": [131, 132, 133],
+          "staticNodeId": "activity-call:largeWorkflow:step21:22"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 22.",
+          "eventIds": [131, 132, 133],
+          "staticNodeId": "activity-call:largeWorkflow:step21:22"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:63.",
+          "staticNodeId": "activity-call:largeWorkflow:step21:22"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step22:137",
+      "staticNodeId": "activity-call:largeWorkflow:step22:23",
+      "confidence": "exact",
+      "reason": "Activity step22 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step22 matched static Activity command step22.",
+          "eventIds": [137, 138, 139],
+          "staticNodeId": "activity-call:largeWorkflow:step22:23"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 23.",
+          "eventIds": [137, 138, 139],
+          "staticNodeId": "activity-call:largeWorkflow:step22:23"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:65.",
+          "staticNodeId": "activity-call:largeWorkflow:step22:23"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step23:143",
+      "staticNodeId": "activity-call:largeWorkflow:step23:24",
+      "confidence": "exact",
+      "reason": "Activity step23 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step23 matched static Activity command step23.",
+          "eventIds": [143, 144, 145],
+          "staticNodeId": "activity-call:largeWorkflow:step23:24"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 24.",
+          "eventIds": [143, 144, 145],
+          "staticNodeId": "activity-call:largeWorkflow:step23:24"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:67.",
+          "staticNodeId": "activity-call:largeWorkflow:step23:24"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step24:149",
+      "staticNodeId": "activity-call:largeWorkflow:step24:25",
+      "confidence": "exact",
+      "reason": "Activity step24 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step24 matched static Activity command step24.",
+          "eventIds": [149, 150, 151],
+          "staticNodeId": "activity-call:largeWorkflow:step24:25"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 25.",
+          "eventIds": [149, 150, 151],
+          "staticNodeId": "activity-call:largeWorkflow:step24:25"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:69.",
+          "staticNodeId": "activity-call:largeWorkflow:step24:25"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step25:155",
+      "staticNodeId": "activity-call:largeWorkflow:step25:26",
+      "confidence": "exact",
+      "reason": "Activity step25 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step25 matched static Activity command step25.",
+          "eventIds": [155, 156, 157],
+          "staticNodeId": "activity-call:largeWorkflow:step25:26"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 26.",
+          "eventIds": [155, 156, 157],
+          "staticNodeId": "activity-call:largeWorkflow:step25:26"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:71.",
+          "staticNodeId": "activity-call:largeWorkflow:step25:26"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step26:161",
+      "staticNodeId": "activity-call:largeWorkflow:step26:27",
+      "confidence": "exact",
+      "reason": "Activity step26 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step26 matched static Activity command step26.",
+          "eventIds": [161, 162, 163],
+          "staticNodeId": "activity-call:largeWorkflow:step26:27"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 27.",
+          "eventIds": [161, 162, 163],
+          "staticNodeId": "activity-call:largeWorkflow:step26:27"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:73.",
+          "staticNodeId": "activity-call:largeWorkflow:step26:27"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step27:167",
+      "staticNodeId": "activity-call:largeWorkflow:step27:28",
+      "confidence": "exact",
+      "reason": "Activity step27 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step27 matched static Activity command step27.",
+          "eventIds": [167, 168, 169],
+          "staticNodeId": "activity-call:largeWorkflow:step27:28"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 28.",
+          "eventIds": [167, 168, 169],
+          "staticNodeId": "activity-call:largeWorkflow:step27:28"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:75.",
+          "staticNodeId": "activity-call:largeWorkflow:step27:28"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step28:173",
+      "staticNodeId": "activity-call:largeWorkflow:step28:29",
+      "confidence": "exact",
+      "reason": "Activity step28 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step28 matched static Activity command step28.",
+          "eventIds": [173, 174, 175],
+          "staticNodeId": "activity-call:largeWorkflow:step28:29"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 29.",
+          "eventIds": [173, 174, 175],
+          "staticNodeId": "activity-call:largeWorkflow:step28:29"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:77.",
+          "staticNodeId": "activity-call:largeWorkflow:step28:29"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step29:179",
+      "staticNodeId": "activity-call:largeWorkflow:step29:30",
+      "confidence": "exact",
+      "reason": "Activity step29 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step29 matched static Activity command step29.",
+          "eventIds": [179, 180, 181],
+          "staticNodeId": "activity-call:largeWorkflow:step29:30"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 30.",
+          "eventIds": [179, 180, 181],
+          "staticNodeId": "activity-call:largeWorkflow:step29:30"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:79.",
+          "staticNodeId": "activity-call:largeWorkflow:step29:30"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step30:190",
+      "staticNodeId": "activity-call:largeWorkflow:step30:32",
+      "confidence": "exact",
+      "reason": "Activity step30 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step30 matched static Activity command step30.",
+          "eventIds": [190, 191, 192],
+          "staticNodeId": "activity-call:largeWorkflow:step30:32"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 32.",
+          "eventIds": [190, 191, 192],
+          "staticNodeId": "activity-call:largeWorkflow:step30:32"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:82.",
+          "staticNodeId": "activity-call:largeWorkflow:step30:32"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step31:196",
+      "staticNodeId": "activity-call:largeWorkflow:step31:33",
+      "confidence": "exact",
+      "reason": "Activity step31 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step31 matched static Activity command step31.",
+          "eventIds": [196, 197, 198],
+          "staticNodeId": "activity-call:largeWorkflow:step31:33"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 33.",
+          "eventIds": [196, 197, 198],
+          "staticNodeId": "activity-call:largeWorkflow:step31:33"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:84.",
+          "staticNodeId": "activity-call:largeWorkflow:step31:33"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step32:202",
+      "staticNodeId": "activity-call:largeWorkflow:step32:34",
+      "confidence": "exact",
+      "reason": "Activity step32 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step32 matched static Activity command step32.",
+          "eventIds": [202, 203, 204],
+          "staticNodeId": "activity-call:largeWorkflow:step32:34"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 34.",
+          "eventIds": [202, 203, 204],
+          "staticNodeId": "activity-call:largeWorkflow:step32:34"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:86.",
+          "staticNodeId": "activity-call:largeWorkflow:step32:34"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step33:208",
+      "staticNodeId": "activity-call:largeWorkflow:step33:35",
+      "confidence": "exact",
+      "reason": "Activity step33 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step33 matched static Activity command step33.",
+          "eventIds": [208, 209, 210],
+          "staticNodeId": "activity-call:largeWorkflow:step33:35"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 35.",
+          "eventIds": [208, 209, 210],
+          "staticNodeId": "activity-call:largeWorkflow:step33:35"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:88.",
+          "staticNodeId": "activity-call:largeWorkflow:step33:35"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step34:214",
+      "staticNodeId": "activity-call:largeWorkflow:step34:36",
+      "confidence": "exact",
+      "reason": "Activity step34 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step34 matched static Activity command step34.",
+          "eventIds": [214, 215, 216],
+          "staticNodeId": "activity-call:largeWorkflow:step34:36"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 36.",
+          "eventIds": [214, 215, 216],
+          "staticNodeId": "activity-call:largeWorkflow:step34:36"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:90.",
+          "staticNodeId": "activity-call:largeWorkflow:step34:36"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step35:220",
+      "staticNodeId": "activity-call:largeWorkflow:step35:37",
+      "confidence": "exact",
+      "reason": "Activity step35 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step35 matched static Activity command step35.",
+          "eventIds": [220, 221, 222],
+          "staticNodeId": "activity-call:largeWorkflow:step35:37"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 37.",
+          "eventIds": [220, 221, 222],
+          "staticNodeId": "activity-call:largeWorkflow:step35:37"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:92.",
+          "staticNodeId": "activity-call:largeWorkflow:step35:37"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step36:226",
+      "staticNodeId": "activity-call:largeWorkflow:step36:38",
+      "confidence": "exact",
+      "reason": "Activity step36 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step36 matched static Activity command step36.",
+          "eventIds": [226, 227, 228],
+          "staticNodeId": "activity-call:largeWorkflow:step36:38"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 38.",
+          "eventIds": [226, 227, 228],
+          "staticNodeId": "activity-call:largeWorkflow:step36:38"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:94.",
+          "staticNodeId": "activity-call:largeWorkflow:step36:38"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step37:232",
+      "staticNodeId": "activity-call:largeWorkflow:step37:39",
+      "confidence": "exact",
+      "reason": "Activity step37 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step37 matched static Activity command step37.",
+          "eventIds": [232, 233, 234],
+          "staticNodeId": "activity-call:largeWorkflow:step37:39"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 39.",
+          "eventIds": [232, 233, 234],
+          "staticNodeId": "activity-call:largeWorkflow:step37:39"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:96.",
+          "staticNodeId": "activity-call:largeWorkflow:step37:39"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step38:238",
+      "staticNodeId": "activity-call:largeWorkflow:step38:40",
+      "confidence": "exact",
+      "reason": "Activity step38 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step38 matched static Activity command step38.",
+          "eventIds": [238, 239, 240],
+          "staticNodeId": "activity-call:largeWorkflow:step38:40"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 40.",
+          "eventIds": [238, 239, 240],
+          "staticNodeId": "activity-call:largeWorkflow:step38:40"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:98.",
+          "staticNodeId": "activity-call:largeWorkflow:step38:40"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step39:244",
+      "staticNodeId": "activity-call:largeWorkflow:step39:41",
+      "confidence": "exact",
+      "reason": "Activity step39 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step39 matched static Activity command step39.",
+          "eventIds": [244, 245, 246],
+          "staticNodeId": "activity-call:largeWorkflow:step39:41"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 41.",
+          "eventIds": [244, 245, 246],
+          "staticNodeId": "activity-call:largeWorkflow:step39:41"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:100.",
+          "staticNodeId": "activity-call:largeWorkflow:step39:41"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step40:250",
+      "staticNodeId": "activity-call:largeWorkflow:step40:42",
+      "confidence": "exact",
+      "reason": "Activity step40 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step40 matched static Activity command step40.",
+          "eventIds": [250, 251, 252],
+          "staticNodeId": "activity-call:largeWorkflow:step40:42"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 42.",
+          "eventIds": [250, 251, 252],
+          "staticNodeId": "activity-call:largeWorkflow:step40:42"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:102.",
+          "staticNodeId": "activity-call:largeWorkflow:step40:42"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step41:256",
+      "staticNodeId": "activity-call:largeWorkflow:step41:43",
+      "confidence": "exact",
+      "reason": "Activity step41 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step41 matched static Activity command step41.",
+          "eventIds": [256, 257, 258],
+          "staticNodeId": "activity-call:largeWorkflow:step41:43"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 43.",
+          "eventIds": [256, 257, 258],
+          "staticNodeId": "activity-call:largeWorkflow:step41:43"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:104.",
+          "staticNodeId": "activity-call:largeWorkflow:step41:43"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step42:262",
+      "staticNodeId": "activity-call:largeWorkflow:step42:44",
+      "confidence": "exact",
+      "reason": "Activity step42 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step42 matched static Activity command step42.",
+          "eventIds": [262, 263, 264],
+          "staticNodeId": "activity-call:largeWorkflow:step42:44"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 44.",
+          "eventIds": [262, 263, 264],
+          "staticNodeId": "activity-call:largeWorkflow:step42:44"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:106.",
+          "staticNodeId": "activity-call:largeWorkflow:step42:44"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step43:268",
+      "staticNodeId": "activity-call:largeWorkflow:step43:45",
+      "confidence": "exact",
+      "reason": "Activity step43 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step43 matched static Activity command step43.",
+          "eventIds": [268, 269, 270],
+          "staticNodeId": "activity-call:largeWorkflow:step43:45"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 45.",
+          "eventIds": [268, 269, 270],
+          "staticNodeId": "activity-call:largeWorkflow:step43:45"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:108.",
+          "staticNodeId": "activity-call:largeWorkflow:step43:45"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step44:274",
+      "staticNodeId": "activity-call:largeWorkflow:step44:46",
+      "confidence": "exact",
+      "reason": "Activity step44 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step44 matched static Activity command step44.",
+          "eventIds": [274, 275, 276],
+          "staticNodeId": "activity-call:largeWorkflow:step44:46"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 46.",
+          "eventIds": [274, 275, 276],
+          "staticNodeId": "activity-call:largeWorkflow:step44:46"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:110.",
+          "staticNodeId": "activity-call:largeWorkflow:step44:46"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step45:280",
+      "staticNodeId": "activity-call:largeWorkflow:step45:47",
+      "confidence": "exact",
+      "reason": "Activity step45 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step45 matched static Activity command step45.",
+          "eventIds": [280, 281, 282],
+          "staticNodeId": "activity-call:largeWorkflow:step45:47"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 47.",
+          "eventIds": [280, 281, 282],
+          "staticNodeId": "activity-call:largeWorkflow:step45:47"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:112.",
+          "staticNodeId": "activity-call:largeWorkflow:step45:47"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step46:286",
+      "staticNodeId": "activity-call:largeWorkflow:step46:48",
+      "confidence": "exact",
+      "reason": "Activity step46 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step46 matched static Activity command step46.",
+          "eventIds": [286, 287, 288],
+          "staticNodeId": "activity-call:largeWorkflow:step46:48"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 48.",
+          "eventIds": [286, 287, 288],
+          "staticNodeId": "activity-call:largeWorkflow:step46:48"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:114.",
+          "staticNodeId": "activity-call:largeWorkflow:step46:48"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step47:292",
+      "staticNodeId": "activity-call:largeWorkflow:step47:49",
+      "confidence": "exact",
+      "reason": "Activity step47 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step47 matched static Activity command step47.",
+          "eventIds": [292, 293, 294],
+          "staticNodeId": "activity-call:largeWorkflow:step47:49"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 49.",
+          "eventIds": [292, 293, 294],
+          "staticNodeId": "activity-call:largeWorkflow:step47:49"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:116.",
+          "staticNodeId": "activity-call:largeWorkflow:step47:49"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step48:298",
+      "staticNodeId": "activity-call:largeWorkflow:step48:50",
+      "confidence": "exact",
+      "reason": "Activity step48 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step48 matched static Activity command step48.",
+          "eventIds": [298, 299, 300],
+          "staticNodeId": "activity-call:largeWorkflow:step48:50"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 50.",
+          "eventIds": [298, 299, 300],
+          "staticNodeId": "activity-call:largeWorkflow:step48:50"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:118.",
+          "staticNodeId": "activity-call:largeWorkflow:step48:50"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step49:304",
+      "staticNodeId": "activity-call:largeWorkflow:step49:51",
+      "confidence": "exact",
+      "reason": "Activity step49 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step49 matched static Activity command step49.",
+          "eventIds": [304, 305, 306],
+          "staticNodeId": "activity-call:largeWorkflow:step49:51"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 51.",
+          "eventIds": [304, 305, 306],
+          "staticNodeId": "activity-call:largeWorkflow:step49:51"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:120.",
+          "staticNodeId": "activity-call:largeWorkflow:step49:51"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step50:310",
+      "staticNodeId": "activity-call:largeWorkflow:step50:52",
+      "confidence": "exact",
+      "reason": "Activity step50 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step50 matched static Activity command step50.",
+          "eventIds": [310, 311, 312],
+          "staticNodeId": "activity-call:largeWorkflow:step50:52"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 52.",
+          "eventIds": [310, 311, 312],
+          "staticNodeId": "activity-call:largeWorkflow:step50:52"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:122.",
+          "staticNodeId": "activity-call:largeWorkflow:step50:52"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step51:316",
+      "staticNodeId": "activity-call:largeWorkflow:step51:53",
+      "confidence": "exact",
+      "reason": "Activity step51 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step51 matched static Activity command step51.",
+          "eventIds": [316, 317, 318],
+          "staticNodeId": "activity-call:largeWorkflow:step51:53"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 53.",
+          "eventIds": [316, 317, 318],
+          "staticNodeId": "activity-call:largeWorkflow:step51:53"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:124.",
+          "staticNodeId": "activity-call:largeWorkflow:step51:53"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step52:322",
+      "staticNodeId": "activity-call:largeWorkflow:step52:54",
+      "confidence": "exact",
+      "reason": "Activity step52 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step52 matched static Activity command step52.",
+          "eventIds": [322, 323, 324],
+          "staticNodeId": "activity-call:largeWorkflow:step52:54"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 54.",
+          "eventIds": [322, 323, 324],
+          "staticNodeId": "activity-call:largeWorkflow:step52:54"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:126.",
+          "staticNodeId": "activity-call:largeWorkflow:step52:54"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step53:328",
+      "staticNodeId": "activity-call:largeWorkflow:step53:55",
+      "confidence": "exact",
+      "reason": "Activity step53 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step53 matched static Activity command step53.",
+          "eventIds": [328, 329, 330],
+          "staticNodeId": "activity-call:largeWorkflow:step53:55"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 55.",
+          "eventIds": [328, 329, 330],
+          "staticNodeId": "activity-call:largeWorkflow:step53:55"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:128.",
+          "staticNodeId": "activity-call:largeWorkflow:step53:55"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step54:334",
+      "staticNodeId": "activity-call:largeWorkflow:step54:56",
+      "confidence": "exact",
+      "reason": "Activity step54 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step54 matched static Activity command step54.",
+          "eventIds": [334, 335, 336],
+          "staticNodeId": "activity-call:largeWorkflow:step54:56"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 56.",
+          "eventIds": [334, 335, 336],
+          "staticNodeId": "activity-call:largeWorkflow:step54:56"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:130.",
+          "staticNodeId": "activity-call:largeWorkflow:step54:56"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step55:340",
+      "staticNodeId": "activity-call:largeWorkflow:step55:57",
+      "confidence": "exact",
+      "reason": "Activity step55 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step55 matched static Activity command step55.",
+          "eventIds": [340, 341, 342],
+          "staticNodeId": "activity-call:largeWorkflow:step55:57"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 57.",
+          "eventIds": [340, 341, 342],
+          "staticNodeId": "activity-call:largeWorkflow:step55:57"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:132.",
+          "staticNodeId": "activity-call:largeWorkflow:step55:57"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step56:346",
+      "staticNodeId": "activity-call:largeWorkflow:step56:58",
+      "confidence": "exact",
+      "reason": "Activity step56 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step56 matched static Activity command step56.",
+          "eventIds": [346, 347, 348],
+          "staticNodeId": "activity-call:largeWorkflow:step56:58"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 58.",
+          "eventIds": [346, 347, 348],
+          "staticNodeId": "activity-call:largeWorkflow:step56:58"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:134.",
+          "staticNodeId": "activity-call:largeWorkflow:step56:58"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step57:352",
+      "staticNodeId": "activity-call:largeWorkflow:step57:59",
+      "confidence": "exact",
+      "reason": "Activity step57 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step57 matched static Activity command step57.",
+          "eventIds": [352, 353, 354],
+          "staticNodeId": "activity-call:largeWorkflow:step57:59"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 59.",
+          "eventIds": [352, 353, 354],
+          "staticNodeId": "activity-call:largeWorkflow:step57:59"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:136.",
+          "staticNodeId": "activity-call:largeWorkflow:step57:59"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step58:358",
+      "staticNodeId": "activity-call:largeWorkflow:step58:60",
+      "confidence": "exact",
+      "reason": "Activity step58 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step58 matched static Activity command step58.",
+          "eventIds": [358, 359, 360],
+          "staticNodeId": "activity-call:largeWorkflow:step58:60"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 60.",
+          "eventIds": [358, 359, 360],
+          "staticNodeId": "activity-call:largeWorkflow:step58:60"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:138.",
+          "staticNodeId": "activity-call:largeWorkflow:step58:60"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:step59:364",
+      "staticNodeId": "activity-call:largeWorkflow:step59:61",
+      "confidence": "exact",
+      "reason": "Activity step59 matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type step59 matched static Activity command step59.",
+          "eventIds": [364, 365, 366],
+          "staticNodeId": "activity-call:largeWorkflow:step59:61"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 61.",
+          "eventIds": [364, 365, 366],
+          "staticNodeId": "activity-call:largeWorkflow:step59:61"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/large-workflow.ts:140.",
+          "staticNodeId": "activity-call:largeWorkflow:step59:61"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "timer:1:185",
+      "staticNodeId": "timer:largeWorkflow:31",
+      "confidence": "exact",
+      "reason": "The only runtime timer matched the only static timer.",
+      "evidence": [
+        {
+          "kind": "timer-order",
+          "description": "Runtime timer 1 matched static timer command timer:largeWorkflow:31 by start order.",
+          "eventIds": [185, 186],
+          "staticNodeId": "timer:largeWorkflow:31"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static timer source is src/workflows/large-workflow.ts:81.",
+          "staticNodeId": "timer:largeWorkflow:31"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 64,
+      "observed": 62,
+      "skipped": 2,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 60,
+      "observed": 60,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 1,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 1,
+      "fired": 1,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

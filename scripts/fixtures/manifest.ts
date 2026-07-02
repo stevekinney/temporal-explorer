@@ -294,6 +294,17 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
     ],
     expectedOutcome: 'completed',
   },
+  {
+    fixture: 'large',
+    history: 'complete',
+    workflowType: 'largeWorkflow',
+    taskQueue: 'large-task-queue',
+    workflowsPath: 'src/workflows/large-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/large/src/activities/large-activities'),
+    args: [{ batchId: 'batch-010' }],
+    expectedOutcome: 'completed',
+  },
 ];
 
 /** Returns the manifest entries selected by an optional `--fixture` filter. */

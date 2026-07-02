@@ -19,6 +19,8 @@
     "packages/*"
   ],
   "scripts": {
+    "benchmark:analyzer": "bun run scripts/benchmarks/analyzer.ts",
+    "benchmark:history": "bun run scripts/benchmarks/history.ts",
     "build": "turbo run build",
     "clean": "turbo run clean",
     "declarations:typecheck-fixtures": "bun run scripts/declarations/typecheck-fixtures.ts",
