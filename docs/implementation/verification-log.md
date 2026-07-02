@@ -530,3 +530,10 @@ Follow-up: None.
 - Mapper tests cover replay confirmation and the mismatch path (wrong replayed name leaves confidence untouched).
 - `bun run examples:library` — all three plan usage modes pass (direct workflow files, Event History overlay, project discovery).
 - `bun run release:dry-run` — dist bundles for CLI/api/schemas build with externalized deps, every published entrypoint smoke-tests against fixtures, and npm pack dry-runs a 9-file tarball. Bundled `.d.ts` for dist remains the recorded packaging gap.
+
+## 2026-07-01: Stage 19 External Compatibility Suite
+
+- `bun run compatibility:fetch-samples` pins temporalio/samples-typescript at a locked SHA (eb6f138); `compatibility:manifest --fail-on-unclassified` exits 0 over all 54 samples; `compatibility:test --subset full` passes 51/51 tested samples (2 nested-monorepo samples recorded unsupported-with-reason, 1 JavaScript sample not-typescript).
+- The corpus immediately exposed a real product gap: 49/51 samples use a flat `src/workflows.ts`, which the discovery globs missed. Fixed by adding `src/**/workflows.ts` to the defaults, then a second gap surfaced (patching-api's workflows.ts is a re-export barrel) and was fixed by following export declarations to their declaring files. Discovery went from 0 to 102 workflows across the corpus; committed fixture artifacts were unaffected by both changes.
+- Six covered samples legitimately discover zero workflows (nested app layouts, activity-only samples); the runner reports the count instead of hiding it, and asserts loudly if a matched file ever extracts zero workflows.
+- `bun run validate` and `bun run snapshots:verify` pass after the analyzer changes.

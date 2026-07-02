@@ -60,3 +60,6 @@ local.env
 .env
 .env.local
 .env.*.local
+
+# External compatibility suite corpus (fetched by compatibility:fetch-samples)
+test-corpora/

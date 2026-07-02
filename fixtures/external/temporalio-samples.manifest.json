@@ -1,0 +1,166 @@
+{
+  "activities-cancellation-heartbeating": {
+    "classification": "covered"
+  },
+  "activities-dependency-injection": {
+    "classification": "covered"
+  },
+  "activities-examples": {
+    "classification": "covered"
+  },
+  "ai-sdk": {
+    "classification": "covered"
+  },
+  "batch-sliding-window": {
+    "classification": "covered"
+  },
+  "child-workflows": {
+    "classification": "covered"
+  },
+  "continue-as-new": {
+    "classification": "covered"
+  },
+  "cron-workflows": {
+    "classification": "covered"
+  },
+  "custom-logger": {
+    "classification": "covered"
+  },
+  "dsl-interpreter": {
+    "classification": "covered"
+  },
+  "eager-workflow-start": {
+    "classification": "covered"
+  },
+  "early-return": {
+    "classification": "covered"
+  },
+  "ejson": {
+    "classification": "covered"
+  },
+  "empty": {
+    "classification": "covered"
+  },
+  "encryption": {
+    "classification": "covered"
+  },
+  "env-config": {
+    "classification": "covered"
+  },
+  "expense": {
+    "classification": "covered"
+  },
+  "fetch-esm": {
+    "classification": "covered"
+  },
+  "food-delivery": {
+    "classification": "unsupported-with-reason",
+    "reason": "Nested workspace monorepo (apps/*, packages/*) with no root tsconfig.json; loadTemporalExplorerProject cannot resolve a project root."
+  },
+  "grpc-calls": {
+    "classification": "covered"
+  },
+  "hello-world": {
+    "classification": "covered"
+  },
+  "hello-world-js": {
+    "classification": "not-typescript"
+  },
+  "hello-world-mtls": {
+    "classification": "covered"
+  },
+  "interceptors-opentelemetry": {
+    "classification": "covered"
+  },
+  "lambda-worker": {
+    "classification": "covered"
+  },
+  "monorepo-folders": {
+    "classification": "unsupported-with-reason",
+    "reason": "Nested workspace monorepo (packages/*) with no root tsconfig.json; loadTemporalExplorerProject cannot resolve a project root."
+  },
+  "mutex": {
+    "classification": "covered"
+  },
+  "nestjs-exchange-rates": {
+    "classification": "covered"
+  },
+  "nextjs-ecommerce-oneclick": {
+    "classification": "covered"
+  },
+  "nexus-cancellation": {
+    "classification": "covered"
+  },
+  "nexus-hello": {
+    "classification": "covered"
+  },
+  "nexus-messaging": {
+    "classification": "covered"
+  },
+  "nexus-standalone-operations": {
+    "classification": "covered"
+  },
+  "openai-agents": {
+    "classification": "covered"
+  },
+  "patching-api": {
+    "classification": "covered"
+  },
+  "production": {
+    "classification": "covered"
+  },
+  "protobufs": {
+    "classification": "covered"
+  },
+  "query-subscriptions": {
+    "classification": "covered"
+  },
+  "saga": {
+    "classification": "covered"
+  },
+  "schedules": {
+    "classification": "covered"
+  },
+  "scratchpad": {
+    "classification": "covered"
+  },
+  "search-attributes": {
+    "classification": "covered"
+  },
+  "signals-queries": {
+    "classification": "covered"
+  },
+  "sinks": {
+    "classification": "covered"
+  },
+  "sleep-for-days": {
+    "classification": "covered"
+  },
+  "snippets": {
+    "classification": "covered"
+  },
+  "standalone-activity": {
+    "classification": "covered"
+  },
+  "state": {
+    "classification": "covered"
+  },
+  "timer-examples": {
+    "classification": "covered"
+  },
+  "timer-progress": {
+    "classification": "covered"
+  },
+  "vscode-debugger": {
+    "classification": "covered"
+  },
+  "worker-specific-task-queues": {
+    "classification": "covered"
+  },
+  "worker-versioning": {
+    "classification": "covered"
+  },
+  "workflow-streams": {
+    "classification": "covered"
+  }
+}

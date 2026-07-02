@@ -1,6 +1,6 @@
 import { basename, resolve } from 'node:path';
 
-import { Project } from 'ts-morph';
+import { Project, type SourceFile } from 'ts-morph';
 
 import type {
   ActivityDefinition,
@@ -33,7 +33,9 @@ export type {
   TemporalExplorerProject,
 } from './types';
 
-const workflowGlobs = ['src/**/workflows/**/*.ts', 'src/**/*.workflow.ts'];
+// `src/workflows.ts` (a flat file) is the dominant convention in real
+// Temporal TypeScript projects, including temporalio/samples-typescript.
+const workflowGlobs = ['src/**/workflows/**/*.ts', 'src/**/*.workflow.ts', 'src/**/workflows.ts'];
 const workerGlobs = ['src/**/worker*.ts', 'src/**/workers/**/*.ts'];
 
 async function resolveWorkflowFiles(
@@ -92,6 +94,26 @@ async function createProjectWithSources(
   return project;
 }
 
+/**
+ * Expands a matched workflow file to the source files that actually declare
+ * its exported Workflows. Re-export barrels (`export { x } from './v3'`) are
+ * a common Temporal versioning convention; the declaring files carry the
+ * analyzable function bodies.
+ */
+function resolveDeclaringSourceFiles(sourceFile: SourceFile): SourceFile[] {
+  const files = new Map<string, SourceFile>([[sourceFile.getFilePath(), sourceFile]]);
+
+  for (const exportDeclaration of sourceFile.getExportDeclarations()) {
+    const target = exportDeclaration.getModuleSpecifierSourceFile();
+
+    if (target) {
+      files.set(target.getFilePath(), target);
+    }
+  }
+
+  return [...files.values()];
+}
+
 function collectWorkflowAnalysis(
   project: Project,
   root: string,
@@ -104,12 +126,22 @@ function collectWorkflowAnalysis(
   const workflows: WorkflowDefinition[] = [];
   const activities: ActivityDefinition[] = [];
   const diagnostics: Diagnostic[] = [];
+  const analyzedPaths = new Set<string>();
 
   for (const workflowFile of workflowFiles) {
-    const analysis = analyzeWorkflowSourceFile(root, project.getSourceFileOrThrow(workflowFile));
-    workflows.push(...analysis.workflows);
-    activities.push(...analysis.activities);
-    diagnostics.push(...analysis.diagnostics);
+    for (const sourceFile of resolveDeclaringSourceFiles(
+      project.getSourceFileOrThrow(workflowFile),
+    )) {
+      if (analyzedPaths.has(sourceFile.getFilePath())) {
+        continue;
+      }
+
+      analyzedPaths.add(sourceFile.getFilePath());
+      const analysis = analyzeWorkflowSourceFile(root, sourceFile);
+      workflows.push(...analysis.workflows);
+      activities.push(...analysis.activities);
+      diagnostics.push(...analysis.diagnostics);
+    }
   }
 
   return { workflows, activities, diagnostics };
