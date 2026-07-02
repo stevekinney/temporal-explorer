@@ -7,11 +7,15 @@
   "author": "Steve Kinney <hello@stevekinney.net>",
   "type": "module",
   "bin": {
-    "temporal-explorer": "./packages/cli/src/bin.ts"
+    "temporal-explorer": "./dist/cli/index.js"
   },
   "exports": {
-    ".": "./packages/api/src/index.ts",
-    "./schemas": "./packages/schemas/src/index.ts",
+    ".": {
+      "import": "./dist/api/index.js"
+    },
+    "./schemas": {
+      "import": "./dist/schemas/index.js"
+    },
     "./package.json": "./package.json"
   },
   "workspaces": [
@@ -22,9 +26,11 @@
     "benchmark:analyzer": "bun run scripts/benchmarks/analyzer.ts",
     "benchmark:history": "bun run scripts/benchmarks/history.ts",
     "build": "turbo run build",
+    "build:dist": "bun run scripts/release/build-dist.ts",
     "clean": "turbo run clean",
     "declarations:typecheck-fixtures": "bun run scripts/declarations/typecheck-fixtures.ts",
     "dev": "turbo run dev",
+    "examples:library": "bun run examples/analyze-workflow-files.ts && bun run examples/import-event-history.ts && bun run examples/analyze-project.ts",
     "fixtures:generate-histories": "bun run scripts/fixtures/generate-histories.ts",
     "fixtures:regenerate-artifacts": "bun run scripts/fixtures/regenerate-artifacts.ts",
     "fixtures:validate": "bun run scripts/fixtures/validate-fixtures.ts",
@@ -34,7 +40,9 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "package:check": "npm pack --dry-run --ignore-scripts",
+    "prepack": "bun run scripts/release/build-dist.ts",
     "prepare": "lefthook install",
+    "release:dry-run": "bun run scripts/release/dry-run.ts",
     "replay:spike": "bun run scripts/replay/spike.ts",
     "schema:emit-json-schema": "bun run scripts/schema/emit-json-schema.ts",
     "schema:validate": "bun run scripts/schema/validate-artifact.ts",
@@ -58,7 +66,6 @@
     "@temporal-explorer/cli": "workspace:*",
     "@temporal-explorer/schemas": "workspace:*",
     "@temporalio/activity": "^1.18.1",
-    "@temporalio/client": "^1.18.1",
     "@temporalio/common": "^1.18.1",
     "@temporalio/proto": "^1.18.1",
     "@temporalio/testing": "^1.18.1",
@@ -84,5 +91,16 @@
   "trustedDependencies": [
     "@swc/core",
     "protobufjs"
+  ],
+  "dependencies": {
+    "@temporalio/client": "^1.18.1",
+    "ts-morph": "^28.0.0",
+    "zod": "^4.4.3"
+  },
+  "files": [
+    "dist",
+    "packages/schemas/json-schema",
+    "README.md",
+    "LICENSE"
   ]
 }

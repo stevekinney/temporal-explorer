@@ -49,6 +49,7 @@ export {
 
 export {
   createAggregateReport,
+  createOverlayReport,
   formatAggregateReport,
   type AggregateReport,
   type CreateAggregateReportOptions,
