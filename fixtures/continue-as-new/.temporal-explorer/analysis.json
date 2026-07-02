@@ -153,7 +153,13 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "IterationInput",
+          "module": "src/activities/iteration-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

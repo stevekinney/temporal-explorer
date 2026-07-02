@@ -21,6 +21,7 @@
   "scripts": {
     "build": "turbo run build",
     "clean": "turbo run clean",
+    "declarations:typecheck-fixtures": "bun run scripts/declarations/typecheck-fixtures.ts",
     "dev": "turbo run dev",
     "fixtures:generate-histories": "bun run scripts/fixtures/generate-histories.ts",
     "fixtures:regenerate-artifacts": "bun run scripts/fixtures/regenerate-artifacts.ts",

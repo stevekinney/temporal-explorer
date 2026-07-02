@@ -71,5 +71,6 @@ for (const fixture of fixtures) {
   }
 
   await runCli(['docs', '--project', fixtureRoot]);
+  await runCli(['types', '--project', fixtureRoot]);
   console.log(`Regenerated artifacts for ${fixture}.`);
 }

@@ -153,7 +153,18 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "DynamicInput",
+          "module": "src/activities/step-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "DynamicResult",
+          "module": "src/activities/step-activities"
+        }
+      ],
       "diagnostics": [
         {
           "code": "TEA_DYNAMIC_ACTIVITY_CALL",

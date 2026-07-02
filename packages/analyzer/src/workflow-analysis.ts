@@ -21,6 +21,7 @@ import {
 import { analyzeQueryHandler, analyzeUpdateValidator } from './handler-diagnostics';
 import { createSourceLocation } from './paths';
 import { findActivityProxyVariables, isNamedImportFrom, temporalWorkerModule } from './symbols';
+import { collectTypeImportDependencies } from './type-imports';
 import { createTypeShape } from './type-shapes';
 import { collectTemporalCommands } from './workflow-commands';
 import {
@@ -137,6 +138,7 @@ function analyzeWorkflowFunction(
     ...analyzeMessageHandlers(root, registrations, proxyVariables),
     ...findNondeterministicApiDiagnostics(root, functionDeclaration),
   ];
+  const signature = createWorkflowSignature(root, functionDeclaration);
 
   return {
     id: `workflow:${workflowName}`,
@@ -148,7 +150,7 @@ function analyzeWorkflowFunction(
       workflowName,
     ),
     exported: functionDeclaration.isExported(),
-    signature: createWorkflowSignature(root, functionDeclaration),
+    signature,
     messageSurface: {
       signals,
       queries,
@@ -161,7 +163,14 @@ function analyzeWorkflowFunction(
       nodes: [],
     },
     temporalCommands: collected.commands,
-    dependencies: [],
+    dependencies: collectTypeImportDependencies(
+      root,
+      functionDeclaration.getSourceFile(),
+      { signature },
+      signals,
+      queries,
+      updates,
+    ),
     diagnostics,
   };
 }

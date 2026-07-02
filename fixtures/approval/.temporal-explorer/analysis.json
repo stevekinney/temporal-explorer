@@ -197,7 +197,23 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ApprovalInput",
+          "module": "src/activities/approval-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ApprovalRecord",
+          "module": "src/activities/approval-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ApprovalResult",
+          "module": "src/activities/approval-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

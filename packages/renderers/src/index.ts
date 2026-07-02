@@ -36,5 +36,6 @@ export function createDocumentationSet(
   return files.toSorted((left, right) => left.path.localeCompare(right.path));
 }
 
+export { renderWorkflowDeclaration } from './declarations';
 export { renderWorkflowIndexMarkdown, renderWorkflowMarkdown, renderWorkflowMermaid };
 export type { CreateDocumentationSetOptions };

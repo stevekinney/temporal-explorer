@@ -63,20 +63,27 @@ describe('schema scaffold', () => {
     expect(result.issues.some((issue) => issue.path === 'metadata')).toBe(true);
   });
 
-  it('rejects artifacts without a supported schema version', () => {
+  it('rejects artifacts without a supported schema version using stable codes', () => {
     expect(validateArtifact(null)).toEqual({
       success: false,
+      code: 'TES_MISSING_SCHEMA_VERSION',
       issues: [{ path: 'schemaVersion', message: 'Artifact is missing schemaVersion.' }],
     });
 
-    expect(validateArtifact({ schemaVersion: 'future/v9' })).toEqual({
-      success: false,
-      issues: [
-        {
-          path: 'schemaVersion',
-          message: 'Unsupported artifact schema version: future/v9.',
-        },
-      ],
+    const newerArtifact = validateArtifact({ schemaVersion: 'temporal-analysis/v9' });
+
+    expect(newerArtifact.success).toBe(false);
+    expect(!newerArtifact.success && newerArtifact.code).toBe('TES_UNSUPPORTED_SCHEMA_VERSION');
+    expect(newerArtifact.issues[0]?.message).toContain(
+      'newer artifacts require upgrading temporal-explorer',
+    );
+
+    const invalidArtifact = validateArtifact({
+      schemaVersion: 'temporal-analysis/v1',
+      artifactId: 42,
     });
+
+    expect(invalidArtifact.success).toBe(false);
+    expect(!invalidArtifact.success && invalidArtifact.code).toBe('TES_SCHEMA_VALIDATION_FAILED');
   });
 });

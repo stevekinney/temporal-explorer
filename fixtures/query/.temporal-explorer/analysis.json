@@ -324,7 +324,23 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "OrderStatus",
+          "module": "src/activities/audit-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "QueryFixtureInput",
+          "module": "src/activities/audit-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "QueryFixtureResult",
+          "module": "src/activities/audit-activities"
+        }
+      ],
       "diagnostics": [
         {
           "code": "TEA_QUERY_STATE_MUTATION",

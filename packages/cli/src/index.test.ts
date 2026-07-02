@@ -198,6 +198,20 @@ export default configuration;
     expect(JSON.stringify(decodedInput)).not.toContain('payment-token-redacted');
   });
 
+  it('aggregates multiple histories for one workflow type', async () => {
+    const timerRaceRoot = await copyFixture('timer-race');
+    const run = await runCommand(['aggregate', 'timerRaceWorkflow', '--project', timerRaceRoot]);
+
+    expect(run.exitCode).toBe(0);
+    expect(run.stdout).toContain('Runs: 2');
+    expect(run.stdout).toContain('Timers: 1 fired, 1 canceled, 0 pending');
+    expect(run.stdout).toContain('notifyExpired: 1/2');
+
+    const missing = await runCommand(['aggregate', 'missingWorkflow', '--project', timerRaceRoot]);
+    expect(missing.exitCode).toBe(1);
+    expect(missing.stderr).toContain('No trace artifacts matched');
+  });
+
   it('proves every determinism diagnostic at its source location', async () => {
     const diagnosticsRoot = await copyFixture('diagnostics');
     const run = await runCommand(['check', '--project', diagnosticsRoot]);

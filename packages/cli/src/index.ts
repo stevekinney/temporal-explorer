@@ -1,15 +1,23 @@
 import {
   applySeverityOverrides,
+  createAggregateReport,
+  formatAggregateReport,
   getTemporalExplorerVersion,
   renderWorkflowMermaidFromArtifacts,
 } from '@temporal-explorer/api';
+import {
+  executionOverlayDocumentSchema,
+  runtimeTraceDocumentSchema,
+} from '@temporal-explorer/schemas';
 
 import { getPositionalArgs, parseFlags } from './arguments';
 import {
   loadAnalysis,
   loadOverlay,
   loadReport,
+  loadRuntimeArtifacts,
   loadTrace,
+  writeDeclarationArtifacts,
   writeDocumentationArtifacts,
 } from './artifact-files';
 import { createDoctorReport, formatDoctorReport } from './doctor';
@@ -161,6 +169,36 @@ async function runCheck(args: string[], environment: CommandEnvironment): Promis
   return errors.length > 0 ? 1 : 0;
 }
 
+async function runAggregate(args: string[], environment: CommandEnvironment): Promise<number> {
+  const [workflowName] = getPositionalArgs(args);
+
+  if (!workflowName) {
+    throw new Error('aggregate requires a Workflow name.');
+  }
+
+  const flags = parseFlags(args);
+  const { traces, overlays } = await loadRuntimeArtifacts(flags);
+  const report = createAggregateReport({
+    workflowType: workflowName,
+    traces: traces.map((artifact) => runtimeTraceDocumentSchema.parse(artifact)),
+    overlays: overlays.map((artifact) => executionOverlayDocumentSchema.parse(artifact)),
+  });
+
+  await environment.stdout(flags.json ? stableJson(report) : formatAggregateReport(report));
+  return 0;
+}
+
+async function runTypes(args: string[], environment: CommandEnvironment): Promise<number> {
+  const flags = parseFlags(args);
+  const [workflowName] = getPositionalArgs(args);
+  const { files, outputDirectory } = await writeDeclarationArtifacts(flags, workflowName);
+
+  await environment.stdout(
+    `Generated ${files.length} declaration file(s).\nWrote ${outputDirectory}\n`,
+  );
+  return 0;
+}
+
 async function runDoctor(args: string[], environment: CommandEnvironment): Promise<number> {
   const flags = parseFlags(args);
   const report = await createDoctorReport(flags.project);
@@ -241,6 +279,7 @@ async function runOpen(args: string[], environment: CommandEnvironment): Promise
 type CommandHandler = (args: string[], environment: CommandEnvironment) => Promise<number>;
 
 const commandHandlers = new Map<string, CommandHandler>([
+  ['aggregate', runAggregate],
   ['analyze', runAnalyze],
   ['check', runCheck],
   ['docs', runDocs],
@@ -252,6 +291,7 @@ const commandHandlers = new Map<string, CommandHandler>([
   ['render', runRender],
   ['show', runShow],
   ['trace', runTrace],
+  ['types', runTypes],
 ]);
 
 function createDefaultEnvironment(): CommandEnvironment {

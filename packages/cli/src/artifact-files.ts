@@ -8,6 +8,7 @@ import {
   createOverlayReportFromArtifact,
   importHistoryFromFile,
   loadTemporalExplorerProject,
+  renderTypeDeclarations,
   validateArtifact,
   type DiagnosticSeverityOverride,
   type DocumentationFile,
@@ -199,6 +200,50 @@ export async function loadTrace(flags: ParsedFlags): Promise<{
     trace: result.value,
     artifactPath,
     decodesPayloads: payloadPreview?.decodePayloads === true,
+  };
+}
+
+export async function loadRuntimeArtifacts(flags: ParsedFlags): Promise<{
+  traces: unknown[];
+  overlays: unknown[];
+}> {
+  const projectRoot = resolve(flags.project ?? process.cwd());
+
+  return {
+    traces: await readJsonArtifacts(
+      join(projectRoot, '.temporal-explorer', 'histories'),
+      '.trace.json',
+    ),
+    overlays: await readJsonArtifacts(
+      join(projectRoot, '.temporal-explorer', 'overlays'),
+      '.overlay.json',
+    ),
+  };
+}
+
+export async function writeDeclarationArtifacts(
+  flags: ParsedFlags,
+  workflowName?: string,
+): Promise<{
+  files: { path: string; contents: string }[];
+  outputDirectory: string;
+}> {
+  const { analysis, projectRoot } = await loadAnalysis(flags);
+  const result = renderTypeDeclarations({
+    analysis,
+    ...(workflowName ? { workflowName } : {}),
+  });
+  const outputDirectory = join(projectRoot, '.temporal-explorer', 'workflows');
+
+  await mkdir(outputDirectory, { recursive: true });
+
+  for (const declarationFile of result.value) {
+    await Bun.write(join(outputDirectory, declarationFile.path), declarationFile.contents);
+  }
+
+  return {
+    files: result.value,
+    outputDirectory,
   };
 }
 

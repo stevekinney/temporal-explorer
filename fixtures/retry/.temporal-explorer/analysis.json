@@ -132,7 +132,18 @@
           "staticOrder": 0
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "RetryInput",
+          "module": "src/activities/charge-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "RetryResult",
+          "module": "src/activities/charge-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

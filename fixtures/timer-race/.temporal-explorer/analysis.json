@@ -240,7 +240,18 @@
           "staticOrder": 3
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "RaceInput",
+          "module": "src/activities/race-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "RaceResult",
+          "module": "src/activities/race-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

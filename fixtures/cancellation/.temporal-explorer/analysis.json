@@ -239,7 +239,18 @@
           "staticOrder": 5
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "CancellationInput",
+          "module": "src/activities/resource-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "CancellationResult",
+          "module": "src/activities/resource-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

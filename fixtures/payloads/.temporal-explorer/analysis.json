@@ -132,7 +132,18 @@
           "staticOrder": 0
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "PaymentProfile",
+          "module": "src/activities/profile-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ProfileReceipt",
+          "module": "src/activities/profile-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

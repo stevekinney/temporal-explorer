@@ -266,7 +266,23 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ShippingAddress",
+          "module": "src/activities/address-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "UpdateFixtureInput",
+          "module": "src/activities/address-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "UpdateFixtureResult",
+          "module": "src/activities/address-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

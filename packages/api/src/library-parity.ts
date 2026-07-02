@@ -6,6 +6,7 @@ import {
   type TemporalExplorerProject,
 } from '@temporal-explorer/analyzer';
 import {
+  renderWorkflowDeclaration,
   renderWorkflowIndexMarkdown,
   renderWorkflowMarkdown,
   type CreateDocumentationSetOptions,
@@ -53,6 +54,41 @@ export function renderWorkflowJson(
 
   return createTemporalExplorerResult(workflow, {
     diagnostics: workflow.diagnostics,
+    metadata: options.analysis.metadata,
+  });
+}
+
+export type RenderTypeDeclarationsOptions = {
+  analysis: TemporalAnalysisDocument;
+  /** Renders one Workflow's declaration; omit for every Workflow. */
+  workflowName?: string;
+};
+
+export type DeclarationFile = {
+  path: string;
+  contents: string;
+};
+
+/** Renders SDK-oriented `.d.ts` declaration artifacts from the semantic model. */
+export function renderTypeDeclarations(
+  options: RenderTypeDeclarationsOptions,
+): TemporalExplorerResult<DeclarationFile[]> {
+  const workflows = options.workflowName
+    ? options.analysis.workflows.filter((workflow) => workflow.name === options.workflowName)
+    : options.analysis.workflows;
+
+  if (options.workflowName && workflows.length === 0) {
+    throw new Error(`Workflow "${options.workflowName}" was not found.`);
+  }
+
+  const files = workflows
+    .toSorted((left, right) => left.name.localeCompare(right.name))
+    .map((workflow) => ({
+      path: `${workflow.name}.d.ts`,
+      contents: renderWorkflowDeclaration(options.analysis, workflow.name),
+    }));
+
+  return createTemporalExplorerResult(files, {
     metadata: options.analysis.metadata,
   });
 }

@@ -37,6 +37,13 @@ import {
 import { createTemporalExplorerResult, type TemporalExplorerResult } from './result';
 
 export {
+  createAggregateReport,
+  formatAggregateReport,
+  type AggregateReport,
+  type CreateAggregateReportOptions,
+} from '@temporal-explorer/mapper';
+
+export {
   applySeverityOverrides,
   createSourceFileHashes,
   defineConfig,
@@ -48,9 +55,12 @@ export {
 
 export {
   renderMarkdown,
+  renderTypeDeclarations,
   renderWorkflowJson,
   runDiagnostics,
+  type DeclarationFile,
   type RenderMarkdownOptions,
+  type RenderTypeDeclarationsOptions,
   type RenderWorkflowJsonOptions,
 } from './library-parity';
 export {

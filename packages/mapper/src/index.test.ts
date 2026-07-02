@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
 
 import {
-  type RuntimeOperation,
   runtimeTraceDocumentSchema,
   temporalAnalysisDocumentSchema,
   validateArtifact,
+  type RuntimeOperation,
 } from '@temporal-explorer/schemas';
 
 import { createExecutionOverlay, createOverlayReport } from './index';

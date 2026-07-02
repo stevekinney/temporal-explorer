@@ -115,4 +115,12 @@ export function createOverlayReport(overlay: ExecutionOverlayDocument): string {
   return `${lines.join('\n')}\n`;
 }
 
+export {
+  createAggregateReport,
+  formatAggregateReport,
+  type AggregateActivityStats,
+  type AggregateNodeCoverage,
+  type AggregateReport,
+  type CreateAggregateReportOptions,
+} from './aggregate';
 export type { ExecutionOverlayDocument, MappingEvidence, RuntimeNodeMapping, StaticOverlayNode };

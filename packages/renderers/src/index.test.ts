@@ -6,7 +6,7 @@ import {
   temporalAnalysisDocumentSchema,
 } from '@temporal-explorer/schemas';
 
-import { createDocumentationSet, renderWorkflowMermaid } from './index';
+import { createDocumentationSet, renderWorkflowDeclaration, renderWorkflowMermaid } from './index';
 
 const fixtureRoot = new URL('../../../fixtures/basic-order/', import.meta.url);
 
@@ -97,6 +97,31 @@ describe('documentation renderers', () => {
 
     expect(index.contents.indexOf('aaaWorkflow')).toBeLessThan(
       index.contents.indexOf('basicOrderWorkflow'),
+    );
+  });
+
+  it('renders deterministic import-preserving workflow declarations', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/update/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const first = renderWorkflowDeclaration(analysis, 'updateWorkflow');
+    const second = renderWorkflowDeclaration(analysis, 'updateWorkflow');
+
+    expect(first).toBe(second);
+    expect(first).toContain(
+      "import type { ShippingAddress, UpdateFixtureInput, UpdateFixtureResult } from '../../src/activities/address-activities';",
+    );
+    expect(first).toContain(
+      'export declare function updateWorkflow(input: UpdateFixtureInput): Promise<UpdateFixtureResult>;',
+    );
+    expect(first).toContain(
+      "export declare const setAddressUpdate: import('@temporalio/workflow').UpdateDefinition<ShippingAddress, [ShippingAddress]>;",
+    );
+    expect(first).toContain('[confidence: exact]');
+    expect(() => renderWorkflowDeclaration(analysis, 'missing')).toThrow(
+      'Workflow "missing" was not found.',
     );
   });
 });

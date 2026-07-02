@@ -134,8 +134,10 @@ describe('temporal-explorer open server', () => {
   it('waits for interactive explorer servers to exit', async () => {
     const actualBunPath = process.execPath;
 
+    // The fake server exits only after serving its first request, so the exit
+    // is causally ordered after the CLI readiness probe instead of racing it.
     await withFakeBunExecutable(
-      `#!/bin/sh\nexec "${actualBunPath}" --eval 'const server = Bun.serve({ hostname: "127.0.0.1", port: Number(Bun.env.PORT), fetch: () => new Response("ok") }); setTimeout(async () => { await server.stop(true); process.exit(0); }, 500);'\n`,
+      `#!/bin/sh\nexec "${actualBunPath}" --eval 'const server = Bun.serve({ hostname: "127.0.0.1", port: Number(Bun.env.PORT), fetch: () => { setTimeout(async () => { await server.stop(true); process.exit(0); }, 100); return new Response("ok"); } });'\n`,
       async () => {
         const result = await runCommand(['open', '--project', fixtureRoot], true);
 

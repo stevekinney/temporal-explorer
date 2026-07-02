@@ -1,6 +1,10 @@
 import { readdir } from 'node:fs/promises';
 
-import { createDocumentationSetFromArtifacts } from '@temporal-explorer/api';
+import {
+  createDocumentationSetFromArtifacts,
+  renderTypeDeclarations,
+} from '@temporal-explorer/api';
+import { temporalAnalysisDocumentSchema } from '@temporal-explorer/schemas';
 
 const fixturesRoot = new URL('../../fixtures/', import.meta.url);
 
@@ -81,7 +85,32 @@ async function verifyFixtureDocumentationSnapshots(fixture: string): Promise<num
     }
   }
 
-  return firstRender.length;
+  return firstRender.length + (await verifyDeclarationSnapshots(fixture, analysisArtifact));
+}
+
+async function verifyDeclarationSnapshots(
+  fixture: string,
+  analysisArtifact: unknown,
+): Promise<number> {
+  const analysis = temporalAnalysisDocumentSchema.parse(analysisArtifact);
+  const declarations = renderTypeDeclarations({ analysis }).value;
+  const declarationsDirectory = new URL(`${fixture}/.temporal-explorer/workflows/`, fixturesRoot);
+
+  for (const declaration of declarations) {
+    const snapshotUrl = new URL(declaration.path, declarationsDirectory);
+
+    if (!(await Bun.file(snapshotUrl).exists())) {
+      throw new Error(`Missing declaration snapshot: ${snapshotUrl.pathname}`);
+    }
+
+    if ((await Bun.file(snapshotUrl).text()) !== declaration.contents) {
+      throw new Error(
+        `Stale declaration snapshot: ${snapshotUrl.pathname}. Run temporal-explorer types for the fixture.`,
+      );
+    }
+  }
+
+  return declarations.length;
 }
 
 let verified = 0;

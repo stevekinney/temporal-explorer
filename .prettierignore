@@ -45,3 +45,7 @@ Thumbs.db
 *.d.ts.map
 *.tsbuildinfo
 .dccache
+
+# Generated declaration artifacts are formatted by their renderer and
+# verified byte-for-byte by snapshots:verify.
+**/.temporal-explorer/workflows/*.d.ts

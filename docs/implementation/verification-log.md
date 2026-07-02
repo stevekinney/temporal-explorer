@@ -499,3 +499,19 @@ Follow-up: None.
 - `bunx temporal-explorer check --project fixtures/query` — exits 1 on TEA_QUERY_STATE_MUTATION at the exact source line; CLI test also proves configured severities (`error` escalation and `off` suppression) through temporal-explorer.config.ts.
 - `bunx temporal-explorer doctor` — reports root, configuration source, tsconfig, output directory, artifact freshness (hash comparison), and per-file workflow discovery reasons; covered by CLI tests in text and JSON modes.
 - Semantic spot checks: cancellation overlay shows the canceled path skipped and non-cancellable cleanup observed with scope containment; patched overlay explains the executed version branch without replay; retry traces carry server-collapsed attempt numbers; update trace shows completed and failed outcomes with the validator-rejected update absent by design; dynamic overlay attributes both dynamic Activities with dynamic confidence.
+
+## 2026-07-01: Stages 16 and 17 (Aggregate Analysis and Type Declarations)
+
+- `bunx temporal-explorer types --project <fixture>` writes `.temporal-explorer/workflows/<workflow>.d.ts` for every fixture; declarations import source-owned named types (verified byte-for-byte in snapshots) and carry source/confidence comments.
+- `bun run declarations:typecheck-fixtures` — 17 Temporal SDK-style consumers (one per fixture Workflow) type-check against `@temporalio/client` using the generated declarations.
+- `bun run snapshots:verify` — 65 snapshots covering docs and declarations, deterministic across double renders.
+- `bunx temporal-explorer aggregate timerRaceWorkflow --project fixtures/timer-race` — aggregates 2 runs: statuses, per-activity retry/failure counts, signal frequencies, timer outcomes (1 fired / 1 canceled), hot paths, and rare branches (notifyApproved and notifyExpired each observed in 1/2 runs). Local JSON artifacts only; no database.
+- `bun test packages` — all suites green including new aggregate and declaration tests.
+- Note: `open-server.test.ts` ("waits for interactive explorer servers to exit") flaked once while two heavy test invocations ran simultaneously outside turbo; it passes consistently under `bun run validate`. Watching for recurrence before treating it as a real defect.
+
+## 2026-07-01: Stage 12 Closeout and Flake Root-Cause
+
+- Artifact validation failures now carry stable codes; newer-version artifacts fail with an explicit upgrade message. Policy recorded in `docs/schema-compatibility.md`.
+- Root-caused the `open-server.test.ts` flake: the fake explorer server exited on a 500ms timer that raced the CLI readiness probe under load. The fake now exits only after serving its first request, making the exit causally ordered; stable across repeated runs.
+- Generated `.d.ts` artifacts are excluded from Prettier: the declaration renderer owns their formatting and `snapshots:verify` enforces byte equality, so a second formatter only created churn.
+- `bun run validate` — pass end to end.

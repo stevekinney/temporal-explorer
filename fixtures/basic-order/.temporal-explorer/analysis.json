@@ -176,7 +176,18 @@
           "staticOrder": 2
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "OrderInput",
+          "module": "src/activities/order-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "OrderResult",
+          "module": "src/activities/order-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

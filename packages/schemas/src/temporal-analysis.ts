@@ -150,6 +150,15 @@ export const updateDefinitionSchema = z
   })
   .strict();
 
+export const workflowDependencySchema = z
+  .object({
+    kind: z.literal('type-import'),
+    name: z.string().min(1),
+    /** Project-relative module path without extension. */
+    module: z.string().min(1),
+  })
+  .strict();
+
 export const workflowDefinitionSchema = z
   .object({
     id: z.string().min(1),
@@ -175,7 +184,7 @@ export const workflowDefinitionSchema = z
       })
       .strict(),
     temporalCommands: z.array(temporalCommandSchema),
-    dependencies: z.array(z.unknown()),
+    dependencies: z.array(workflowDependencySchema),
     diagnostics: z.array(diagnosticSchema),
   })
   .strict();
@@ -223,6 +232,7 @@ export type TemporalCommand = z.infer<typeof temporalCommandSchema>;
 export type SignalDefinition = z.infer<typeof signalDefinitionSchema>;
 export type QueryDefinition = z.infer<typeof queryDefinitionSchema>;
 export type UpdateDefinition = z.infer<typeof updateDefinitionSchema>;
+export type WorkflowDependency = z.infer<typeof workflowDependencySchema>;
 export type WorkflowDefinition = z.infer<typeof workflowDefinitionSchema>;
 export type ActivityDefinition = z.infer<typeof activityDefinitionSchema>;
 export type TemporalAnalysisDocument = z.infer<typeof temporalAnalysisDocumentSchema>;

@@ -109,7 +109,18 @@
         "nodes": []
       },
       "temporalCommands": [],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ChildInput",
+          "module": "src/workflows/child-workflow-parent"
+        },
+        {
+          "kind": "type-import",
+          "name": "ChildSummary",
+          "module": "src/workflows/child-workflow-parent"
+        }
+      ],
       "diagnostics": []
     },
     {
@@ -175,7 +186,18 @@
         "nodes": []
       },
       "temporalCommands": [],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ChildInput",
+          "module": "src/workflows/child-workflow-parent"
+        },
+        {
+          "kind": "type-import",
+          "name": "ChildNotice",
+          "module": "src/workflows/child-workflow-parent"
+        }
+      ],
       "diagnostics": []
     },
     {
@@ -286,7 +308,18 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ParentInput",
+          "module": "src/workflows/child-workflow-parent"
+        },
+        {
+          "kind": "type-import",
+          "name": "ParentResult",
+          "module": "src/workflows/child-workflow-parent"
+        }
+      ],
       "diagnostics": []
     }
   ],

@@ -32,6 +32,10 @@ export type ArtifactValidationIssue = {
   message: string;
 };
 
+/** Stable failure codes for artifact validation, usable by automation. */
+export type ArtifactValidationFailureCode =
+  'TES_MISSING_SCHEMA_VERSION' | 'TES_UNSUPPORTED_SCHEMA_VERSION' | 'TES_SCHEMA_VALIDATION_FAILED';
+
 export type ArtifactValidationResult =
   | {
       success: true;
@@ -41,6 +45,7 @@ export type ArtifactValidationResult =
     }
   | {
       success: false;
+      code: ArtifactValidationFailureCode;
       schemaVersion?: ArtifactSchemaVersion;
       value?: never;
       issues: ArtifactValidationIssue[];
@@ -69,6 +74,7 @@ export function validateArtifact(value: unknown): ArtifactValidationResult {
   if (!schemaVersion) {
     return {
       success: false,
+      code: 'TES_MISSING_SCHEMA_VERSION',
       issues: [{ path: 'schemaVersion', message: 'Artifact is missing schemaVersion.' }],
     };
   }
@@ -76,10 +82,11 @@ export function validateArtifact(value: unknown): ArtifactValidationResult {
   if (!isTemporalExplorerArtifactSchemaVersion(schemaVersion)) {
     return {
       success: false,
+      code: 'TES_UNSUPPORTED_SCHEMA_VERSION',
       issues: [
         {
           path: 'schemaVersion',
-          message: `Unsupported artifact schema version: ${schemaVersion}.`,
+          message: `Unsupported artifact schema version: ${schemaVersion}. This build supports ${Object.values(artifactSchemaVersions).join(', ')}; newer artifacts require upgrading temporal-explorer.`,
         },
       ],
     };
@@ -90,6 +97,7 @@ export function validateArtifact(value: unknown): ArtifactValidationResult {
   if (!result.success) {
     return {
       success: false,
+      code: 'TES_SCHEMA_VALIDATION_FAILED',
       schemaVersion,
       issues: result.error.issues.map(formatZodIssue),
     };

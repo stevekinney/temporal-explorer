@@ -196,7 +196,18 @@
           "staticOrder": 3
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "PatchedInput",
+          "module": "src/activities/charge-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "PatchedResult",
+          "module": "src/activities/charge-activities"
+        }
+      ],
       "diagnostics": []
     }
   ],

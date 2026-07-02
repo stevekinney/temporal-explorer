@@ -299,7 +299,18 @@
           "staticOrder": 1
         }
       ],
-      "dependencies": [],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ExternalInteractionInput",
+          "module": "src/workflows/external-interaction-workflow"
+        },
+        {
+          "kind": "type-import",
+          "name": "ExternalInteractionResult",
+          "module": "src/workflows/external-interaction-workflow"
+        }
+      ],
       "diagnostics": []
     }
   ],
