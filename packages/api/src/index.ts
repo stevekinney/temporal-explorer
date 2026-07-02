@@ -53,6 +53,7 @@ export {
   formatAggregateReport,
   type AggregateReport,
   type CreateAggregateReportOptions,
+  type ReplayCapturedCommand,
 } from '@temporal-explorer/mapper';
 
 export {
@@ -192,6 +193,7 @@ export type CreateExecutionOverlayFromArtifactsOptions = {
   analysisArtifact: unknown;
   traceArtifact: unknown;
   workflowName: string;
+  replayCapture?: CreateExecutionOverlayOptions['replayCapture'];
 };
 
 export type CreateDocumentationSetFromArtifactsOptions = {
@@ -232,6 +234,7 @@ export function createExecutionOverlayFromArtifacts(
       runtimeTraceDocumentSchema.safeParse(options.traceArtifact),
     ),
     workflowName: options.workflowName,
+    ...(options.replayCapture ? { replayCapture: options.replayCapture } : {}),
   });
 }
 

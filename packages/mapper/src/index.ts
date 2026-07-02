@@ -11,10 +11,19 @@ import type {
 import { createCoverage, createDiagnostics, createStaticNodes } from './coverage';
 import { createMappings } from './mappings';
 
+/** One command observed during optional replay, in scheduling order. */
+export type ReplayCapturedCommand = {
+  kind: 'activity' | 'timer';
+  name: string;
+  sequence: number;
+};
+
 export type CreateExecutionOverlayOptions = {
   analysis: TemporalAnalysisDocument;
   trace: RuntimeTraceDocument;
   workflowName: string;
+  /** Optional replay-derived evidence; upgrades dynamic mappings. */
+  replayCapture?: ReplayCapturedCommand[] | undefined;
 };
 
 function getWorkflow(analysis: TemporalAnalysisDocument, workflowName: string): WorkflowDefinition {
@@ -27,12 +36,59 @@ function getWorkflow(analysis: TemporalAnalysisDocument, workflowName: string): 
   return workflow;
 }
 
+/**
+ * Applies replay-derived command evidence: runtime Activity operations are
+ * aligned with the replay capture by scheduling order, and mappings that were
+ * only attributable to a dynamic dispatch site gain resolved-name evidence
+ * with upgraded confidence when the replayed Activity type matches.
+ */
+function applyReplayEvidence(
+  mappings: RuntimeNodeMapping[],
+  trace: RuntimeTraceDocument,
+  replayCapture: ReplayCapturedCommand[],
+): void {
+  const capturedActivities = replayCapture
+    .filter((command) => command.kind === 'activity')
+    .toSorted((left, right) => left.sequence - right.sequence);
+  const activityOperations = trace.operations
+    .filter((operation) => operation.kind === 'activity')
+    .toSorted(
+      (left, right) =>
+        (left.eventReferences[0]?.eventId ?? 0) - (right.eventReferences[0]?.eventId ?? 0),
+    );
+
+  activityOperations.forEach((operation, index) => {
+    const captured = capturedActivities[index];
+
+    if (!captured || operation.kind !== 'activity' || captured.name !== operation.activityType) {
+      return;
+    }
+
+    const mapping = mappings.find((entry) => entry.runtimeOperationId === operation.id);
+
+    if (mapping?.confidence === 'dynamic') {
+      mapping.confidence = 'inferred';
+      mapping.reason = `${mapping.reason} Replay confirmed ${captured.name} at command sequence ${captured.sequence}.`;
+      mapping.evidence.push({
+        kind: 'replay-command-sequence',
+        description: `Replay observed Activity ${captured.name} scheduled at command sequence ${captured.sequence}.`,
+        staticNodeId: mapping.staticNodeId ?? undefined,
+      });
+    }
+  });
+}
+
 /** Joins one static analysis document and one runtime trace into a source-aware overlay. */
 export function createExecutionOverlay(
   options: CreateExecutionOverlayOptions,
 ): ExecutionOverlayDocument {
   const workflow = getWorkflow(options.analysis, options.workflowName);
   const mappings = createMappings(workflow, options.trace);
+
+  if (options.replayCapture) {
+    applyReplayEvidence(mappings, options.trace, options.replayCapture);
+  }
+
   const staticNodes = createStaticNodes(workflow, mappings);
 
   return {

@@ -13,9 +13,13 @@ import {
   type DiagnosticSeverityOverride,
   type DocumentationFile,
   type ExecutionOverlayDocument,
+  type ReplayCapturedCommand,
   type RuntimeTraceDocument,
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/api';
+import { temporalAnalysisDocumentSchema } from '@temporal-explorer/schemas';
+
+import { captureReplayCommands } from './replay-capture';
 
 import type { ParsedFlags } from './arguments';
 import { stableJson } from './json-format';
@@ -132,10 +136,14 @@ export async function loadOverlay(
   const traceArtifact = await readJsonFile(
     join(projectRoot, '.temporal-explorer', 'histories', `${flags.history}.trace.json`),
   );
+  const replayCapture = flags.replay
+    ? await captureReplayForWorkflow(projectRoot, analysisArtifact, workflowName, flags)
+    : undefined;
   const result = createExecutionOverlayFromArtifacts({
     analysisArtifact,
     traceArtifact,
     workflowName,
+    ...(replayCapture ? { replayCapture } : {}),
   });
   const artifactPath = await writeOverlayArtifact(projectRoot, result.value, flags.history);
 
@@ -143,6 +151,34 @@ export async function loadOverlay(
     overlay: result.value,
     artifactPath,
   };
+}
+
+async function captureReplayForWorkflow(
+  projectRoot: string,
+  analysisArtifact: unknown,
+  workflowName: string,
+  flags: ParsedFlags,
+): Promise<ReplayCapturedCommand[]> {
+  const analysis = temporalAnalysisDocumentSchema.parse(analysisArtifact);
+  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
+
+  if (!workflow) {
+    throw new Error(`Workflow "${workflowName}" was not found in the analysis artifact.`);
+  }
+
+  const historyFile = flags.file ?? join(projectRoot, 'histories', `${flags.history}.json`);
+
+  if (!(await Bun.file(historyFile).exists())) {
+    throw new Error(
+      `--replay needs the raw Event History JSON at ${historyFile} (or pass it with --file).`,
+    );
+  }
+
+  return await captureReplayCommands({
+    projectRoot,
+    workflowSourcePath: workflow.source.path,
+    historyFile,
+  });
 }
 
 export async function loadReport(flags: ParsedFlags): Promise<string> {

@@ -13,9 +13,10 @@ export type ParsedFlags = {
   query?: string;
   limit?: string;
   json: boolean;
+  replay: boolean;
 };
 
-type StringFlagName = Exclude<keyof ParsedFlags, 'json'>;
+type StringFlagName = Exclude<keyof ParsedFlags, 'json' | 'replay'>;
 
 const stringFlagDefinitions = new Map<
   string,
@@ -52,6 +53,7 @@ function readFlagValue(args: string[], index: number, flag: string, valueName: s
 export function parseFlags(args: string[]): ParsedFlags {
   const flags: ParsedFlags = {
     json: false,
+    replay: false,
   };
 
   for (let index = 0; index < args.length; index += 1) {
@@ -63,6 +65,11 @@ export function parseFlags(args: string[]): ParsedFlags {
 
     if (arg === '--json') {
       flags.json = true;
+      continue;
+    }
+
+    if (arg === '--replay') {
+      flags.replay = true;
       continue;
     }
 
@@ -83,7 +90,7 @@ export function getPositionalArgs(args: string[]): string[] {
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
 
-    if (!arg || arg === '--json') {
+    if (!arg || arg === '--json' || arg === '--replay') {
       continue;
     }
 
