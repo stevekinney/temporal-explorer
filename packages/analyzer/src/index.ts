@@ -36,9 +36,15 @@ export type {
 } from './types';
 
 // `src/workflows.ts` (a flat file) is the dominant convention in real
-// Temporal TypeScript projects, including temporalio/samples-typescript.
-const workflowGlobs = ['src/**/workflows/**/*.ts', 'src/**/*.workflow.ts', 'src/**/workflows.ts'];
-const workerGlobs = ['src/**/worker*.ts', 'src/**/workers/**/*.ts'];
+// Temporal TypeScript projects, including temporalio/samples-typescript. The
+// `src/` segment isn't always at the project root either (e.g. an app nested
+// under apps/worker/src/...), so the leading `**/` lets it appear anywhere.
+const workflowGlobs = [
+  '**/src/**/workflows/**/*.ts',
+  '**/src/**/*.workflow.ts',
+  '**/src/**/workflows.ts',
+];
+const workerGlobs = ['**/src/**/worker*.ts', '**/src/**/workers/**/*.ts'];
 
 async function resolveWorkflowFiles(
   root: string,

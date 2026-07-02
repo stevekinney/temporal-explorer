@@ -54,6 +54,10 @@ export async function createSourceFileHashes(
   return Object.fromEntries(entries.toSorted(([left], [right]) => left.localeCompare(right)));
 }
 
+function isDependencyPath(relativePath: string): boolean {
+  return relativePath.split('/').includes('node_modules');
+}
+
 export async function discoverFiles(root: string, globs: string[]): Promise<string[]> {
   const discovered = new Set<string>();
 
@@ -61,7 +65,11 @@ export async function discoverFiles(root: string, globs: string[]): Promise<stri
     const glob = new Bun.Glob(pattern);
 
     for await (const relativePath of glob.scan({ cwd: root, onlyFiles: true })) {
-      if (!relativePath.endsWith('.test.ts') && !relativePath.endsWith('.spec.ts')) {
+      if (
+        !relativePath.endsWith('.test.ts') &&
+        !relativePath.endsWith('.spec.ts') &&
+        !isDependencyPath(relativePath)
+      ) {
         discovered.add(resolve(root, relativePath));
       }
     }

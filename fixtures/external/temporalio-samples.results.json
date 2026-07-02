@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-02T04:56:48.712Z",
+  "generatedAt": "2026-07-02T19:07:58.678Z",
   "subset": "full",
   "corpus": {
     "repository": "temporalio/samples-typescript",
@@ -19,7 +19,7 @@
       "environment-dependent": 0,
       "not-typescript": 1
     },
-    "coveredZeroWorkflowSamples": 6
+    "coveredZeroWorkflowSamples": 4
   },
   "samples": {
     "activities-cancellation-heartbeating": {
@@ -28,7 +28,7 @@
       "workflows": ["runCancellableActivity"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 1316
+      "durationMs": 923
     },
     "activities-dependency-injection": {
       "classification": "covered",
@@ -45,7 +45,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 1015
+      "durationMs": 706
     },
     "activities-examples": {
       "classification": "covered",
@@ -62,7 +62,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 872
+      "durationMs": 672
     },
     "ai-sdk": {
       "classification": "covered",
@@ -70,7 +70,7 @@
       "workflows": ["haikuAgent", "toolsAgent", "middlewareAgent", "mcpAgent"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 995
+      "durationMs": 752
     },
     "batch-sliding-window": {
       "classification": "covered",
@@ -87,7 +87,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 846
+      "durationMs": 647
     },
     "child-workflows": {
       "classification": "covered",
@@ -95,7 +95,7 @@
       "workflows": ["parentWorkflow", "childWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 854
+      "durationMs": 668
     },
     "continue-as-new": {
       "classification": "covered",
@@ -103,7 +103,7 @@
       "workflows": ["loopingWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 830
+      "durationMs": 629
     },
     "cron-workflows": {
       "classification": "covered",
@@ -116,7 +116,7 @@
           "severity": "error"
         }
       ],
-      "durationMs": 837
+      "durationMs": 648
     },
     "custom-logger": {
       "classification": "covered",
@@ -124,7 +124,7 @@
       "workflows": ["logSampleWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 756
+      "durationMs": 676
     },
     "dsl-interpreter": {
       "classification": "covered",
@@ -132,7 +132,7 @@
       "workflows": ["DSLInterpreter"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 824
+      "durationMs": 644
     },
     "eager-workflow-start": {
       "classification": "covered",
@@ -140,7 +140,7 @@
       "workflows": ["eagerWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 878
+      "durationMs": 710
     },
     "early-return": {
       "classification": "covered",
@@ -148,7 +148,7 @@
       "workflows": ["transactionWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 856
+      "durationMs": 623
     },
     "ejson": {
       "classification": "covered",
@@ -165,7 +165,7 @@
           "severity": "error"
         }
       ],
-      "durationMs": 801
+      "durationMs": 661
     },
     "empty": {
       "classification": "covered",
@@ -173,7 +173,7 @@
       "workflows": ["YOUR_WORKFLOW"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 751
+      "durationMs": 686
     },
     "encryption": {
       "classification": "covered",
@@ -181,7 +181,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 1250
+      "durationMs": 943
     },
     "env-config": {
       "classification": "covered",
@@ -189,7 +189,7 @@
       "workflows": [],
       "workflowFileCount": 0,
       "diagnostics": [],
-      "durationMs": 505
+      "durationMs": 414
     },
     "expense": {
       "classification": "covered",
@@ -197,7 +197,7 @@
       "workflows": ["timeoutOrUserAction", "expense"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 752
+      "durationMs": 650
     },
     "fetch-esm": {
       "classification": "covered",
@@ -205,7 +205,7 @@
       "workflows": ["exampleLocal", "exampleFetch"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 793
+      "durationMs": 688
     },
     "food-delivery": {
       "classification": "unsupported-with-reason",
@@ -221,7 +221,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 821
+      "durationMs": 661
     },
     "hello-world": {
       "classification": "covered",
@@ -229,7 +229,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 890
+      "durationMs": 642
     },
     "hello-world-js": {
       "classification": "not-typescript",
@@ -245,7 +245,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 812
+      "durationMs": 648
     },
     "interceptors-opentelemetry": {
       "classification": "covered",
@@ -253,7 +253,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 798
+      "durationMs": 654
     },
     "lambda-worker": {
       "classification": "covered",
@@ -261,7 +261,7 @@
       "workflows": ["sampleWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 837
+      "durationMs": 729
     },
     "monorepo-folders": {
       "classification": "unsupported-with-reason",
@@ -294,23 +294,32 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 845
+      "durationMs": 683
     },
     "nestjs-exchange-rates": {
       "classification": "covered",
       "outcome": "passed",
-      "workflows": [],
-      "workflowFileCount": 0,
-      "diagnostics": [],
-      "durationMs": 778
+      "workflows": ["exchangeRatesWorkflow"],
+      "workflowFileCount": 1,
+      "diagnostics": [
+        {
+          "code": "TEA_UNRESOLVED_ACTIVITY_IMPLEMENTATION",
+          "severity": "warning"
+        },
+        {
+          "code": "TEA_NONDETERMINISTIC_API",
+          "severity": "error"
+        }
+      ],
+      "durationMs": 670
     },
     "nextjs-ecommerce-oneclick": {
       "classification": "covered",
       "outcome": "passed",
-      "workflows": [],
-      "workflowFileCount": 0,
+      "workflows": ["OneClickBuy"],
+      "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 141
+      "durationMs": 739
     },
     "nexus-cancellation": {
       "classification": "covered",
@@ -318,7 +327,7 @@
       "workflows": ["cancellableCallerWorkflow", "helloWorkflow"],
       "workflowFileCount": 2,
       "diagnostics": [],
-      "durationMs": 808
+      "durationMs": 656
     },
     "nexus-hello": {
       "classification": "covered",
@@ -326,7 +335,7 @@
       "workflows": ["echoCallerWorkflow", "helloCallerWorkflow", "helloWorkflow"],
       "workflowFileCount": 2,
       "diagnostics": [],
-      "durationMs": 873
+      "durationMs": 627
     },
     "nexus-messaging": {
       "classification": "covered",
@@ -339,7 +348,7 @@
       ],
       "workflowFileCount": 4,
       "diagnostics": [],
-      "durationMs": 811
+      "durationMs": 658
     },
     "nexus-standalone-operations": {
       "classification": "covered",
@@ -347,7 +356,7 @@
       "workflows": ["helloWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 809
+      "durationMs": 638
     },
     "openai-agents": {
       "classification": "covered",
@@ -397,7 +406,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 1022
+      "durationMs": 807
     },
     "patching-api": {
       "classification": "covered",
@@ -405,7 +414,7 @@
       "workflows": ["myWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 796
+      "durationMs": 621
     },
     "production": {
       "classification": "covered",
@@ -413,7 +422,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 806
+      "durationMs": 687
     },
     "protobufs": {
       "classification": "covered",
@@ -421,7 +430,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 950
+      "durationMs": 631
     },
     "query-subscriptions": {
       "classification": "covered",
@@ -429,7 +438,7 @@
       "workflows": ["counter", "subscribableState"],
       "workflowFileCount": 2,
       "diagnostics": [],
-      "durationMs": 892
+      "durationMs": 678
     },
     "saga": {
       "classification": "covered",
@@ -466,7 +475,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 1126
+      "durationMs": 642
     },
     "schedules": {
       "classification": "covered",
@@ -474,7 +483,7 @@
       "workflows": ["reminder"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 1280
+      "durationMs": 658
     },
     "scratchpad": {
       "classification": "covered",
@@ -482,7 +491,7 @@
       "workflows": [],
       "workflowFileCount": 0,
       "diagnostics": [],
-      "durationMs": 980
+      "durationMs": 538
     },
     "search-attributes": {
       "classification": "covered",
@@ -490,7 +499,7 @@
       "workflows": ["example"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 1515
+      "durationMs": 920
     },
     "signals-queries": {
       "classification": "covered",
@@ -498,7 +507,7 @@
       "workflows": ["unblockOrCancel"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 810
+      "durationMs": 625
     },
     "sinks": {
       "classification": "covered",
@@ -506,7 +515,7 @@
       "workflows": ["sinkWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 962
+      "durationMs": 664
     },
     "sleep-for-days": {
       "classification": "covered",
@@ -514,7 +523,7 @@
       "workflows": ["sleepForDays"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 955
+      "durationMs": 662
     },
     "snippets": {
       "classification": "covered",
@@ -527,7 +536,7 @@
           "severity": "error"
         }
       ],
-      "durationMs": 880
+      "durationMs": 619
     },
     "standalone-activity": {
       "classification": "covered",
@@ -535,7 +544,7 @@
       "workflows": [],
       "workflowFileCount": 0,
       "diagnostics": [],
-      "durationMs": 1059
+      "durationMs": 636
     },
     "state": {
       "classification": "covered",
@@ -543,7 +552,7 @@
       "workflows": ["trackState"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 959
+      "durationMs": 651
     },
     "timer-examples": {
       "classification": "covered",
@@ -568,7 +577,7 @@
           "severity": "error"
         }
       ],
-      "durationMs": 961
+      "durationMs": 645
     },
     "timer-progress": {
       "classification": "covered",
@@ -576,7 +585,7 @@
       "workflows": ["progress"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 885
+      "durationMs": 662
     },
     "vscode-debugger": {
       "classification": "covered",
@@ -584,7 +593,7 @@
       "workflows": ["humanVerificationWorkflow"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 943
+      "durationMs": 632
     },
     "worker-specific-task-queues": {
       "classification": "covered",
@@ -609,7 +618,7 @@
           "severity": "warning"
         }
       ],
-      "durationMs": 836
+      "durationMs": 640
     },
     "worker-versioning": {
       "classification": "covered",
@@ -617,7 +626,7 @@
       "workflows": [],
       "workflowFileCount": 0,
       "diagnostics": [],
-      "durationMs": 840
+      "durationMs": 733
     },
     "workflow-streams": {
       "classification": "covered",
@@ -625,7 +634,7 @@
       "workflows": ["order", "pipeline", "hub", "ticker"],
       "workflowFileCount": 1,
       "diagnostics": [],
-      "durationMs": 975
+      "durationMs": 693
     }
   }
 }
