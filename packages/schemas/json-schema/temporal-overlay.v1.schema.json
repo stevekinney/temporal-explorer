@@ -21,7 +21,15 @@
               { "type": "string", "const": "activity" },
               { "type": "string", "const": "signal" },
               { "type": "string", "const": "timer" },
-              { "type": "string", "const": "condition" }
+              { "type": "string", "const": "condition" },
+              { "type": "string", "const": "query" },
+              { "type": "string", "const": "update" },
+              { "type": "string", "const": "child-workflow" },
+              { "type": "string", "const": "external-workflow" },
+              { "type": "string", "const": "continue-as-new" },
+              { "type": "string", "const": "patch" },
+              { "type": "string", "const": "cancellation-scope" },
+              { "type": "string", "const": "dynamic" }
             ]
           },
           "name": { "type": "string", "minLength": 1 },
@@ -53,6 +61,14 @@
                     { "type": "string", "const": "workflow-type" },
                     { "type": "string", "const": "signal-name" },
                     { "type": "string", "const": "timer-order" },
+                    { "type": "string", "const": "update-name" },
+                    { "type": "string", "const": "child-workflow-type" },
+                    { "type": "string", "const": "external-signal-name" },
+                    { "type": "string", "const": "patch-id" },
+                    { "type": "string", "const": "continue-as-new" },
+                    { "type": "string", "const": "scope-containment" },
+                    { "type": "string", "const": "dynamic-dispatch" },
+                    { "type": "string", "const": "replay-command-sequence" },
                     { "type": "string", "const": "event-reference" },
                     { "type": "string", "const": "source-location" },
                     { "type": "string", "const": "unmapped" }

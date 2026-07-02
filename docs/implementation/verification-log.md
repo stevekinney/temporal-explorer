@@ -537,3 +537,22 @@ Follow-up: None.
 - The corpus immediately exposed a real product gap: 49/51 samples use a flat `src/workflows.ts`, which the discovery globs missed. Fixed by adding `src/**/workflows.ts` to the defaults, then a second gap surfaced (patching-api's workflows.ts is a re-export barrel) and was fixed by following export declarations to their declaring files. Discovery went from 0 to 102 workflows across the corpus; committed fixture artifacts were unaffected by both changes.
 - Six covered samples legitimately discover zero workflows (nested app layouts, activity-only samples); the runner reports the count instead of hiding it, and asserts loudly if a matched file ever extracts zero workflows.
 - `bun run validate` and `bun run snapshots:verify` pass after the analyzer changes.
+
+## 2026-07-01: Stage 21 Final Acceptance
+
+Consolidated battery, all passing on `main`:
+
+- `bun run validate` — lint, typecheck, test, build, and format across all workspaces.
+- `bun run fixtures:validate` — 16 history fixtures, 47 committed artifacts.
+- `bun run fixtures:verify-no-drift` — regeneration produces byte-identical histories. (This run caught a real regression: moving `@temporalio/client` to runtime dependencies broke the provenance SDK-version lookup, which now reads both dependency sections.)
+- `bun run test:fixtures` — 14 named fixture suites.
+- `bun run snapshots:verify` — 69 documentation and declaration snapshots.
+- `bun run declarations:typecheck-fixtures` — 18 SDK-style declaration consumers.
+- `bun run schema:emit-json-schema --check` — caught genuinely stale JSON Schema docs (emitted before the query/update schema enrichment) which are now refreshed and committed.
+- `bun run examples:library`, `bun run benchmark:analyzer` (~1.7s / 15s budget), `bun run benchmark:history` (~7ms / 1s budget).
+- `bun run test:live` — 3 real-server integration tests.
+- `bun run compatibility:test --subset full` — 51/51 tested external samples.
+- `bun run ui:e2e`, `bun run ui:e2e:graph`, `bun run ui:accessibility`.
+- `bun run release:dry-run` — dist bundles verified and tarball packed.
+
+Recorded remainders (also in the progress table and the vault note): the Explorer UI connection selector/run browser and large-graph thresholds, and bundled `.d.ts` files for the dist entrypoints.

@@ -55,7 +55,8 @@
             { "type": "string", "const": "failed" },
             { "type": "string", "const": "canceled" },
             { "type": "string", "const": "terminated" },
-            { "type": "string", "const": "timedOut" }
+            { "type": "string", "const": "timedOut" },
+            { "type": "string", "const": "continued-as-new" }
           ]
         },
         "startedAt": {
@@ -104,7 +105,10 @@
                   { "type": "string", "const": "started" },
                   { "type": "string", "const": "completed" },
                   { "type": "string", "const": "failed" },
-                  { "type": "string", "const": "canceled" }
+                  { "type": "string", "const": "canceled" },
+                  { "type": "string", "const": "terminated" },
+                  { "type": "string", "const": "timedOut" },
+                  { "type": "string", "const": "continued-as-new" }
                 ]
               },
               "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
@@ -255,6 +259,192 @@
               "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } }
             },
             "required": ["id", "kind", "timerId", "status", "startedAt", "eventReferences"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "update" },
+              "updateId": { "type": "string", "minLength": 1 },
+              "updateName": { "type": "string", "minLength": 1 },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "accepted" },
+                  { "type": "string", "const": "completed" },
+                  { "type": "string", "const": "failed" }
+                ]
+              },
+              "acceptedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "closedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "updateId",
+              "updateName",
+              "status",
+              "acceptedAt",
+              "eventReferences",
+              "payloadReferences"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "child-workflow" },
+              "workflowType": { "type": "string", "minLength": 1 },
+              "childWorkflowId": { "type": "string", "minLength": 1 },
+              "childRunId": { "type": "string", "minLength": 1 },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "initiated" },
+                  { "type": "string", "const": "startFailed" },
+                  { "type": "string", "const": "started" },
+                  { "type": "string", "const": "completed" },
+                  { "type": "string", "const": "failed" },
+                  { "type": "string", "const": "canceled" },
+                  { "type": "string", "const": "timedOut" },
+                  { "type": "string", "const": "terminated" }
+                ]
+              },
+              "initiatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "closedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "workflowType",
+              "childWorkflowId",
+              "status",
+              "initiatedAt",
+              "eventReferences",
+              "payloadReferences"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "external-signal" },
+              "signalName": { "type": "string", "minLength": 1 },
+              "targetWorkflowId": { "type": "string", "minLength": 1 },
+              "targetRunId": { "type": "string", "minLength": 1 },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "initiated" },
+                  { "type": "string", "const": "signaled" },
+                  { "type": "string", "const": "failed" }
+                ]
+              },
+              "initiatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "closedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "signalName",
+              "targetWorkflowId",
+              "status",
+              "initiatedAt",
+              "eventReferences",
+              "payloadReferences"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "marker" },
+              "markerName": { "type": "string", "minLength": 1 },
+              "patchId": { "type": "string", "minLength": 1 },
+              "deprecated": { "type": "boolean" },
+              "recordedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } }
+            },
+            "required": ["id", "kind", "markerName", "recordedAt", "eventReferences"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "continue-as-new" },
+              "newRunId": { "type": "string", "minLength": 1 },
+              "occurredAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": ["id", "kind", "occurredAt", "eventReferences", "payloadReferences"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "cancel-request" },
+              "requestedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } }
+            },
+            "required": ["id", "kind", "requestedAt", "eventReferences"],
             "additionalProperties": false
           },
           {

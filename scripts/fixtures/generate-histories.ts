@@ -23,23 +23,29 @@ type HistoryGenerationResult = {
 
 const fixturesRoot = new URL('../../fixtures/', import.meta.url);
 
-async function readRootPackageJson(): Promise<{ devDependencies: Record<string, string> }> {
+async function readRootPackageJson(): Promise<{ dependencies: Record<string, string> }> {
   const parsed: unknown = await Bun.file(new URL('../../package.json', import.meta.url)).json();
-  const devDependencies: Record<string, string> = {};
+  const dependencies: Record<string, string> = {};
 
-  if (typeof parsed === 'object' && parsed !== null && 'devDependencies' in parsed) {
-    const raw = parsed.devDependencies;
+  // Runtime and dev dependency maps are merged: the Temporal SDK packages
+  // may legitimately live in either section of the root package.json.
+  for (const section of ['dependencies', 'devDependencies']) {
+    if (typeof parsed !== 'object' || parsed === null || !(section in parsed)) {
+      continue;
+    }
+
+    const raw = (parsed as Record<string, unknown>)[section];
 
     if (typeof raw === 'object' && raw !== null) {
       for (const [name, version] of Object.entries(raw)) {
         if (typeof version === 'string') {
-          devDependencies[name] = version;
+          dependencies[name] = version;
         }
       }
     }
   }
 
-  return { devDependencies };
+  return { dependencies };
 }
 
 async function executeFixtureWorkflow(
@@ -201,7 +207,7 @@ function getFlagValue(flag: string): string | undefined {
 const checkOnly = Bun.argv.includes('--check');
 const definitions = selectFixtureHistories(getFlagValue('--fixture'));
 const packageJson = await readRootPackageJson();
-const temporalSdkVersion = packageJson.devDependencies['@temporalio/client'] ?? 'unknown';
+const temporalSdkVersion = packageJson.dependencies['@temporalio/client'] ?? 'unknown';
 const environment = await TestWorkflowEnvironment.createTimeSkipping();
 
 try {
