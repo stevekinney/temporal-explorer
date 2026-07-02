@@ -1,5 +1,7 @@
 import type { PayloadReference, RuntimeTraceDocument } from '@temporal-explorer/schemas';
 
+import temporalExplorerPackageJson from '../../../package.json';
+
 import { createActivityOperations } from './activity-operations';
 import { createChildWorkflowOperations } from './child-workflow-operations';
 import { createUnknownEventDiagnostics } from './diagnostics';
@@ -38,7 +40,7 @@ export type ParseEventHistoryOptions = {
 
 function createMetadata(options: ParseEventHistoryOptions): RuntimeTraceDocument['metadata'] {
   return {
-    temporalExplorerVersion: '0.0.0-mvp',
+    temporalExplorerVersion: temporalExplorerPackageJson.version,
     schemaVersion: 'temporal-trace/v1',
     inputs: {
       projectRoot: options.projectRoot ?? '',

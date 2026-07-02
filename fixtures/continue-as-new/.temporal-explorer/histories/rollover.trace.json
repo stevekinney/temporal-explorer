@@ -2,7 +2,7 @@
   "schemaVersion": "temporal-trace/v1",
   "artifactId": "trace:rollover:rollover-run-id",
   "metadata": {
-    "temporalExplorerVersion": "0.0.0-mvp",
+    "temporalExplorerVersion": "0.0.1-mvp",
     "schemaVersion": "temporal-trace/v1",
     "inputs": {
       "projectRoot": "continue-as-new",

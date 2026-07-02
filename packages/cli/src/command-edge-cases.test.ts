@@ -9,6 +9,8 @@ import {
 } from '@temporal-explorer/api';
 import { beforeAll, describe, expect, it } from 'bun:test';
 
+import temporalExplorerPackageJson from '../../../package.json';
+
 import { formatShow } from './formatters';
 import { main } from './index';
 import { stableJson } from './json-format';
@@ -131,7 +133,7 @@ describe('temporal-explorer command edge cases', () => {
     expect(helpRun.stdout).toContain('Temporal Workflow Explorer');
     expect(versionRun).toEqual({
       exitCode: 0,
-      stdout: '0.0.0-mvp\n',
+      stdout: `${temporalExplorerPackageJson.version}\n`,
       stderr: '',
     });
     expect(unknownRun.exitCode).toBe(1);

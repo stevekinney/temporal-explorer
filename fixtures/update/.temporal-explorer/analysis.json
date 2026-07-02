@@ -2,7 +2,7 @@
   "schemaVersion": "temporal-analysis/v1",
   "artifactId": "analysis:update",
   "metadata": {
-    "temporalExplorerVersion": "0.0.0-mvp",
+    "temporalExplorerVersion": "0.0.1-mvp",
     "schemaVersion": "temporal-analysis/v1",
     "inputs": {
       "projectRoot": "update",

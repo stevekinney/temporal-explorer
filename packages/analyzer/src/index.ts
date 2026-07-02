@@ -9,6 +9,8 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import temporalExplorerPackageJson from '../../../package.json';
+
 import { loadConfiguration } from './configuration';
 import { getPackageManager, readPackageJson } from './package-metadata';
 import { createSourceFileHashes, discoverFiles, hashFile, toProjectPath } from './paths';
@@ -169,7 +171,7 @@ export async function analyzeWorkflowFiles(
     schemaVersion: 'temporal-analysis/v1',
     artifactId: `analysis:${projectName}`,
     metadata: {
-      temporalExplorerVersion: '0.0.0-mvp',
+      temporalExplorerVersion: temporalExplorerPackageJson.version,
       schemaVersion: 'temporal-analysis/v1',
       inputs: {
         projectRoot: projectName,

@@ -4,6 +4,8 @@ import {
   type Diagnostic,
 } from '@temporal-explorer/schemas';
 
+import packageJson from '../../../package.json';
+
 export type ArtifactReference = {
   path: string;
   schemaVersion: string;
@@ -19,9 +21,9 @@ export type TemporalExplorerResult<T> = {
 
 export const temporalExplorerArtifactVersions = artifactSchemaVersions;
 
-/** Returns the package version used in generated artifacts during the MVP implementation. */
+/** Returns the published package version, read from the root package.json. */
 export function getTemporalExplorerVersion(): string {
-  return '0.0.0-mvp';
+  return packageJson.version;
 }
 
 /** Wraps a library value in the shared structured result contract. */

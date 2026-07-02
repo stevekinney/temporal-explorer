@@ -22,6 +22,8 @@ import {
   runtimeTraceDocumentSchema,
 } from '@temporal-explorer/schemas';
 
+import temporalExplorerPackageJson from '../../../package.json';
+
 const fixtureRoot = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
 const analysisArtifactFile = Bun.file(`${fixtureRoot}/.temporal-explorer/analysis.json`);
 const traceArtifactFile = Bun.file(
@@ -33,7 +35,7 @@ const overlayArtifactFile = Bun.file(
 
 describe('public API scaffold', () => {
   it('exposes the product version and artifact versions', () => {
-    expect(getTemporalExplorerVersion()).toBe('0.0.0-mvp');
+    expect(getTemporalExplorerVersion()).toBe(temporalExplorerPackageJson.version);
     expect(temporalExplorerArtifactVersions.analysis).toBe('temporal-analysis/v1');
   });
 
@@ -164,7 +166,6 @@ describe('public API scaffold', () => {
   });
 
   it('matches committed CLI markdown and workflow JSON for parity', async () => {
-    const fixtureRoot = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
     const analysisResult = await analyzeProject({ root: fixtureRoot });
     const committedDocumentation = await Bun.file(
       new URL(
