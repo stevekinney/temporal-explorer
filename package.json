@@ -1,13 +1,12 @@
 {
   "name": "temporal-explorer",
   "version": "0.0.0-mvp",
-  "private": true,
   "description": "Local-first Temporal TypeScript workflow analysis, documentation, and trace exploration.",
   "license": "MIT",
   "author": "Steve Kinney <hello@stevekinney.net>",
   "type": "module",
   "bin": {
-    "temporal-explorer": "./dist/cli/index.js"
+    "temporal-explorer": "dist/cli/index.js"
   },
   "exports": {
     ".": {
