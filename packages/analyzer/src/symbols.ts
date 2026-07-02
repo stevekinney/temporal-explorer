@@ -1,7 +1,16 @@
 import { Node, SyntaxKind, type CallExpression, type Identifier, type SourceFile } from 'ts-morph';
 
-const temporalWorkflowModule = '@temporalio/workflow';
+export const temporalWorkflowModule = '@temporalio/workflow';
 export const temporalWorkerModule = '@temporalio/worker';
+
+/** Reports whether a call invokes a named export of `@temporalio/workflow`, following import aliases. */
+export function isWorkflowModuleCall(call: CallExpression, importedName: string): boolean {
+  const expression = call.getExpression();
+  return (
+    Node.isIdentifier(expression) &&
+    isNamedImportFrom(expression, temporalWorkflowModule, importedName)
+  );
+}
 
 export function isNamedImportFrom(
   identifier: Identifier,

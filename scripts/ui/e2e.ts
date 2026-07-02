@@ -2,11 +2,13 @@ import { chromium } from '@playwright/test';
 
 import { startExplorerServer } from '../../packages/cli/src/open-server';
 import { collectBrowserErrors } from './browser-errors';
+import { warmUpServer } from './warm-up-server';
 
 const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url).pathname;
 
 async function runExplorerSmokeTest(): Promise<void> {
   const server = await startExplorerServer({ projectRoot: fixtureRoot });
+  await warmUpServer(server.url);
   const browser = await chromium.launch();
 
   try {

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "approval",
+  "history": "approved",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "approvalWorkflow",
+  "workflowId": "approval-approved",
+  "runIdNormalization": { "replacement": "approved-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 15,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 1,
+    "11": 1,
+    "12": 1,
+    "26": 1
+  },
+  "contentSha256": "a6ebeb050a9079ec97d84a74a0a80537a05029ef32c92c54c811e723c856794e"
+}

@@ -1,0 +1,197 @@
+{
+  "events": [
+    {
+      "links": [],
+      "eventId": "1",
+      "eventTime": "2026-01-01T00:00:00.001Z",
+      "eventType": 1,
+      "workflowExecutionStartedEventAttributes": {
+        "completionCallbacks": [],
+        "workflowType": { "name": "retryWorkflow" },
+        "taskQueue": { "name": "retry-task-queue", "kind": 1 },
+        "input": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJvcmRlcklkIjoib3JkZXItcmV0cnkiLCJmYWlsdXJlc0JlZm9yZVN1Y2Nlc3MiOjJ9"
+            }
+          ]
+        },
+        "workflowExecutionTimeout": { "seconds": "315360000" },
+        "workflowRunTimeout": { "seconds": "315360000" },
+        "workflowTaskTimeout": { "seconds": "10" },
+        "originalExecutionRunId": "retry-success-run-id",
+        "identity": "temporal-explorer-fixture-worker",
+        "firstExecutionRunId": "retry-success-run-id",
+        "attempt": 1,
+        "firstWorkflowTaskBackoff": {},
+        "header": { "fields": {} }
+      }
+    },
+    {
+      "links": [],
+      "eventId": "2",
+      "eventTime": "2026-01-01T00:00:00.002Z",
+      "eventType": 5,
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": { "name": "retry-task-queue", "kind": 1 },
+        "startToCloseTimeout": { "seconds": "10" },
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "3",
+      "eventTime": "2026-01-01T00:00:00.003Z",
+      "eventType": 6,
+      "workflowTaskStartedEventAttributes": {
+        "suggestContinueAsNewReasons": [],
+        "scheduledEventId": "2",
+        "identity": "temporal-explorer-fixture-worker",
+        "historySizeBytes": "0"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "4",
+      "eventTime": "2026-01-01T00:00:00.004Z",
+      "eventType": 7,
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "2",
+        "identity": "temporal-explorer-fixture-worker",
+        "binaryChecksum": "@temporalio/worker@1.18.1+a08bfdb39fbaff868f425d998fa8e781e2ea564fa95bf2f7c57197aa644a203e",
+        "sdkMetadata": {
+          "coreUsedFlags": [1, 2, 3],
+          "langUsedFlags": [],
+          "sdkName": "temporal-typescript",
+          "sdkVersion": "1.18.1"
+        },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "links": [],
+      "eventId": "5",
+      "eventTime": "2026-01-01T00:00:00.005Z",
+      "eventType": 10,
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "1",
+        "activityType": { "name": "flakyCharge" },
+        "taskQueue": { "name": "retry-task-queue", "kind": 1 },
+        "header": { "fields": {} },
+        "input": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "Im9yZGVyLXJldHJ5Ig=="
+            },
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "Mg=="
+            }
+          ]
+        },
+        "scheduleToCloseTimeout": { "seconds": "315360000" },
+        "scheduleToStartTimeout": { "seconds": "315360000" },
+        "startToCloseTimeout": { "seconds": "60" },
+        "heartbeatTimeout": {},
+        "workflowTaskCompletedEventId": "3",
+        "retryPolicy": {
+          "nonRetryableErrorTypes": [],
+          "initialInterval": { "seconds": "1" },
+          "backoffCoefficient": 1,
+          "maximumInterval": { "seconds": "100" },
+          "maximumAttempts": 3
+        }
+      }
+    },
+    {
+      "links": [],
+      "eventId": "6",
+      "eventTime": "2026-01-01T00:00:00.006Z",
+      "eventType": 11,
+      "activityTaskStartedEventAttributes": {
+        "scheduledEventId": "5",
+        "identity": "temporal-explorer-fixture-worker",
+        "attempt": 3
+      }
+    },
+    {
+      "links": [],
+      "eventId": "7",
+      "eventTime": "2026-01-01T00:00:00.007Z",
+      "eventType": 12,
+      "activityTaskCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJhdXRob3JpemF0aW9uSWQiOiJhdXRob3JpemF0aW9uLW9yZGVyLXJldHJ5Iiwic3VjY2VlZGVkT25BdHRlbXB0IjozfQ=="
+            }
+          ]
+        },
+        "scheduledEventId": "5",
+        "startedEventId": "6",
+        "identity": "temporal-explorer-fixture-worker"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "8",
+      "eventTime": "2026-01-01T00:00:00.008Z",
+      "eventType": 5,
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": { "name": "retry-task-queue", "kind": 1 },
+        "startToCloseTimeout": { "seconds": "10" },
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "9",
+      "eventTime": "2026-01-01T00:00:00.009Z",
+      "eventType": 6,
+      "workflowTaskStartedEventAttributes": {
+        "suggestContinueAsNewReasons": [],
+        "scheduledEventId": "8",
+        "identity": "temporal-explorer-fixture-worker",
+        "historySizeBytes": "0"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "10",
+      "eventTime": "2026-01-01T00:00:00.010Z",
+      "eventType": 7,
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "8",
+        "identity": "temporal-explorer-fixture-worker",
+        "binaryChecksum": "@temporalio/worker@1.18.1+a08bfdb39fbaff868f425d998fa8e781e2ea564fa95bf2f7c57197aa644a203e",
+        "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "links": [],
+      "eventId": "11",
+      "eventTime": "2026-01-01T00:00:00.011Z",
+      "eventType": 2,
+      "workflowExecutionCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJvcmRlcklkIjoib3JkZXItcmV0cnkiLCJhdXRob3JpemF0aW9uSWQiOiJhdXRob3JpemF0aW9uLW9yZGVyLXJldHJ5Iiwic3VjY2VlZGVkT25BdHRlbXB0IjozfQ=="
+            }
+          ]
+        },
+        "workflowTaskCompletedEventId": "9"
+      }
+    }
+  ]
+}

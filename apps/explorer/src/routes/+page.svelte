@@ -1,5 +1,6 @@
 <script lang="ts">
   import WorkflowFlowPanel from '$lib/components/workflow-flow-panel.svelte';
+  import WorkflowMessagesPanel from '$lib/components/workflow-messages-panel.svelte';
   import { buildGraphProjection, formatEventReferences, sourceText } from '$lib/graph/projection';
   import {
     formatDuration,
@@ -359,20 +360,12 @@
         </TabPanel>
 
         <TabPanel value="messages">
-          <div class="message-grid">
-            <Card title="Signals" headingLevel={2}>
-              <strong>{selectedWorkflow.messageSurface.signals.length}</strong>
-              <span>static signals</span>
-            </Card>
-            <Card title="Queries" headingLevel={2}>
-              <strong>{selectedWorkflow.messageSurface.queries.length}</strong>
-              <span>static queries</span>
-            </Card>
-            <Card title="Updates" headingLevel={2}>
-              <strong>{selectedWorkflow.messageSurface.updates.length}</strong>
-              <span>static updates</span>
-            </Card>
-          </div>
+          <WorkflowMessagesPanel
+            signals={selectedWorkflow.messageSurface.signals}
+            queryCount={selectedWorkflow.messageSurface.queries.length}
+            updateCount={selectedWorkflow.messageSurface.updates.length}
+            {graphProjection}
+          />
         </TabPanel>
 
         <TabPanel value="activities">
@@ -587,8 +580,7 @@
 
   .workflow-header,
   .signal-strip,
-  .panel-grid,
-  .message-grid {
+  .panel-grid {
     display: grid;
     gap: 1rem;
   }
@@ -672,22 +664,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .message-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .message-grid strong {
-    display: block;
-    color: #2f6fed;
-    font-size: 2rem;
-    line-height: 1;
-  }
-
-  .message-grid span {
-    color: #5d6b75;
-    font-size: 0.875rem;
-  }
-
   .table-panel {
     margin-bottom: 1rem;
     overflow-x: auto;
@@ -741,8 +717,7 @@
 
     .workflow-header,
     .signal-strip,
-    .panel-grid,
-    .message-grid {
+    .panel-grid {
       grid-template-columns: 1fr;
     }
   }

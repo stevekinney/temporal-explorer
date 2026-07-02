@@ -1,0 +1,230 @@
+{
+  "$id": "https://temporal-explorer.dev/schemas/temporal-overlay/v1",
+  "title": "temporal-overlay/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "temporal-overlay/v1" },
+    "artifactId": { "type": "string", "minLength": 1 },
+    "staticAnalysisId": { "type": "string", "minLength": 1 },
+    "runtimeTraceId": { "type": "string", "minLength": 1 },
+    "workflow": { "type": "string", "minLength": 1 },
+    "staticNodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": {
+            "anyOf": [
+              { "type": "string", "const": "workflow" },
+              { "type": "string", "const": "activity" },
+              { "type": "string", "const": "signal" },
+              { "type": "string", "const": "timer" },
+              { "type": "string", "const": "condition" }
+            ]
+          },
+          "name": { "type": "string", "minLength": 1 },
+          "observed": { "type": "boolean" },
+          "source": { "$ref": "#/$defs/__schema0" }
+        },
+        "required": ["id", "kind", "name", "observed"],
+        "additionalProperties": false
+      }
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "runtimeOperationId": { "type": "string", "minLength": 1 },
+          "staticNodeId": { "type": "string", "minLength": 1 },
+          "confidence": { "$ref": "#/$defs/__schema2" },
+          "reason": { "type": "string", "minLength": 1 },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "anyOf": [
+                    { "type": "string", "const": "activity-type" },
+                    { "type": "string", "const": "command-order" },
+                    { "type": "string", "const": "workflow-type" },
+                    { "type": "string", "const": "signal-name" },
+                    { "type": "string", "const": "timer-order" },
+                    { "type": "string", "const": "event-reference" },
+                    { "type": "string", "const": "source-location" },
+                    { "type": "string", "const": "unmapped" }
+                  ]
+                },
+                "description": { "type": "string", "minLength": 1 },
+                "eventIds": {
+                  "type": "array",
+                  "items": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 }
+                },
+                "staticNodeId": { "type": "string", "minLength": 1 }
+              },
+              "required": ["kind", "description"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["runtimeOperationId", "confidence", "reason", "evidence"],
+        "additionalProperties": false
+      }
+    },
+    "branchOutcomes": { "type": "array", "items": {} },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "object",
+          "properties": {
+            "total": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "observed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "skipped": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "unmappedRuntimeOperations": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": ["total", "observed", "skipped", "unmappedRuntimeOperations"],
+          "additionalProperties": false
+        },
+        "activities": {
+          "type": "object",
+          "properties": {
+            "staticTotal": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "observed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "retried": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "failed": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+          },
+          "required": ["staticTotal", "observed", "retried", "failed"],
+          "additionalProperties": false
+        },
+        "messages": {
+          "type": "object",
+          "properties": {
+            "staticSignals": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "receivedSignals": { "type": "array", "items": { "type": "string" } },
+            "staticUpdates": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "receivedUpdates": { "type": "array", "items": { "type": "string" } },
+            "staticQueries": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+          },
+          "required": [
+            "staticSignals",
+            "receivedSignals",
+            "staticUpdates",
+            "receivedUpdates",
+            "staticQueries"
+          ],
+          "additionalProperties": false
+        },
+        "timers": {
+          "type": "object",
+          "properties": {
+            "staticTotal": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "fired": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "canceled": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+            "pending": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+          },
+          "required": ["staticTotal", "fired", "canceled", "pending"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["nodes", "activities", "messages", "timers"],
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "category": {
+            "anyOf": [
+              { "type": "string", "const": "configuration" },
+              { "type": "string", "const": "discovery" },
+              { "type": "string", "const": "type-extraction" },
+              { "type": "string", "const": "control-flow" },
+              { "type": "string", "const": "determinism" },
+              { "type": "string", "const": "history" },
+              { "type": "string", "const": "mapping" },
+              { "type": "string", "const": "rendering" },
+              { "type": "string", "const": "privacy" },
+              { "type": "string", "const": "compatibility" }
+            ]
+          },
+          "severity": {
+            "anyOf": [
+              { "type": "string", "const": "error" },
+              { "type": "string", "const": "warning" },
+              { "type": "string", "const": "info" }
+            ]
+          },
+          "message": { "type": "string", "minLength": 1 },
+          "source": { "$ref": "#/$defs/__schema0" },
+          "relatedSources": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+          "confidence": { "$ref": "#/$defs/__schema2" },
+          "documentationUrl": { "type": "string", "format": "uri" }
+        },
+        "required": ["code", "category", "severity", "message", "confidence"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "artifactId",
+    "staticAnalysisId",
+    "runtimeTraceId",
+    "workflow",
+    "staticNodes",
+    "mappings",
+    "branchOutcomes",
+    "coverage",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "pathKind": {
+          "anyOf": [
+            { "type": "string", "const": "project-relative" },
+            { "type": "string", "const": "absolute" }
+          ]
+        },
+        "start": { "$ref": "#/$defs/__schema1" },
+        "end": { "$ref": "#/$defs/__schema1" },
+        "symbolName": { "type": "string", "minLength": 1 }
+      },
+      "required": ["path", "pathKind", "start", "end"],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "object",
+      "properties": {
+        "line": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "column": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "offset": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+      },
+      "required": ["line", "column", "offset"],
+      "additionalProperties": false
+    },
+    "__schema2": {
+      "anyOf": [
+        { "type": "string", "const": "exact" },
+        { "type": "string", "const": "inferred" },
+        { "type": "string", "const": "partial" },
+        { "type": "string", "const": "ambiguous" },
+        { "type": "string", "const": "dynamic" },
+        { "type": "string", "const": "unknown" }
+      ]
+    }
+  }
+}

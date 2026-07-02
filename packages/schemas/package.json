@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./json-schema": "./src/json-schema.ts"
   },
   "scripts": {
     "build": "bun build src/index.ts --target=bun --outdir=dist --entry-naming index.js",

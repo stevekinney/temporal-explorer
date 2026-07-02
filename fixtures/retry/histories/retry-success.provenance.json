@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "retry",
+  "history": "retry-success",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "retryWorkflow",
+  "workflowId": "retry-retry-success",
+  "runIdNormalization": { "replacement": "retry-success-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 11,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 2,
+    "6": 2,
+    "7": 2,
+    "10": 1,
+    "11": 1,
+    "12": 1
+  },
+  "contentSha256": "fdd0e32dfa12ddebc562beffbdd7b59a589ed1df9baed29aa0fb623a90ee9a9e"
+}

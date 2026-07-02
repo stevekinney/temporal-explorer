@@ -5,7 +5,13 @@ import { confidenceSchema, diagnosticSchema, sourceLocationSchema } from './comm
 export const staticOverlayNodeSchema = z
   .object({
     id: z.string().min(1),
-    kind: z.union([z.literal('workflow'), z.literal('activity')]),
+    kind: z.union([
+      z.literal('workflow'),
+      z.literal('activity'),
+      z.literal('signal'),
+      z.literal('timer'),
+      z.literal('condition'),
+    ]),
     name: z.string().min(1),
     observed: z.boolean(),
     source: sourceLocationSchema.optional(),
@@ -18,6 +24,8 @@ export const mappingEvidenceSchema = z
       z.literal('activity-type'),
       z.literal('command-order'),
       z.literal('workflow-type'),
+      z.literal('signal-name'),
+      z.literal('timer-order'),
       z.literal('event-reference'),
       z.literal('source-location'),
       z.literal('unmapped'),

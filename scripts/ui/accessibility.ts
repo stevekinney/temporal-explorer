@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 
 import { startExplorerServer } from '../../packages/cli/src/open-server';
 import { collectBrowserErrors } from './browser-errors';
+import { warmUpServer } from './warm-up-server';
 
 const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url).pathname;
 const require = createRequire(import.meta.url);
@@ -11,6 +12,7 @@ const axeSourcePath = require.resolve('axe-core/axe.min.js');
 
 async function runAccessibilityAudit(): Promise<void> {
   const server = await startExplorerServer({ projectRoot: fixtureRoot });
+  await warmUpServer(server.url);
   const browser = await chromium.launch();
 
   try {

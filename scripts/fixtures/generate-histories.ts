@@ -83,8 +83,16 @@ async function executeFixtureWorkflow(
       }
     }
 
+    // Fetch the first execution run explicitly so continue-as-new fixtures
+    // capture the run that ends with WorkflowExecutionContinuedAsNew instead
+    // of following the chain to the final run.
+    const firstRunHandle = environment.client.workflow.getHandle(
+      workflowId,
+      handle.firstExecutionRunId,
+    );
+
     return {
-      history: toJsonCompatible(await handle.fetchHistory()),
+      history: toJsonCompatible(await firstRunHandle.fetchHistory()),
       runId: handle.firstExecutionRunId ?? 'unknown-run-id',
     };
   });

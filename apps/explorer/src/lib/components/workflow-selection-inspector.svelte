@@ -2,9 +2,9 @@
   import { Badge } from '$cinder-components/badge';
 
   import { formatEventReferences, type RuntimeOverlayState } from '$lib/graph/projection';
-  import { statusBadgeVariant } from '$lib/graph/runtime-display';
+  import { formatTimestamp, statusBadgeVariant } from '$lib/graph/runtime-display';
 
-  import type { EventReference } from '@temporal-explorer/schemas';
+  import type { EventReference, RuntimeOperation } from '@temporal-explorer/schemas';
 
   type Props = {
     title: string;
@@ -12,9 +12,10 @@
     source: string;
     eventReferences: EventReference[];
     reason: string | undefined;
+    operation: RuntimeOperation | undefined;
   };
 
-  let { title, state, source, eventReferences, reason }: Props = $props();
+  let { title, state, source, eventReferences, reason, operation }: Props = $props();
 </script>
 
 <aside class="selection-inspector" aria-label="Selection inspector">
@@ -43,6 +44,22 @@
       <section>
         <span>Mapping reason</span>
         <p>{reason}</p>
+      </section>
+    {/if}
+    {#if operation?.kind === 'timer'}
+      <section>
+        <span>Timer status</span>
+        <strong>{operation.status}</strong>
+      </section>
+      <section>
+        <span>Timer duration</span>
+        <strong>{operation.durationText ?? 'pending'}</strong>
+      </section>
+    {/if}
+    {#if operation?.kind === 'signal'}
+      <section>
+        <span>Signal received</span>
+        <strong>{formatTimestamp(operation.receivedAt)}</strong>
       </section>
     {/if}
   </div>

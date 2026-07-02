@@ -82,4 +82,77 @@ describe('event history parser', () => {
     expect(trace.diagnostics[0]?.code).toBe('TEH_UNKNOWN_EVENT_TYPE');
     expect(trace.operations.map((operation) => operation.kind)).toEqual(['workflow-lifecycle']);
   });
+
+  it('collapses signal and canceled timer events from the timer-race history', async () => {
+    const history = await Bun.file(
+      new URL('../../../fixtures/timer-race/histories/signal-wins.json', import.meta.url),
+    ).json();
+    const trace = parseEventHistory({
+      history,
+      traceId: 'signal-wins',
+      historyHash: 'timer-race-signal-wins-hash',
+    });
+    const signals = trace.operations.filter((operation) => operation.kind === 'signal');
+    const timers = trace.operations.filter((operation) => operation.kind === 'timer');
+
+    expect(validateArtifact(trace).success).toBe(true);
+    expect(signals).toHaveLength(1);
+    expect(signals[0]?.kind === 'signal' && signals[0].signalName).toBe('approve');
+    expect(timers).toHaveLength(1);
+    expect(timers[0]?.kind === 'timer' && timers[0].status).toBe('canceled');
+    expect(timers[0]?.kind === 'timer' && timers[0].durationText).toBe('2592000s');
+    expect(timers[0]?.eventReferences.map((reference) => reference.eventType)).toEqual([
+      'TimerStarted',
+      'TimerCanceled',
+    ]);
+    expect(trace.timeline.some((entry) => entry.label === 'Signal approve received')).toBe(true);
+    expect(
+      trace.payloads.filter((payload) => payload.kind === 'signal').every((p) => p.redacted),
+    ).toBe(true);
+  });
+
+  it('collapses fired timer events from the timer-race timeout history', async () => {
+    const history = await Bun.file(
+      new URL('../../../fixtures/timer-race/histories/timeout.json', import.meta.url),
+    ).json();
+    const trace = parseEventHistory({
+      history,
+      traceId: 'timeout',
+      historyHash: 'timer-race-timeout-hash',
+    });
+    const timers = trace.operations.filter((operation) => operation.kind === 'timer');
+
+    expect(timers).toHaveLength(1);
+    expect(timers[0]?.kind === 'timer' && timers[0].status).toBe('fired');
+    expect(trace.timeline.filter((entry) => entry.label.startsWith('Timer'))).toHaveLength(2);
+  });
+
+  it('keeps unclosed timers pending', () => {
+    const trace = parseEventHistory({
+      history: {
+        events: [
+          {
+            eventId: '1',
+            eventTime: '2026-01-01T00:00:00.001Z',
+            eventType: 1,
+            workflowExecutionStartedEventAttributes: {
+              workflowType: { name: 'pendingTimerWorkflow' },
+              originalExecutionRunId: 'pending-run',
+            },
+          },
+          {
+            eventId: '2',
+            eventTime: '2026-01-01T00:00:00.002Z',
+            eventType: 17,
+            timerStartedEventAttributes: { timerId: '1' },
+          },
+        ],
+      },
+      historyHash: 'pending-timer-hash',
+    });
+    const timers = trace.operations.filter((operation) => operation.kind === 'timer');
+
+    expect(timers).toHaveLength(1);
+    expect(timers[0]?.kind === 'timer' && timers[0].status).toBe('pending');
+  });
 });

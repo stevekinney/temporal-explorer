@@ -3,7 +3,7 @@
 
   export type TemporalFlowNodeData = Record<string, unknown> & {
     label: string;
-    kind: 'workflow' | 'activity' | 'runtime';
+    kind: 'workflow' | 'activity' | 'timer' | 'condition' | 'signal' | 'runtime';
     state: RuntimeOverlayState;
     sourceText: string;
     eventSummary: string;
@@ -17,20 +17,10 @@
   import { Handle, Position, type NodeProps } from '@xyflow/svelte';
 
   import { runtimeStateToken } from '$lib/graph/projection';
-
-  type BadgeVariant = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'accent';
+  import { statusBadgeVariant } from '$lib/graph/runtime-display';
 
   let { data }: NodeProps = $props();
   const nodeData = $derived(data as TemporalFlowNodeData);
-
-  function badgeVariant(state: RuntimeOverlayState): BadgeVariant {
-    if (state === 'completed' || state === 'observed') return 'success';
-    if (state === 'failed' || state === 'timed out' || state === 'canceled') return 'danger';
-    if (state === 'retried' || state === 'pending' || state === 'ambiguous') return 'warning';
-    if (state === 'unmapped') return 'accent';
-
-    return 'neutral';
-  }
 </script>
 
 <div
@@ -56,7 +46,7 @@
   />
   <div class="node-kicker">
     <span>{nodeData.kind}</span>
-    <Badge variant={badgeVariant(nodeData.state)} size="xs">{nodeData.state}</Badge>
+    <Badge variant={statusBadgeVariant(nodeData.state)} size="xs">{nodeData.state}</Badge>
   </div>
   <strong>{nodeData.label}</strong>
   <span class="node-source">{nodeData.sourceText}</span>
@@ -91,6 +81,18 @@
 
   .temporal-flow-node[data-kind='activity'] {
     border-left-color: #18845b;
+  }
+
+  .temporal-flow-node[data-kind='timer'] {
+    border-left-color: #b76b00;
+  }
+
+  .temporal-flow-node[data-kind='condition'] {
+    border-left-color: #0f7a8c;
+  }
+
+  .temporal-flow-node[data-kind='signal'] {
+    border-left-color: #c9436e;
   }
 
   .temporal-flow-node[data-kind='runtime'] {

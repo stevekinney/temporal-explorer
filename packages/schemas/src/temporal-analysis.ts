@@ -96,6 +96,7 @@ export const temporalCommandSchema = z
       z.literal('activity'),
       z.literal('workflow-lifecycle'),
       z.literal('timer'),
+      z.literal('condition'),
       z.literal('signal'),
       z.literal('query'),
       z.literal('update'),
@@ -110,6 +111,42 @@ export const temporalCommandSchema = z
   })
   .strict();
 
+export const signalDefinitionSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    source: sourceLocationSchema,
+    args: z.array(typeShapeSchema),
+    handlerSource: sourceLocationSchema.optional(),
+    confidence: confidenceSchema,
+  })
+  .strict();
+
+export const queryDefinitionSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    source: sourceLocationSchema,
+    args: z.array(typeShapeSchema),
+    result: typeShapeSchema.optional(),
+    handlerSource: sourceLocationSchema.optional(),
+    confidence: confidenceSchema,
+  })
+  .strict();
+
+export const updateDefinitionSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    source: sourceLocationSchema,
+    args: z.array(typeShapeSchema),
+    result: typeShapeSchema.optional(),
+    handlerSource: sourceLocationSchema.optional(),
+    validatorSource: sourceLocationSchema.optional(),
+    confidence: confidenceSchema,
+  })
+  .strict();
+
 export const workflowDefinitionSchema = z
   .object({
     id: z.string().min(1),
@@ -119,7 +156,7 @@ export const workflowDefinitionSchema = z
     signature: workflowSignatureSchema,
     messageSurface: z
       .object({
-        signals: z.array(z.unknown()),
+        signals: z.array(signalDefinitionSchema),
         queries: z.array(z.unknown()),
         updates: z.array(z.unknown()),
       })
@@ -180,6 +217,9 @@ export const temporalAnalysisDocumentSchema = z
 
 export type WorkflowSignature = z.infer<typeof workflowSignatureSchema>;
 export type TemporalCommand = z.infer<typeof temporalCommandSchema>;
+export type SignalDefinition = z.infer<typeof signalDefinitionSchema>;
+export type QueryDefinition = z.infer<typeof queryDefinitionSchema>;
+export type UpdateDefinition = z.infer<typeof updateDefinitionSchema>;
 export type WorkflowDefinition = z.infer<typeof workflowDefinitionSchema>;
 export type ActivityDefinition = z.infer<typeof activityDefinitionSchema>;
 export type TemporalAnalysisDocument = z.infer<typeof temporalAnalysisDocumentSchema>;

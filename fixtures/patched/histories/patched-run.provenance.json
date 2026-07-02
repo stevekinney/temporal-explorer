@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "patched",
+  "history": "patched-run",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "patchedWorkflow",
+  "workflowId": "patched-patched-run",
+  "runIdNormalization": { "replacement": "patched-run-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 15,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 2,
+    "6": 2,
+    "7": 2,
+    "10": 1,
+    "11": 1,
+    "12": 1,
+    "25": 2,
+    "40": 2
+  },
+  "contentSha256": "dafd80b68b91f2f9546a4a49915e7461a23a7bb31186e21a645e18c6364bddd3"
+}

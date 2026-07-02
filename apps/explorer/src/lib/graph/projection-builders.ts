@@ -4,17 +4,13 @@ import type {
   RuntimeOperation,
   RuntimeTimelineEntry,
   RuntimeTraceDocument,
+  SignalDefinition,
   TemporalCommand,
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
 import { sourceText } from './formatting';
-import type {
-  RuntimeOperationRow,
-  TemporalGraphEdge,
-  TemporalGraphNode,
-  TimelineRow,
-} from './projection';
+import type { RuntimeOperationRow, TemporalGraphNode, TimelineRow } from './projection';
 import {
   confidenceForOperationIds,
   eventReferencesForOperationIds,
@@ -28,12 +24,16 @@ import {
   operationState,
   runtimeOperationRowState,
   workflowState,
+  type RuntimeOverlayState,
 } from './runtime-state';
 
 type ProjectionBuildContext = {
   mappingsByRuntimeOperationId: Map<string, RuntimeNodeMapping>;
   operationsById: Map<string, RuntimeOperation>;
 };
+
+/** A static command that renders as a node in the sequential command chain. */
+type GraphCommand = TemporalCommand & { kind: 'activity' | 'timer' | 'condition' };
 
 export function createWorkflowGraphNode(
   workflow: WorkflowDefinition,
@@ -59,16 +59,29 @@ export function createWorkflowGraphNode(
   };
 }
 
-export function createActivityGraphNodes(
+/** Builds one node per Activity, Timer, and Condition command, ordered by staticOrder. */
+export function createCommandGraphNodes(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument | undefined,
   overlay: ExecutionOverlayDocument | undefined,
   context: ProjectionBuildContext,
 ): TemporalGraphNode[] {
   return workflow.temporalCommands
-    .filter(isActivityCommand)
+    .filter(isGraphCommand)
     .toSorted((left, right) => left.staticOrder - right.staticOrder)
-    .map((command, index) => createActivityGraphNode(command, index, trace, overlay, context));
+    .map((command, index) => createCommandGraphNode(command, index, trace, overlay, context));
+}
+
+/** Builds one node per static Signal declared on the workflow's message surface. */
+export function createSignalGraphNodes(
+  workflow: WorkflowDefinition,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode[] {
+  return workflow.messageSurface.signals.map((signal, index) =>
+    createSignalGraphNode(signal, index, trace, overlay, context),
+  );
 }
 
 export function createUnmappedRuntimeNodes(
@@ -92,28 +105,9 @@ export function createUnmappedRuntimeNodes(
         runtimeOperationIds: [operation.id],
         eventReferences: operation.eventReferences,
         confidence: 'unknown',
-        fallbackPosition: { x: 320 + index * 280, y: 340 },
+        fallbackPosition: { x: 320 + index * 280, y: 480 },
       })) ?? []
   );
-}
-
-export function createGraphEdges(
-  workflowNode: TemporalGraphNode,
-  activityNodes: TemporalGraphNode[],
-): TemporalGraphEdge[] {
-  return [workflowNode, ...activityNodes].slice(1).map((node, index, staticEdgeNodes) => {
-    const source = staticEdgeNodes[index]?.id ?? workflowNode.id;
-
-    return {
-      id: `edge:${source}->${node.id}`,
-      source,
-      target: node.id,
-      label: node.kind === 'activity' ? `Activity ${index + 1}` : 'Workflow path',
-      state: node.state,
-      runtimeOperationIds: node.runtimeOperationIds,
-      eventReferences: node.eventReferences,
-    };
-  });
 }
 
 export function createTimelineRows(
@@ -140,8 +134,8 @@ export function createRuntimeOperationRows(
   );
 }
 
-function createActivityGraphNode(
-  command: TemporalCommand,
+function createCommandGraphNode(
+  command: GraphCommand,
   index: number,
   trace: RuntimeTraceDocument | undefined,
   overlay: ExecutionOverlayDocument | undefined,
@@ -155,12 +149,13 @@ function createActivityGraphNode(
   return {
     id: command.id,
     label: command.name,
-    kind: 'activity',
+    kind: command.kind,
     state: commandState(
       command,
       overlay,
       trace?.operations ?? [],
       context.mappingsByRuntimeOperationId,
+      fallbackObservedState(command.kind),
     ),
     source: command.source,
     sourceText: sourceText(command.source),
@@ -172,6 +167,48 @@ function createActivityGraphNode(
     ),
     fallbackPosition: { x: 320 + index * 280, y: 120 },
   };
+}
+
+function createSignalGraphNode(
+  signal: SignalDefinition,
+  index: number,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode {
+  const runtimeOperationIds = runtimeOperationIdsForNode(
+    signal.id,
+    context.mappingsByRuntimeOperationId,
+  );
+
+  return {
+    id: signal.id,
+    label: signal.name,
+    kind: 'signal',
+    state: commandState(
+      signal,
+      overlay,
+      trace?.operations ?? [],
+      context.mappingsByRuntimeOperationId,
+      'observed',
+    ),
+    source: signal.source,
+    sourceText: sourceText(signal.source),
+    runtimeOperationIds,
+    eventReferences: eventReferencesForOperationIds(runtimeOperationIds, context.operationsById),
+    confidence: confidenceForOperationIds(
+      runtimeOperationIds,
+      context.mappingsByRuntimeOperationId,
+    ),
+    fallbackPosition: { x: 40, y: 320 + index * 160 },
+  };
+}
+
+function fallbackObservedState(kind: GraphCommand['kind']): RuntimeOverlayState {
+  if (kind === 'timer') return 'fired';
+  if (kind === 'condition') return 'observed';
+
+  return 'completed';
 }
 
 function createTimelineRow(
@@ -231,6 +268,6 @@ function graphNodeIdForOperation(
   );
 }
 
-function isActivityCommand(command: TemporalCommand): boolean {
-  return command.kind === 'activity';
+function isGraphCommand(command: TemporalCommand): command is GraphCommand {
+  return command.kind === 'activity' || command.kind === 'timer' || command.kind === 'condition';
 }

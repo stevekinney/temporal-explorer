@@ -31,7 +31,10 @@ async function runCli(args: string[]): Promise<void> {
 }
 
 const fixtureFilter = getFlagValue('--fixture');
-const fixtures = [...new Set(fixtureHistories.map((definition) => definition.fixture))]
+const artifactDefinitions = fixtureHistories.filter(
+  (definition) => definition.generateArtifacts !== false,
+);
+const fixtures = [...new Set(artifactDefinitions.map((definition) => definition.fixture))]
   .filter((fixture) => !fixtureFilter || fixture === fixtureFilter)
   .toSorted((left, right) => left.localeCompare(right));
 
@@ -41,7 +44,7 @@ if (fixtures.length === 0) {
 
 for (const fixture of fixtures) {
   const fixtureRoot = new URL(`${fixture}/`, fixturesRoot).pathname;
-  const histories = fixtureHistories.filter((definition) => definition.fixture === fixture);
+  const histories = artifactDefinitions.filter((definition) => definition.fixture === fixture);
 
   await runCli(['analyze', '--project', fixtureRoot]);
 

@@ -1,0 +1,324 @@
+{
+  "$id": "https://temporal-explorer.dev/schemas/temporal-analysis/v1",
+  "title": "temporal-analysis/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "temporal-analysis/v1" },
+    "artifactId": { "type": "string", "minLength": 1 },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "temporalExplorerVersion": { "type": "string", "minLength": 1 },
+        "schemaVersion": { "type": "string", "minLength": 1 },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "projectRoot": { "type": "string" },
+            "configHash": { "type": "string" },
+            "tsconfigHash": { "type": "string" },
+            "packageMetadataHash": { "type": "string" },
+            "lockfileHash": { "type": "string" },
+            "sourceFileHashes": {
+              "type": "object",
+              "propertyNames": { "type": "string" },
+              "additionalProperties": { "type": "string" }
+            },
+            "temporalSdkVersions": {
+              "type": "object",
+              "propertyNames": { "type": "string" },
+              "additionalProperties": { "type": "string" }
+            }
+          },
+          "required": ["projectRoot", "configHash", "sourceFileHashes", "temporalSdkVersions"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["temporalExplorerVersion", "schemaVersion", "inputs"],
+      "additionalProperties": false
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "tsconfig": { "type": "string", "minLength": 1 },
+        "packageManager": {
+          "anyOf": [
+            { "type": "string", "const": "bun" },
+            { "type": "string", "const": "npm" },
+            { "type": "string", "const": "pnpm" },
+            { "type": "string", "const": "yarn" }
+          ]
+        }
+      },
+      "required": ["root", "tsconfig"],
+      "additionalProperties": false
+    },
+    "sdk": {
+      "type": "object",
+      "properties": {
+        "temporalTypeScriptVersion": { "type": "string", "minLength": 1 },
+        "detectedPackages": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "required": ["detectedPackages"],
+      "additionalProperties": false
+    },
+    "workers": { "type": "array", "items": {} },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "source": { "$ref": "#/$defs/__schema0" },
+          "exported": { "type": "boolean" },
+          "signature": {
+            "type": "object",
+            "properties": {
+              "args": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+              "result": { "$ref": "#/$defs/__schema2" }
+            },
+            "required": ["args", "result"],
+            "additionalProperties": false
+          },
+          "messageSurface": {
+            "type": "object",
+            "properties": {
+              "signals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "minLength": 1 },
+                    "name": { "type": "string", "minLength": 1 },
+                    "source": { "$ref": "#/$defs/__schema0" },
+                    "args": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+                    "handlerSource": { "$ref": "#/$defs/__schema0" },
+                    "confidence": { "$ref": "#/$defs/__schema3" }
+                  },
+                  "required": ["id", "name", "source", "args", "confidence"],
+                  "additionalProperties": false
+                }
+              },
+              "queries": { "type": "array", "items": {} },
+              "updates": { "type": "array", "items": {} }
+            },
+            "required": ["signals", "queries", "updates"],
+            "additionalProperties": false
+          },
+          "state": {
+            "type": "object",
+            "properties": { "variables": { "type": "array", "items": {} } },
+            "required": ["variables"],
+            "additionalProperties": false
+          },
+          "body": {
+            "type": "object",
+            "properties": { "nodes": { "type": "array", "items": {} } },
+            "required": ["nodes"],
+            "additionalProperties": false
+          },
+          "temporalCommands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "kind": {
+                  "anyOf": [
+                    { "type": "string", "const": "activity" },
+                    { "type": "string", "const": "workflow-lifecycle" },
+                    { "type": "string", "const": "timer" },
+                    { "type": "string", "const": "condition" },
+                    { "type": "string", "const": "signal" },
+                    { "type": "string", "const": "query" },
+                    { "type": "string", "const": "update" },
+                    { "type": "string", "const": "child-workflow" },
+                    { "type": "string", "const": "external-workflow" },
+                    { "type": "string", "const": "dynamic" }
+                  ]
+                },
+                "name": { "type": "string", "minLength": 1 },
+                "source": { "$ref": "#/$defs/__schema0" },
+                "confidence": { "$ref": "#/$defs/__schema3" },
+                "staticOrder": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+              },
+              "required": ["id", "kind", "name", "source", "confidence", "staticOrder"],
+              "additionalProperties": false
+            }
+          },
+          "dependencies": { "type": "array", "items": {} },
+          "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/__schema4" } }
+        },
+        "required": [
+          "id",
+          "name",
+          "source",
+          "exported",
+          "signature",
+          "messageSurface",
+          "state",
+          "body",
+          "temporalCommands",
+          "dependencies",
+          "diagnostics"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "source": { "$ref": "#/$defs/__schema0" },
+          "implementationSource": { "$ref": "#/$defs/__schema0" },
+          "confidence": { "$ref": "#/$defs/__schema3" }
+        },
+        "required": ["id", "name", "confidence"],
+        "additionalProperties": false
+      }
+    },
+    "clients": { "type": "array", "items": {} },
+    "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/__schema4" } }
+  },
+  "required": [
+    "schemaVersion",
+    "artifactId",
+    "metadata",
+    "project",
+    "sdk",
+    "workers",
+    "workflows",
+    "activities",
+    "clients",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "pathKind": {
+          "anyOf": [
+            { "type": "string", "const": "project-relative" },
+            { "type": "string", "const": "absolute" }
+          ]
+        },
+        "start": { "$ref": "#/$defs/__schema1" },
+        "end": { "$ref": "#/$defs/__schema1" },
+        "symbolName": { "type": "string", "minLength": 1 }
+      },
+      "required": ["path", "pathKind", "start", "end"],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "object",
+      "properties": {
+        "line": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "column": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "offset": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+      },
+      "required": ["line", "column", "offset"],
+      "additionalProperties": false
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "display": { "type": "string", "minLength": 1 },
+        "displayName": { "type": "string", "minLength": 1 },
+        "fullyQualifiedName": { "type": "string", "minLength": 1 },
+        "kind": {
+          "anyOf": [
+            { "type": "string", "const": "primitive" },
+            { "type": "string", "const": "object" },
+            { "type": "string", "const": "array" },
+            { "type": "string", "const": "tuple" },
+            { "type": "string", "const": "union" },
+            { "type": "string", "const": "intersection" },
+            { "type": "string", "const": "literal" },
+            { "type": "string", "const": "enum" },
+            { "type": "string", "const": "function" },
+            { "type": "string", "const": "promise" },
+            { "type": "string", "const": "external" },
+            { "type": "string", "const": "unknown" }
+          ]
+        },
+        "nullable": { "type": "boolean" },
+        "optional": { "type": "boolean" },
+        "properties": {
+          "type": "object",
+          "propertyNames": { "type": "string" },
+          "additionalProperties": { "$ref": "#/$defs/__schema2" }
+        },
+        "items": { "$ref": "#/$defs/__schema2" },
+        "tupleItems": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+        "union": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+        "intersection": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+        "source": { "$ref": "#/$defs/__schema0" },
+        "module": { "type": "string", "minLength": 1 },
+        "declaration": { "$ref": "#/$defs/__schema0" },
+        "typeArguments": { "type": "array", "items": { "$ref": "#/$defs/__schema2" } },
+        "references": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "recursive": { "type": "boolean" },
+        "confidence": { "$ref": "#/$defs/__schema3" }
+      },
+      "required": ["id", "display", "kind", "confidence"],
+      "additionalProperties": false
+    },
+    "__schema3": {
+      "anyOf": [
+        { "type": "string", "const": "exact" },
+        { "type": "string", "const": "inferred" },
+        { "type": "string", "const": "partial" },
+        { "type": "string", "const": "ambiguous" },
+        { "type": "string", "const": "dynamic" },
+        { "type": "string", "const": "unknown" }
+      ]
+    },
+    "__schema4": {
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "category": {
+          "anyOf": [
+            { "type": "string", "const": "configuration" },
+            { "type": "string", "const": "discovery" },
+            { "type": "string", "const": "type-extraction" },
+            { "type": "string", "const": "control-flow" },
+            { "type": "string", "const": "determinism" },
+            { "type": "string", "const": "history" },
+            { "type": "string", "const": "mapping" },
+            { "type": "string", "const": "rendering" },
+            { "type": "string", "const": "privacy" },
+            { "type": "string", "const": "compatibility" }
+          ]
+        },
+        "severity": {
+          "anyOf": [
+            { "type": "string", "const": "error" },
+            { "type": "string", "const": "warning" },
+            { "type": "string", "const": "info" }
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "source": { "$ref": "#/$defs/__schema0" },
+        "relatedSources": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+        "confidence": { "$ref": "#/$defs/__schema3" },
+        "documentationUrl": { "type": "string", "format": "uri" }
+      },
+      "required": ["code", "category", "severity", "message", "confidence"],
+      "additionalProperties": false
+    }
+  }
+}

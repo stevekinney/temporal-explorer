@@ -175,6 +175,95 @@ describe('basic static analyzer slice', () => {
     expect(Object.keys(hashes)).toEqual(['src/a.ts', 'src/b.ts']);
   });
 
+  it('discovers signals, conditions, and handler registrations in the approval fixture', async () => {
+    const fixtureRoot = new URL('../../../fixtures/approval', import.meta.url).pathname;
+    const analysis = await analyzeProject(
+      await loadTemporalExplorerProject({
+        root: fixtureRoot,
+        workflowFiles: ['src/workflows/approval-workflow.ts'],
+      }),
+    );
+    const workflow = analysis.workflows[0];
+    const signal = workflow?.messageSurface.signals[0];
+
+    if (!workflow || !signal) {
+      throw new Error('Expected the approval workflow and its signal to be discovered.');
+    }
+
+    expect(workflow.name).toBe('approvalWorkflow');
+    expect(workflow.messageSurface.signals).toHaveLength(1);
+    expect(signal.name).toBe('approve');
+    expect(signal.args.map((arg) => arg.display)).toEqual(['ApprovalRecord']);
+    expect(signal.handlerSource?.path).toBe('src/workflows/approval-workflow.ts');
+    expect(workflow.temporalCommands.map((command) => [command.kind, command.staticOrder])).toEqual(
+      [
+        ['condition', 0],
+        ['activity', 1],
+      ],
+    );
+  });
+
+  it('discovers condition timeouts as timer commands in the timer-race fixture', async () => {
+    const fixtureRoot = new URL('../../../fixtures/timer-race', import.meta.url).pathname;
+    const analysis = await analyzeProject(
+      await loadTemporalExplorerProject({
+        root: fixtureRoot,
+        workflowFiles: ['src/workflows/timer-race-workflow.ts'],
+      }),
+    );
+    const workflow = analysis.workflows[0];
+    const commands = workflow?.temporalCommands ?? [];
+
+    expect(commands.map((command) => command.kind)).toEqual([
+      'condition',
+      'timer',
+      'activity',
+      'activity',
+    ]);
+    expect(commands.find((command) => command.kind === 'timer')?.name).toBe("'30 days'");
+    expect(workflow?.messageSurface.signals[0]?.args.map((arg) => arg.display)).toEqual(['string']);
+  });
+
+  it('discovers sleep calls and dynamic signal names defensively', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'temporal-explorer-signals-'));
+    await mkdir(join(root, 'src', 'workflows'), { recursive: true });
+    await Bun.write(join(root, 'tsconfig.json'), JSON.stringify({ include: ['src/**/*.ts'] }));
+    await Bun.write(
+      join(root, 'src', 'workflows', 'sleepy.workflow.ts'),
+      `
+import { defineSignal, setHandler, sleep } from '@temporalio/workflow';
+
+const signalName = 'runtime-named';
+const dynamicSignal = defineSignal(signalName);
+const bareSignal = defineSignal('bare');
+
+export async function sleepyWorkflow(): Promise<void> {
+  setHandler(dynamicSignal, () => {});
+  setHandler(bareSignal, () => {});
+  await sleep('5 minutes');
+}
+`,
+    );
+
+    const analysis = await analyzeWorkflowFiles({
+      projectRoot: root,
+      tsconfig: 'tsconfig.json',
+      workflowFiles: ['src/workflows/sleepy.workflow.ts'],
+      outputDirectory: '.temporal-explorer',
+    });
+    const workflow = analysis.workflows[0];
+    const signals = workflow?.messageSurface.signals ?? [];
+
+    expect(signals.map((signal) => [signal.name, signal.confidence])).toEqual([
+      ['bare', 'exact'],
+      ['signalName', 'dynamic'],
+    ]);
+    expect(signals.map((signal) => signal.args)).toEqual([[], []]);
+    expect(workflow?.temporalCommands.map((command) => [command.kind, command.name])).toEqual([
+      ['timer', "'5 minutes'"],
+    ]);
+  });
+
   it('returns false for identifiers without import declarations', () => {
     const project = new Project({ useInMemoryFileSystem: true });
     const sourceFile = project.createSourceFile(

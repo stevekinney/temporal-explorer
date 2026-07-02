@@ -8,6 +8,7 @@ import {
   createOverlayReportFromArtifact,
   importHistoryFromFile,
   loadTemporalExplorerProject,
+  validateArtifact,
   type DocumentationFile,
   type ExecutionOverlayDocument,
   type RuntimeTraceDocument,
@@ -23,6 +24,18 @@ type LoadedAnalysis = {
   projectRoot: string;
 };
 
+/** Writes an artifact only after it validates against its runtime schema. */
+async function writeValidatedArtifact(artifactPath: string, artifact: unknown): Promise<void> {
+  const validation = validateArtifact(artifact);
+
+  if (!validation.success) {
+    const issues = validation.issues.map((issue) => `${issue.path}: ${issue.message}`).join('\n');
+    throw new Error(`Refusing to write invalid artifact ${artifactPath}:\n${issues}`);
+  }
+
+  await Bun.write(artifactPath, stableJson(artifact));
+}
+
 export async function writeAnalysisArtifact(
   projectRoot: string,
   analysis: TemporalAnalysisDocument,
@@ -30,7 +43,7 @@ export async function writeAnalysisArtifact(
   const outputDirectory = join(projectRoot, '.temporal-explorer');
   const artifactPath = join(outputDirectory, 'analysis.json');
   await mkdir(outputDirectory, { recursive: true });
-  await Bun.write(artifactPath, stableJson(analysis));
+  await writeValidatedArtifact(artifactPath, analysis);
   return artifactPath;
 }
 
@@ -42,7 +55,7 @@ export async function writeTraceArtifact(
   const outputDirectory = join(projectRoot, '.temporal-explorer', 'histories');
   const artifactPath = join(outputDirectory, `${traceId}.trace.json`);
   await mkdir(outputDirectory, { recursive: true });
-  await Bun.write(artifactPath, stableJson(trace));
+  await writeValidatedArtifact(artifactPath, trace);
   return artifactPath;
 }
 
@@ -54,7 +67,7 @@ export async function writeOverlayArtifact(
   const outputDirectory = join(projectRoot, '.temporal-explorer', 'overlays');
   const artifactPath = join(outputDirectory, `${traceId}.overlay.json`);
   await mkdir(outputDirectory, { recursive: true });
-  await Bun.write(artifactPath, stableJson(overlay));
+  await writeValidatedArtifact(artifactPath, overlay);
   return artifactPath;
 }
 

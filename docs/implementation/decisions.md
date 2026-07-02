@@ -199,3 +199,50 @@ Decision: Use Prettier inside `scripts/fixtures/generate-histories.ts` for gener
 Alternatives considered: Ignore generated history fixtures in Prettier, format the fixture file manually after generation, or copy the CLI artifact JSON formatter into the fixture generator. Ignoring fixtures would weaken the final repository formatting gate. Manual post-formatting would keep drift checks red. Reusing the CLI formatter would preserve compact arrays but still disagree with Prettier.
 
 Verification impact: `bun run fixtures:generate-histories`, `bun run fixtures:verify-no-drift`, `bun run format:check`, and `bun run validate` all pass with the same generated fixture text.
+
+## 2026-07-01: Model Condition Timeouts as Implicit Timer Commands
+
+Context: Stage 9A adds timers and conditions. `condition(predicate, timeout)` in the TypeScript SDK starts a durable timer that appears in Event History as TimerStarted plus TimerFired or TimerCanceled, even though the source contains no explicit `sleep`.
+
+Decision: The analyzer emits two commands for a condition call with a timeout argument: a `condition` command for the predicate and a `timer` command for the implicit timeout timer, sharing the condition call's source location. Static timer counts therefore match runtime timer counts, and the timer-race overlay maps its canceled or fired timer to a real static node.
+
+Alternatives considered: Emitting only a condition command would leave every condition-timeout runtime timer unmapped. Emitting only a timer command would hide the predicate that gates the wait.
+
+Verification impact: `bun test packages/analyzer` asserts the command sequence `condition, timer, activity, activity` for `timerRaceWorkflow`; the timer-race fixture overlays map runtime timers with zero unmapped operations.
+
+## 2026-07-01: Attach Signals to the Workflow That Registers the Handler
+
+Context: `defineSignal` declarations are module-level, but the message surface is modeled per Workflow.
+
+Decision: A signal joins a Workflow's `messageSurface.signals` when the Workflow function body registers it with `setHandler`. The definition site provides the payload types and source location; the registration site provides `handlerSource`. Signals defined but never registered are not attached in Stage 9A; a diagnostic for unregistered signals belongs to Stage 10.
+
+Alternatives considered: Attaching every module-level signal to every exported Workflow in the file would fabricate message surfaces for Workflows that never handle those signals.
+
+Verification impact: Analyzer tests cover registered signals (approval, timer-race) and dynamic signal names; the mapper maps runtime signal deliveries by name with `signal-name` evidence.
+
+## 2026-07-01: Sequence Fixture Scenarios After a Settled First Workflow Task
+
+Context: Multi-history fixtures need deterministic Event History event ordering. A signal sent immediately after `workflow.start` can race the first Workflow Task, moving WorkflowExecutionSignaled before TimerStarted between runs.
+
+Decision: Fixture scenarios call `environment.sleep('10 seconds')` before signaling. On the time-skipping test server this lets pending Workflow Tasks complete (commands such as StartTimer land in history) while staying far below every fixture timer duration.
+
+Alternatives considered: Signaling immediately (racy) or polling workflow state via queries (adds Query surface to fixtures that do not need it).
+
+Verification impact: `bun run fixtures:verify-no-drift` regenerates approval and timer-race histories and compares byte-for-byte; the event sequences are stable across regenerations.
+
+## 2026-07-01: Replay Spike Findings and Replay-Assisted Mapping Decision
+
+Context: Stage 13 requires a spike answering whether replay can provide source-level precision that static analysis plus Event History cannot, covering repeated Activities, identical timers, dynamic dispatch, and patch markers. The spike (`scripts/replay/spike.ts`) replays committed fixture histories through `Worker.runReplayHistory` with an instrumented workflow interceptors module reporting through a `callDuringReplay` sink.
+
+Findings:
+
+- Dynamic dispatch resolution works. Replaying `fixtures/dynamic` captured `archiveRequest`, `prepareShipment`, `notifyWarehouse` — the resolved Activity types for `activities[step]` calls, in command order. Static analysis cannot produce these names.
+- Branch outcome resolution works. Replaying `timer-race/signal-wins` captured `notifyApproved`; `timer-race/timeout` captured `notifyExpired`; `patched/patched-run` captured `newCharge`. Replay directly answers which branch executed.
+- Command sequencing works. The interceptor observes one call per scheduled Activity or started timer, in an order that aligns with history command order, so repeated identical commands can be disambiguated by sequence index.
+- Source attribution through stack traces does not work under Bun. The workflow VM reports `v8.promiseHooks.createHook is not available; stack trace collection will be disabled`, and captured frames are bundle-relative without source map application.
+
+Decision: Replay-assisted mapping is worth building as an optional precision layer, keyed on interceptor **sequence and resolved-name evidence**, not stack traces. The mapper will accept optional replay evidence (`replay-command-sequence` kind) that upgrades `dynamic`/`ambiguous` mappings to `inferred` or `exact`. Source locations continue to come from static analysis. Replay stays optional: it requires local workflow code and a compatible SDK, and file-based imports must keep working without it.
+
+Alternatives considered: Requiring replay for dynamic mapping (breaks history-without-source usage), or extracting file:line from replay stacks (unreliable under Bun, redundant with static sources).
+
+Verification impact: `bun run replay:spike` exercises the capture path over four committed histories. Production `--replay` mapping will be gated by mapper tests when implemented alongside Stage 9H dynamic boundaries.

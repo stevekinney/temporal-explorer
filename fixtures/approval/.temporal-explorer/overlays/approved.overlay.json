@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:approvalWorkflow:trace:approved:approved-run-id",
+  "staticAnalysisId": "analysis:approval",
+  "runtimeTraceId": "trace:approved:approved-run-id",
+  "workflow": "approvalWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:approvalWorkflow",
+      "kind": "workflow",
+      "name": "approvalWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 461
+        },
+        "end": {
+          "line": 36,
+          "column": 2,
+          "offset": 978
+        },
+        "symbolName": "approvalWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:approvalWorkflow:recordApproval:1",
+      "kind": "activity",
+      "name": "recordApproval",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 25,
+          "offset": 796
+        },
+        "end": {
+          "line": 29,
+          "column": 5,
+          "offset": 876
+        },
+        "symbolName": "recordApproval"
+      }
+    },
+    {
+      "id": "condition:approvalWorkflow:0",
+      "kind": "condition",
+      "name": "() => approval !== undefined",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 9,
+          "offset": 674
+        },
+        "end": {
+          "line": 23,
+          "column": 48,
+          "offset": 713
+        }
+      }
+    },
+    {
+      "id": "signal:approvalWorkflow:approve",
+      "kind": "signal",
+      "name": "approve",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 30,
+          "offset": 313
+        },
+        "end": {
+          "line": 10,
+          "column": 71,
+          "offset": 354
+        },
+        "symbolName": "approve"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:approvalWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to approvalWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type approvalWorkflow matched static Workflow approvalWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:approvalWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/approval-workflow.ts:16.",
+          "staticNodeId": "workflow:approvalWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:approvalWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to approvalWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type approvalWorkflow matched static Workflow approvalWorkflow.",
+          "eventIds": [15],
+          "staticNodeId": "workflow:approvalWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/approval-workflow.ts:16.",
+          "staticNodeId": "workflow:approvalWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordApproval:9",
+      "staticNodeId": "activity-call:approvalWorkflow:recordApproval:1",
+      "confidence": "exact",
+      "reason": "Activity recordApproval matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordApproval matched static Activity command recordApproval.",
+          "eventIds": [9, 10, 11],
+          "staticNodeId": "activity-call:approvalWorkflow:recordApproval:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [9, 10, 11],
+          "staticNodeId": "activity-call:approvalWorkflow:recordApproval:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/approval-workflow.ts:26.",
+          "staticNodeId": "activity-call:approvalWorkflow:recordApproval:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "signal:approve:5",
+      "staticNodeId": "signal:approvalWorkflow:approve",
+      "confidence": "exact",
+      "reason": "Signal approve matched a static Signal definition by name.",
+      "evidence": [
+        {
+          "kind": "signal-name",
+          "description": "Runtime Signal approve matched static Signal approve.",
+          "eventIds": [5],
+          "staticNodeId": "signal:approvalWorkflow:approve"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Signal source is src/workflows/approval-workflow.ts:10.",
+          "staticNodeId": "signal:approvalWorkflow:approve"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 3,
+      "skipped": 1,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 1,
+      "receivedSignals": ["approve"],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

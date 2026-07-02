@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "cancellation",
+  "history": "canceled",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "cancellationWorkflow",
+  "workflowId": "cancellation-canceled",
+  "runIdNormalization": { "replacement": "canceled-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 23,
+  "eventTypes": {
+    "1": 1,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "10": 2,
+    "11": 2,
+    "12": 2,
+    "17": 1,
+    "19": 1,
+    "20": 1,
+    "21": 1
+  },
+  "contentSha256": "75a4793379904d39b32466b2cbc331e2086611a771753900d1ac0214effd776b"
+}

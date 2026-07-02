@@ -18,7 +18,7 @@ export const normalizedIdentity = 'temporal-explorer-fixture-worker';
 
 const repositoryRoot = new URL('../../', import.meta.url);
 const baseEventTime = Date.UTC(2026, 0, 1, 0, 0, 0, 0);
-const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+const uuidSubstringPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/giu;
 
 /** Formats a JSON value with Prettier so committed fixtures match format:check. */
 export async function createStableJson(value: unknown): Promise<string> {
@@ -33,10 +33,11 @@ export function createContentHash(text: string): string {
 }
 
 /**
- * Maps every distinct UUID-shaped string to a stable replacement. The primary
- * run ID becomes `<history>-run-id`; later distinct UUIDs (child Workflow run
- * IDs, continue-as-new run IDs) become `<history>-run-id-2`, `-3`, and so on
- * in order of first appearance.
+ * Maps every distinct UUID to a stable replacement, including UUIDs embedded
+ * inside longer strings such as `"<uuid>/request"` message identifiers. The
+ * primary run ID becomes `<history>-run-id`; later distinct UUIDs (child
+ * Workflow run IDs, update request IDs, continue-as-new run IDs) become
+ * `<history>-run-id-2`, `-3`, and so on in order of first appearance.
  */
 export class RunIdNormalizer {
   private readonly replacements = new Map<string, string>();
@@ -45,23 +46,24 @@ export class RunIdNormalizer {
     private readonly historyName: string,
     primaryRunId: string,
   ) {
-    this.replacements.set(primaryRunId, `${historyName}-run-id`);
+    this.replacements.set(primaryRunId.toLowerCase(), `${historyName}-run-id`);
   }
 
-  normalize(value: string): string {
-    if (!uuidPattern.test(value)) {
-      return value;
-    }
-
-    const existing = this.replacements.get(value);
+  private replaceUuid(uuid: string): string {
+    const key = uuid.toLowerCase();
+    const existing = this.replacements.get(key);
 
     if (existing) {
       return existing;
     }
 
     const replacement = `${this.historyName}-run-id-${this.replacements.size + 1}`;
-    this.replacements.set(value, replacement);
+    this.replacements.set(key, replacement);
     return replacement;
+  }
+
+  normalize(value: string): string {
+    return value.replaceAll(uuidSubstringPattern, (uuid) => this.replaceUuid(uuid));
   }
 }
 
@@ -156,8 +158,14 @@ function normalizeValue(value: unknown, runIds: RunIdNormalizer, key?: string): 
 
   if (value && typeof value === 'object') {
     const normalized: Record<string, unknown> = {};
+    // Proto map fields (payload metadata, indexed search attribute fields)
+    // serialize with nondeterministic key order; sort them for stable output.
+    const entries =
+      key === 'metadata' || key === 'indexedFields'
+        ? Object.entries(value).toSorted(([left], [right]) => left.localeCompare(right))
+        : Object.entries(value);
 
-    for (const [childKey, childValue] of Object.entries(value)) {
+    for (const [childKey, childValue] of entries) {
       normalized[childKey] = normalizeValue(childValue, runIds, childKey);
     }
 

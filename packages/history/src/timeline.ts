@@ -45,16 +45,65 @@ function appendActivityTimelineEntry(
   }
 }
 
+function appendSignalTimelineEntry(
+  entries: RuntimeTimelineEntry[],
+  operation: Extract<RuntimeOperation, { kind: 'signal' }>,
+): void {
+  const reference = operation.eventReferences[0];
+
+  if (reference) {
+    entries.push({
+      id: `timeline:${reference.eventId}`,
+      operationId: operation.id,
+      at: operation.receivedAt,
+      label: `Signal ${operation.signalName} received`,
+      eventIds: [reference.eventId],
+    });
+  }
+}
+
+function appendTimerTimelineEntries(
+  entries: RuntimeTimelineEntry[],
+  operation: Extract<RuntimeOperation, { kind: 'timer' }>,
+): void {
+  const started = operation.eventReferences[0];
+  const closed = operation.eventReferences.at(-1);
+
+  if (started) {
+    entries.push({
+      id: `timeline:${started.eventId}`,
+      operationId: operation.id,
+      at: operation.startedAt,
+      label: `Timer ${operation.timerId} started`,
+      eventIds: [started.eventId],
+    });
+  }
+
+  if (closed && closed !== started && operation.closedAt) {
+    entries.push({
+      id: `timeline:${closed.eventId}`,
+      operationId: operation.id,
+      at: operation.closedAt,
+      label: `Timer ${operation.timerId} ${operation.status}`,
+      eventIds: [closed.eventId],
+    });
+  }
+}
+
 export function createTimeline(
   started: HistoryEvent,
   closed: HistoryEvent | undefined,
-  activityOperations: RuntimeOperation[],
+  operations: RuntimeOperation[],
 ): RuntimeTimelineEntry[] {
   const entries = [createTimelineEntry(started, 'workflow:start', 'Workflow started')];
 
-  for (const operation of activityOperations) {
+  for (const operation of operations) {
     if (operation.kind === 'activity') {
       appendActivityTimelineEntry(entries, operation);
+    } else if (operation.kind === 'signal') {
+      appendSignalTimelineEntry(entries, operation);
+    } else if (operation.kind === 'timer') {
+      appendTimerTimelineEntries(entries, operation);
     }
   }
 

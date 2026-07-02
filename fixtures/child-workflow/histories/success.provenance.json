@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "child-workflow",
+  "history": "success",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "childWorkflowParent",
+  "workflowId": "child-workflow-success",
+  "runIdNormalization": { "replacement": "success-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 23,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 5,
+    "6": 5,
+    "7": 5,
+    "29": 2,
+    "31": 2,
+    "32": 2
+  },
+  "contentSha256": "3da32efd4e61dd1e3b9944cd4431e9390a99357dc2da1e65a65818421fbfa8be"
+}

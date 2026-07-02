@@ -469,3 +469,23 @@ Follow-up: None.
 - `bun run validate` — pass (typecheck, lint, test, build, format across all workspaces).
 - Note: `packages/history/src/event-types.ts` previously mismapped event types 17/18 (Temporal proto defines 17=TimerStarted, 18=TimerFired; the file claimed WorkflowExecutionCanceled/Terminated). Fixed against `@temporalio/proto` 1.18.1 before any timer fixtures exist.
 - Note: analysis/trace artifacts previously embedded `process.cwd()`-relative project paths, so CLI tests (cwd=packages/cli) and root scripts fought over committed artifact content. Artifacts now record the project directory basename.
+
+## 2026-07-01: Stage 9A Signals, Conditions, and Timers (packages)
+
+- `bun run fixtures:generate-histories` — pass; 13 histories across 12 fixtures generated from real Temporal executions (approval, timer-race signal-wins/timeout, query, update, retry success/failure, child-workflow, external, cancellation, continue-as-new, patched, dynamic).
+- `bun run fixtures:verify-no-drift` — pass twice back-to-back after two determinism fixes: UUIDs embedded in longer strings (update `acceptedRequestMessageId`) now normalize by substring, and proto map fields (`metadata`, `indexedFields`) serialize with sorted keys.
+- `bun test packages/analyzer packages/history packages/mapper packages/schemas packages/cli` — pass (signal/condition/timer discovery, signal/timer trace parsing, signal-name and timer-order mapping, branch skip detection, check command).
+- `bun run test:fixtures` — pass (basic-order, approval, timer-race assertions).
+- `bun run fixtures:regenerate-artifacts` — pass for artifact-enabled fixtures (basic-order, approval, timer-race).
+- Found and fixed: `node_modules/.bin/temporal-explorer` pointed at `src/index.ts` (an importable module with no entrypoint side effect) because `bun.lock` still recorded the pre-MVP bin path. Every `bunx temporal-explorer` invocation had become a silent no-op. Corrected the lock entry to `src/bin.ts` and re-ran the affected CLI gates for real: `check` (exit 0 clean fixture), `list`, `show`, `history import`, `trace`, `report`, `docs`, `render` all behave.
+
+## 2026-07-01: Stage 9A Completion (UI, gates, and commit)
+
+- Explorer UI now projects signal, timer, and condition nodes with runtime states; Messages tab lists signal payloads and handler sources; inspector shows timer status and duration.
+- `bun test apps/explorer` — 13 pass. `bun run --cwd apps/explorer typecheck` — clean.
+- `bun run ui:e2e`, `bun run ui:e2e:graph` (including a timer-race timeout trace assertion), `bun run ui:accessibility` — pass.
+- Root-caused and fixed a pre-existing e2e flake: the `$cinder-components` alias skips Vite pre-bundling, so the first page request pays a ~15s on-demand compile that could blow Playwright's navigation timeout. Fixed with a warm-up fetch after server start, not a timeout bump.
+- `bun run validate` — pass end to end after fixing: a duplicate-import lint error, Prettier-incompatible emitted JSON Schema documents (now formatted with the repo Prettier config), and a Zod `toJSONSchema` overload mismatch.
+- `bun run fixtures:validate` (14 histories, 11 artifacts), `bun run test:fixtures`, `bun run snapshots:verify` (9 documents) — pass.
+- Stage 12 groundwork landed: JSON Schema documents are emitted from the Zod schemas, drift-checked, and verified against committed artifacts with an independent (non-TypeScript) validator; CLI artifact writes are schema-validated before hitting disk.
+- Stage 13 spike landed: `bun run replay:spike` proves replay resolves dynamic dispatch, branch outcomes, and command sequences; decision recorded in decisions.md.

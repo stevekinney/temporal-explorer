@@ -79,6 +79,30 @@ export const activityExecutionOperationSchema = z
   })
   .strict();
 
+export const signalDeliveryOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('signal'),
+    signalName: z.string().min(1),
+    receivedAt: z.string().datetime(),
+    eventReferences: z.array(eventReferenceSchema),
+    payloadReferences: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export const timerOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('timer'),
+    timerId: z.string().min(1),
+    status: z.union([z.literal('fired'), z.literal('canceled'), z.literal('pending')]),
+    startedAt: z.string().datetime(),
+    closedAt: z.string().datetime().optional(),
+    durationText: z.string().min(1).optional(),
+    eventReferences: z.array(eventReferenceSchema),
+  })
+  .strict();
+
 export const unmappedHistoryOperationSchema = z
   .object({
     id: z.string().min(1),
@@ -91,6 +115,8 @@ export const unmappedHistoryOperationSchema = z
 export const runtimeOperationSchema = z.discriminatedUnion('kind', [
   workflowLifecycleOperationSchema,
   activityExecutionOperationSchema,
+  signalDeliveryOperationSchema,
+  timerOperationSchema,
   unmappedHistoryOperationSchema,
 ]);
 

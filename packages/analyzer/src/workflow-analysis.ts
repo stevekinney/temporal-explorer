@@ -1,11 +1,8 @@
 import {
   Node,
-  Project,
   SyntaxKind,
-  type CallExpression,
-  type ElementAccessExpression,
   type FunctionDeclaration,
-  type PropertyAccessExpression,
+  type Project,
   type SourceFile,
 } from 'ts-morph';
 
@@ -13,29 +10,22 @@ import type {
   ActivityDefinition,
   Diagnostic,
   SourceLocation,
-  TemporalCommand,
-  TypeShape,
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import { analyzeQueryHandler, analyzeUpdateValidator } from './handler-diagnostics';
 import { createSourceLocation } from './paths';
 import { findActivityProxyVariables, isNamedImportFrom, temporalWorkerModule } from './symbols';
-
-function createTypeShape(
-  id: string,
-  display: string,
-  source?: SourceLocation,
-  displayName?: string,
-): TypeShape {
-  return {
-    id,
-    display,
-    ...(displayName ? { displayName } : {}),
-    kind: display === 'void' ? 'primitive' : 'external',
-    ...(source ? { source } : {}),
-    confidence: display === 'unknown' ? 'unknown' : 'exact',
-  };
-}
+import { createTypeShape } from './type-shapes';
+import { collectTemporalCommands } from './workflow-commands';
+import {
+  createQueryDefinition,
+  createUpdateDefinition,
+  findMessageDeclarations,
+  findMessageRegistrations,
+  type MessageRegistration,
+} from './workflow-messages';
+import { findSignalDeclarations, findSignalRegistrations } from './workflow-signals';
 
 function findNamespaceImportSource(sourceFile: SourceFile): SourceFile | undefined {
   for (const importDeclaration of sourceFile.getImportDeclarations()) {
@@ -95,78 +85,16 @@ function createWorkflowSignature(root: string, functionDeclaration: FunctionDecl
   };
 }
 
-function createActivityCommand(
+function analyzeMessageHandlers(
   root: string,
-  workflowName: string,
-  expression: PropertyAccessExpression,
-  call: CallExpression,
-  order: number,
-): TemporalCommand {
-  const activityName = expression.getName();
-
-  return {
-    id: `activity-call:${workflowName}:${activityName}:${order}`,
-    kind: 'activity',
-    name: activityName,
-    source: createSourceLocation(root, call.getSourceFile(), call, activityName),
-    confidence: 'exact',
-    staticOrder: order,
-  };
-}
-
-function getProxyPropertyAccessExpression(
-  call: CallExpression,
-  proxyVariables: Set<string>,
-): PropertyAccessExpression | undefined {
-  const expression = call.getExpression();
-
-  if (!Node.isPropertyAccessExpression(expression)) {
-    return undefined;
-  }
-
-  const receiver = expression.getExpression();
-  return Node.isIdentifier(receiver) && proxyVariables.has(receiver.getText())
-    ? expression
-    : undefined;
-}
-
-function createDynamicActivityDiagnostic(
-  root: string,
-  call: CallExpression,
-  expression: ElementAccessExpression,
-): Diagnostic {
-  return {
-    code: 'TEA_DYNAMIC_ACTIVITY_CALL',
-    category: 'control-flow',
-    severity: 'warning',
-    message: `Dynamic Activity call could not be fully resolved: ${expression.getText()}`,
-    source: createSourceLocation(root, call.getSourceFile(), call),
-    confidence: 'dynamic',
-  };
-}
-
-function findDynamicActivityDiagnostics(
-  root: string,
-  functionDeclaration: FunctionDeclaration,
+  registrations: MessageRegistration[],
   proxyVariables: Set<string>,
 ): Diagnostic[] {
-  const diagnostics: Diagnostic[] = [];
-
-  for (const call of functionDeclaration.getDescendantsOfKind(SyntaxKind.CallExpression)) {
-    const expression = call.getExpression();
-
-    if (!Node.isElementAccessExpression(expression)) {
-      continue;
-    }
-
-    const receiver = expression.getExpression();
-
-    if (Node.isIdentifier(receiver) && proxyVariables.has(receiver.getText())) {
-      diagnostics.push(createDynamicActivityDiagnostic(root, call, expression));
-    }
-  }
-
-  return diagnostics;
+  return registrations.flatMap((registration) =>
+    registration.declared.kind === 'query'
+      ? analyzeQueryHandler(root, registration.declared.name, registration.handler, proxyVariables)
+      : analyzeUpdateValidator(root, registration.declared.name, registration.validator),
+  );
 }
 
 function analyzeWorkflowFunction(
@@ -175,24 +103,34 @@ function analyzeWorkflowFunction(
   proxyVariables: Set<string>,
 ): WorkflowDefinition {
   const workflowName = functionDeclaration.getName() ?? 'anonymousWorkflow';
-  const activityCommands: TemporalCommand[] = [];
-
-  for (const call of functionDeclaration.getDescendantsOfKind(SyntaxKind.CallExpression)) {
-    const expression = getProxyPropertyAccessExpression(call, proxyVariables);
-
-    if (!expression) {
-      continue;
-    }
-
-    const command = createActivityCommand(
-      root,
-      workflowName,
-      expression,
-      call,
-      activityCommands.length,
-    );
-    activityCommands.push(command);
-  }
+  const collected = collectTemporalCommands(
+    root,
+    workflowName,
+    functionDeclaration,
+    proxyVariables,
+  );
+  const signals = findSignalRegistrations(
+    root,
+    workflowName,
+    functionDeclaration,
+    findSignalDeclarations(root, functionDeclaration.getSourceFile()),
+  );
+  const registrations = findMessageRegistrations(
+    functionDeclaration,
+    findMessageDeclarations(root, functionDeclaration.getSourceFile()),
+  );
+  const queries = registrations
+    .filter((registration) => registration.declared.kind === 'query')
+    .map((registration) => createQueryDefinition(root, workflowName, registration))
+    .toSorted((left, right) => left.name.localeCompare(right.name));
+  const updates = registrations
+    .filter((registration) => registration.declared.kind === 'update')
+    .map((registration) => createUpdateDefinition(root, workflowName, registration))
+    .toSorted((left, right) => left.name.localeCompare(right.name));
+  const diagnostics = [
+    ...collected.diagnostics,
+    ...analyzeMessageHandlers(root, registrations, proxyVariables),
+  ];
 
   return {
     id: `workflow:${workflowName}`,
@@ -206,9 +144,9 @@ function analyzeWorkflowFunction(
     exported: functionDeclaration.isExported(),
     signature: createWorkflowSignature(root, functionDeclaration),
     messageSurface: {
-      signals: [],
-      queries: [],
-      updates: [],
+      signals,
+      queries,
+      updates,
     },
     state: {
       variables: [],
@@ -216,9 +154,9 @@ function analyzeWorkflowFunction(
     body: {
       nodes: [],
     },
-    temporalCommands: activityCommands,
+    temporalCommands: collected.commands,
     dependencies: [],
-    diagnostics: findDynamicActivityDiagnostics(root, functionDeclaration, proxyVariables),
+    diagnostics,
   };
 }
 
@@ -227,21 +165,23 @@ function analyzeActivities(
   workflow: WorkflowDefinition,
   activitySourceFile?: SourceFile,
 ): ActivityDefinition[] {
-  return workflow.temporalCommands.map((command) => {
-    const implementationSource = findActivityImplementationSource(
-      activitySourceFile,
-      command.name,
-      root,
-    );
+  return workflow.temporalCommands
+    .filter((command) => command.kind === 'activity')
+    .map((command) => {
+      const implementationSource = findActivityImplementationSource(
+        activitySourceFile,
+        command.name,
+        root,
+      );
 
-    return {
-      id: `activity:${command.name}`,
-      name: command.name,
-      source: command.source,
-      ...(implementationSource ? { implementationSource } : {}),
-      confidence: implementationSource ? 'exact' : 'inferred',
-    };
-  });
+      return {
+        id: `activity:${command.name}`,
+        name: command.name,
+        source: command.source,
+        ...(implementationSource ? { implementationSource } : {}),
+        confidence: implementationSource ? 'exact' : 'inferred',
+      };
+    });
 }
 
 export function analyzeWorkerFiles(project: Project, root: string): unknown[] {

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "timer-race",
+  "history": "timeout",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "timerRaceWorkflow",
+  "workflowId": "timer-race-timeout",
+  "runIdNormalization": { "replacement": "timeout-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 16,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 1,
+    "11": 1,
+    "12": 1,
+    "17": 1,
+    "18": 1
+  },
+  "contentSha256": "5f0b72d3974338173b468ef94c42b6c91bc4acad6347f6185a31f220a342a7c5"
+}

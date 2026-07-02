@@ -114,6 +114,44 @@ async function runReport(args: string[], environment: CommandEnvironment): Promi
   return 0;
 }
 
+function formatCheckDiagnostic(diagnostic: {
+  severity: string;
+  code: string;
+  message: string;
+  source?: { path: string; start: { line: number } } | undefined;
+}): string {
+  const location = diagnostic.source
+    ? ` ${diagnostic.source.path}:${diagnostic.source.start.line}`
+    : '';
+  return `${diagnostic.severity}${location}\n${diagnostic.code}: ${diagnostic.message}\n`;
+}
+
+async function runCheck(args: string[], environment: CommandEnvironment): Promise<number> {
+  const flags = parseFlags(args);
+  const { analysis } = await loadAnalysis(flags);
+  const errors = analysis.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+  const warnings = analysis.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
+
+  if (flags.json) {
+    await environment.stdout(
+      stableJson({
+        diagnostics: analysis.diagnostics,
+        errorCount: errors.length,
+        warningCount: warnings.length,
+      }),
+    );
+    return errors.length > 0 ? 1 : 0;
+  }
+
+  const lines = analysis.diagnostics.map((diagnostic) => formatCheckDiagnostic(diagnostic));
+  const summary =
+    errors.length > 0
+      ? `Analysis failed with ${errors.length} error(s) and ${warnings.length} warning(s).\n`
+      : `Analysis passed with ${warnings.length} warning(s).\n`;
+  await environment.stdout([...lines, summary].join('\n'));
+  return errors.length > 0 ? 1 : 0;
+}
+
 async function runDocs(args: string[], environment: CommandEnvironment): Promise<number> {
   const flags = parseFlags(args);
   const { files, outputDirectory } = await writeDocumentationArtifacts(flags);
@@ -187,6 +225,7 @@ type CommandHandler = (args: string[], environment: CommandEnvironment) => Promi
 
 const commandHandlers = new Map<string, CommandHandler>([
   ['analyze', runAnalyze],
+  ['check', runCheck],
   ['docs', runDocs],
   ['history', runHistory],
   ['list', runList],

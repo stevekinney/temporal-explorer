@@ -12,6 +12,14 @@ Signature: `basicOrderWorkflow(input: OrderInput): Promise<OrderResult>`
 |     2 | `chargeCard`    | `src/workflows/basic-order-workflow.ts:18` | yes      | exact      |
 |     3 | `shipOrder`     | `src/workflows/basic-order-workflow.ts:19` | yes      | exact      |
 
+## Messages
+
+- none
+
+## Waits
+
+- none
+
 ## Runtime Summary
 
 - Mapped runtime operations: 5/5

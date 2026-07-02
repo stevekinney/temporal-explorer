@@ -1,0 +1,8 @@
+flowchart TD
+  start(["approvalWorkflow"])
+  condition_approvalWorkflow_0{"() => approval !== undefined"}
+  activity_call_approvalWorkflow_recordApproval_1["recordApproval"]
+  complete(["complete"])
+  start --> condition_approvalWorkflow_0
+  condition_approvalWorkflow_0 --> activity_call_approvalWorkflow_recordApproval_1
+  activity_call_approvalWorkflow_recordApproval_1 --> complete

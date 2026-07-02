@@ -11,13 +11,14 @@ import type {
 
 import { formatEventReferences, sourceText } from './formatting';
 import {
-  createActivityGraphNodes,
-  createGraphEdges,
+  createCommandGraphNodes,
   createRuntimeOperationRows,
+  createSignalGraphNodes,
   createTimelineRows,
   createUnmappedRuntimeNodes,
   createWorkflowGraphNode,
 } from './projection-builders';
+import { createGraphEdges } from './projection-edges';
 import { createStatusCounts } from './projection-helpers';
 import { runtimeOverlayStates, runtimeStateToken, type RuntimeOverlayState } from './runtime-state';
 
@@ -32,7 +33,7 @@ export {
 export type TemporalGraphNode = {
   id: string;
   label: string;
-  kind: 'workflow' | 'activity' | 'runtime';
+  kind: 'workflow' | 'activity' | 'timer' | 'condition' | 'signal' | 'runtime';
   state: RuntimeOverlayState;
   source: SourceLocation | undefined;
   sourceText: string;
@@ -99,15 +100,16 @@ export function buildGraphProjection({
   );
   const context = { mappingsByRuntimeOperationId, operationsById };
   const workflowNode = createWorkflowGraphNode(workflow, trace, context);
-  const activityNodes = createActivityGraphNodes(workflow, trace, overlay, context);
+  const commandNodes = createCommandGraphNodes(workflow, trace, overlay, context);
+  const signalNodes = createSignalGraphNodes(workflow, trace, overlay, context);
   const mappedRuntimeOperationIds = new Set(
     Array.from(mappingsByRuntimeOperationId.keys()).filter((operationId) =>
       Boolean(mappingsByRuntimeOperationId.get(operationId)?.staticNodeId),
     ),
   );
   const unmappedRuntimeNodes = createUnmappedRuntimeNodes(trace, mappedRuntimeOperationIds);
-  const nodes = [workflowNode, ...activityNodes, ...unmappedRuntimeNodes];
-  const edges = createGraphEdges(workflowNode, activityNodes);
+  const nodes = [workflowNode, ...commandNodes, ...signalNodes, ...unmappedRuntimeNodes];
+  const edges = createGraphEdges(workflowNode, commandNodes, signalNodes);
   const timelineRows = createTimelineRows(trace, workflow.id, nodes, context);
   const runtimeOperationRows = createRuntimeOperationRows(trace, workflow.id, nodes, context);
   const edgesById = new Map(edges.map((edge) => [edge.id, edge]));

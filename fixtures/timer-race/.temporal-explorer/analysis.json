@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:timer-race",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "timer-race",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/timer-race-workflow.ts": "02c66d646ea07ae0d9cb7ec36ad73332ee20ad83ac64effc14ddb7b011075d27"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "timer-race",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 198
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 341
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:timerRaceWorkflow",
+      "name": "timerRaceWorkflow",
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 12,
+          "column": 1,
+          "offset": 406
+        },
+        "end": {
+          "line": 38,
+          "column": 2,
+          "offset": 1087
+        },
+        "symbolName": "timerRaceWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "timerRaceWorkflow:arg:0:input",
+            "display": "RaceInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 12,
+                "column": 41,
+                "offset": 446
+              },
+              "end": {
+                "line": 12,
+                "column": 57,
+                "offset": 462
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "timerRaceWorkflow:result",
+          "display": "Promise<RaceResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [
+          {
+            "id": "signal:timerRaceWorkflow:approve",
+            "name": "approve",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 6,
+                "column": 30,
+                "offset": 270
+              },
+              "end": {
+                "line": 6,
+                "column": 63,
+                "offset": 303
+              },
+              "symbolName": "approve"
+            },
+            "args": [
+              {
+                "id": "signal:approve:arg:0",
+                "display": "string",
+                "kind": "external",
+                "confidence": "exact"
+              }
+            ],
+            "handlerSource": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 15,
+                "column": 3,
+                "offset": 528
+              },
+              "end": {
+                "line": 17,
+                "column": 5,
+                "offset": 601
+              },
+              "symbolName": "approve"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "condition:timerRaceWorkflow:0",
+          "kind": "condition",
+          "name": "() => approvedBy !== undefined",
+          "source": {
+            "path": "src/workflows/timer-race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 26,
+              "offset": 629
+            },
+            "end": {
+              "line": 19,
+              "column": 78,
+              "offset": 681
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "timer:timerRaceWorkflow:1",
+          "kind": "timer",
+          "name": "'30 days'",
+          "source": {
+            "path": "src/workflows/timer-race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 26,
+              "offset": 629
+            },
+            "end": {
+              "line": 19,
+              "column": 78,
+              "offset": 681
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:timerRaceWorkflow:notifyApproved:2",
+          "kind": "activity",
+          "name": "notifyApproved",
+          "source": {
+            "path": "src/workflows/timer-race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 22,
+              "column": 26,
+              "offset": 727
+            },
+            "end": {
+              "line": 22,
+              "column": 93,
+              "offset": 794
+            },
+            "symbolName": "notifyApproved"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:timerRaceWorkflow:notifyExpired:3",
+          "kind": "activity",
+          "name": "notifyExpired",
+          "source": {
+            "path": "src/workflows/timer-race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 31,
+              "column": 24,
+              "offset": 939
+            },
+            "end": {
+              "line": 31,
+              "column": 65,
+              "offset": 980
+            },
+            "symbolName": "notifyExpired"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:notifyApproved",
+      "name": "notifyApproved",
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 26,
+          "offset": 727
+        },
+        "end": {
+          "line": 22,
+          "column": 93,
+          "offset": 794
+        },
+        "symbolName": "notifyApproved"
+      },
+      "implementationSource": {
+        "path": "src/activities/race-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 209
+        },
+        "end": {
+          "line": 19,
+          "column": 2,
+          "offset": 378
+        },
+        "symbolName": "notifyApproved"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:notifyExpired",
+      "name": "notifyExpired",
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 24,
+          "offset": 939
+        },
+        "end": {
+          "line": 31,
+          "column": 65,
+          "offset": 980
+        },
+        "symbolName": "notifyExpired"
+      },
+      "implementationSource": {
+        "path": "src/activities/race-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 1,
+          "offset": 380
+        },
+        "end": {
+          "line": 25,
+          "column": 2,
+          "offset": 513
+        },
+        "symbolName": "notifyExpired"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

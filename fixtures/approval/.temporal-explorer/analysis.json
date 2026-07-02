@@ -1,0 +1,243 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:approval",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "approval",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/approval-workflow.ts": "50228c216c5b5aad7d352b81c86e5b5a77681182ead025415eeae31a71355386"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "approval",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 201
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 342
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:approvalWorkflow",
+      "name": "approvalWorkflow",
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 461
+        },
+        "end": {
+          "line": 36,
+          "column": 2,
+          "offset": 978
+        },
+        "symbolName": "approvalWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "approvalWorkflow:arg:0:input",
+            "display": "ApprovalInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/approval-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 40,
+                "offset": 500
+              },
+              "end": {
+                "line": 16,
+                "column": 60,
+                "offset": 520
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "approvalWorkflow:result",
+          "display": "Promise<ApprovalResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [
+          {
+            "id": "signal:approvalWorkflow:approve",
+            "name": "approve",
+            "source": {
+              "path": "src/workflows/approval-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 10,
+                "column": 30,
+                "offset": 313
+              },
+              "end": {
+                "line": 10,
+                "column": 71,
+                "offset": 354
+              },
+              "symbolName": "approve"
+            },
+            "args": [
+              {
+                "id": "signal:approve:arg:0",
+                "display": "ApprovalRecord",
+                "kind": "external",
+                "confidence": "exact"
+              }
+            ],
+            "handlerSource": {
+              "path": "src/workflows/approval-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 3,
+                "offset": 596
+              },
+              "end": {
+                "line": 21,
+                "column": 5,
+                "offset": 663
+              },
+              "symbolName": "approve"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "condition:approvalWorkflow:0",
+          "kind": "condition",
+          "name": "() => approval !== undefined",
+          "source": {
+            "path": "src/workflows/approval-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 23,
+              "column": 9,
+              "offset": 674
+            },
+            "end": {
+              "line": 23,
+              "column": 48,
+              "offset": 713
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:approvalWorkflow:recordApproval:1",
+          "kind": "activity",
+          "name": "recordApproval",
+          "source": {
+            "path": "src/workflows/approval-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 26,
+              "column": 25,
+              "offset": 796
+            },
+            "end": {
+              "line": 29,
+              "column": 5,
+              "offset": 876
+            },
+            "symbolName": "recordApproval"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:recordApproval",
+      "name": "recordApproval",
+      "source": {
+        "path": "src/workflows/approval-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 25,
+          "offset": 796
+        },
+        "end": {
+          "line": 29,
+          "column": 5,
+          "offset": 876
+        },
+        "symbolName": "recordApproval"
+      },
+      "implementationSource": {
+        "path": "src/activities/approval-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 268
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 470
+        },
+        "symbolName": "recordApproval"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

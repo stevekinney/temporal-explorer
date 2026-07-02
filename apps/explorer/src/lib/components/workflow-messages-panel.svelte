@@ -1,0 +1,120 @@
+<script lang="ts">
+  import { Badge } from '$cinder-components/badge';
+  import { Card } from '$cinder-components/card';
+  import { EmptyState } from '$cinder-components/empty-state';
+  import { Table } from '$cinder-components/table';
+  import { TableBody } from '$cinder-components/table-body';
+  import { TableCell } from '$cinder-components/table-cell';
+  import { TableHeader } from '$cinder-components/table-header';
+  import { TableHeaderCell } from '$cinder-components/table-header-cell';
+  import { TableRow } from '$cinder-components/table-row';
+
+  import type { GraphProjection } from '$lib/graph/projection';
+  import { sourceText } from '$lib/graph/projection';
+  import { statusBadgeVariant } from '$lib/graph/runtime-display';
+
+  import type { SignalDefinition } from '@temporal-explorer/schemas';
+
+  type Props = {
+    signals: SignalDefinition[];
+    queryCount: number;
+    updateCount: number;
+    graphProjection: GraphProjection | undefined;
+  };
+
+  let { signals, queryCount, updateCount, graphProjection }: Props = $props();
+
+  function payloadTypeText(signal: SignalDefinition): string {
+    return signal.args.length > 0
+      ? signal.args.map((argument) => argument.display).join(', ')
+      : 'none';
+  }
+</script>
+
+<div class="message-grid">
+  <Card title="Signals" headingLevel={2}>
+    <strong>{signals.length}</strong>
+    <span>static signals</span>
+  </Card>
+  <Card title="Queries" headingLevel={2}>
+    <strong>{queryCount}</strong>
+    <span>static queries</span>
+  </Card>
+  <Card title="Updates" headingLevel={2}>
+    <strong>{updateCount}</strong>
+    <span>static updates</span>
+  </Card>
+</div>
+
+{#if signals.length > 0}
+  <div class="table-panel">
+    <Table caption="Signal handlers" density="condensed">
+      <TableHeader>
+        <TableRow>
+          <TableHeaderCell>Signal</TableHeaderCell>
+          <TableHeaderCell>Payload type</TableHeaderCell>
+          <TableHeaderCell>Handler source</TableHeaderCell>
+          <TableHeaderCell>State</TableHeaderCell>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {#each signals as signal (signal.id)}
+          <TableRow>
+            <TableCell as="th">{signal.name}</TableCell>
+            <TableCell>{payloadTypeText(signal)}</TableCell>
+            <TableCell>{sourceText(signal.handlerSource)}</TableCell>
+            <TableCell>
+              <Badge
+                variant={statusBadgeVariant(graphProjection?.nodesById.get(signal.id)?.state)}
+                size="sm"
+              >
+                {graphProjection?.nodesById.get(signal.id)?.state ?? 'not observed'}
+              </Badge>
+            </TableCell>
+          </TableRow>
+        {/each}
+      </TableBody>
+    </Table>
+  </div>
+{:else}
+  <EmptyState
+    title="No signals"
+    description="This Workflow does not declare any signal handlers."
+    headingLevel={2}
+  />
+{/if}
+
+<style>
+  .message-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .message-grid strong {
+    display: block;
+    color: #2f6fed;
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .message-grid span {
+    color: #5d6b75;
+    font-size: 0.875rem;
+  }
+
+  .table-panel {
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    border: 1px solid #d3dde5;
+    border-radius: 0.5rem;
+    background: #ffffff;
+  }
+
+  @media (max-width: 840px) {
+    .message-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

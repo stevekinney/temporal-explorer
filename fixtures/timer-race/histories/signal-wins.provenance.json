@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "timer-race",
+  "history": "signal-wins",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "timerRaceWorkflow",
+  "workflowId": "timer-race-signal-wins",
+  "runIdNormalization": { "replacement": "signal-wins-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 17,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 1,
+    "11": 1,
+    "12": 1,
+    "17": 1,
+    "19": 1,
+    "26": 1
+  },
+  "contentSha256": "474ea11b6c83d111bfd92ac145ecc88a9b237239158c6c11dbadb66dffbcb29d"
+}

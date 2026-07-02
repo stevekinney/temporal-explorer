@@ -23,6 +23,14 @@ export function operationLabel(operation: RuntimeOperation): string {
     return `Workflow ${operation.status}`;
   }
 
+  if (operation.kind === 'signal') {
+    return `Signal ${operation.signalName}`;
+  }
+
+  if (operation.kind === 'timer') {
+    return `Timer ${operation.timerId}`;
+  }
+
   return 'Unmapped history operation';
 }
 

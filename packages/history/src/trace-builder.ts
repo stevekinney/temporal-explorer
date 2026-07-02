@@ -4,7 +4,9 @@ import { createActivityOperations } from './activity-operations';
 import { createUnknownEventDiagnostics } from './diagnostics';
 import { parseEventHistoryEvents, readRecordField, readStringField } from './history-json';
 import type { PayloadPreviewConfiguration } from './payloads';
+import { createSignalOperations } from './signal-operations';
 import { createTimeline } from './timeline';
+import { createTimerOperations } from './timer-operations';
 import {
   createWorkflowExecution,
   createWorkflowLifecycle,
@@ -66,6 +68,9 @@ export function parseEventHistory(options: ParseEventHistoryOptions): RuntimeTra
   const configuration = options.payloadPreview ?? {};
   const lifecycle = createWorkflowLifecycle(events, payloads, configuration, options.provenance);
   const activityOperations = createActivityOperations(events, payloads, configuration);
+  const signalOperations = createSignalOperations(events, payloads, configuration);
+  const timerOperations = createTimerOperations(events);
+  const detailOperations = [...activityOperations, ...signalOperations, ...timerOperations];
 
   return {
     schemaVersion: 'temporal-trace/v1',
@@ -73,11 +78,11 @@ export function parseEventHistory(options: ParseEventHistoryOptions): RuntimeTra
     metadata: createMetadata(options),
     execution: createWorkflowExecution(lifecycle),
     source: createSource(lifecycle, events.length, options.importedFrom),
-    operations: [...lifecycle.operations, ...activityOperations],
+    operations: [...lifecycle.operations, ...detailOperations],
     timeline: createTimeline(
       lifecycle.workflowStartedEvent,
       lifecycle.workflowClosedEvent,
-      activityOperations,
+      detailOperations,
     ),
     payloads,
     diagnostics: createUnknownEventDiagnostics(events),

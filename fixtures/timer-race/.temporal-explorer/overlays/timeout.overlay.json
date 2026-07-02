@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:timerRaceWorkflow:trace:timeout:timeout-run-id",
+  "staticAnalysisId": "analysis:timer-race",
+  "runtimeTraceId": "trace:timeout:timeout-run-id",
+  "workflow": "timerRaceWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:timerRaceWorkflow",
+      "kind": "workflow",
+      "name": "timerRaceWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 12,
+          "column": 1,
+          "offset": 406
+        },
+        "end": {
+          "line": 38,
+          "column": 2,
+          "offset": 1087
+        },
+        "symbolName": "timerRaceWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:timerRaceWorkflow:notifyApproved:2",
+      "kind": "activity",
+      "name": "notifyApproved",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 26,
+          "offset": 727
+        },
+        "end": {
+          "line": 22,
+          "column": 93,
+          "offset": 794
+        },
+        "symbolName": "notifyApproved"
+      }
+    },
+    {
+      "id": "activity-call:timerRaceWorkflow:notifyExpired:3",
+      "kind": "activity",
+      "name": "notifyExpired",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 24,
+          "offset": 939
+        },
+        "end": {
+          "line": 31,
+          "column": 65,
+          "offset": 980
+        },
+        "symbolName": "notifyExpired"
+      }
+    },
+    {
+      "id": "timer:timerRaceWorkflow:1",
+      "kind": "timer",
+      "name": "'30 days'",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 26,
+          "offset": 629
+        },
+        "end": {
+          "line": 19,
+          "column": 78,
+          "offset": 681
+        }
+      }
+    },
+    {
+      "id": "condition:timerRaceWorkflow:0",
+      "kind": "condition",
+      "name": "() => approvedBy !== undefined",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 26,
+          "offset": 629
+        },
+        "end": {
+          "line": 19,
+          "column": 78,
+          "offset": 681
+        }
+      }
+    },
+    {
+      "id": "signal:timerRaceWorkflow:approve",
+      "kind": "signal",
+      "name": "approve",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/timer-race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 30,
+          "offset": 270
+        },
+        "end": {
+          "line": 6,
+          "column": 63,
+          "offset": 303
+        },
+        "symbolName": "approve"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:timerRaceWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to timerRaceWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type timerRaceWorkflow matched static Workflow timerRaceWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:timerRaceWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/timer-race-workflow.ts:12.",
+          "staticNodeId": "workflow:timerRaceWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:timerRaceWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to timerRaceWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type timerRaceWorkflow matched static Workflow timerRaceWorkflow.",
+          "eventIds": [16],
+          "staticNodeId": "workflow:timerRaceWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/timer-race-workflow.ts:12.",
+          "staticNodeId": "workflow:timerRaceWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:notifyExpired:10",
+      "staticNodeId": "activity-call:timerRaceWorkflow:notifyExpired:3",
+      "confidence": "exact",
+      "reason": "Activity notifyExpired matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type notifyExpired matched static Activity command notifyExpired.",
+          "eventIds": [10, 11, 12],
+          "staticNodeId": "activity-call:timerRaceWorkflow:notifyExpired:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [10, 11, 12],
+          "staticNodeId": "activity-call:timerRaceWorkflow:notifyExpired:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/timer-race-workflow.ts:31.",
+          "staticNodeId": "activity-call:timerRaceWorkflow:notifyExpired:3"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "timer:1:5",
+      "staticNodeId": "timer:timerRaceWorkflow:1",
+      "confidence": "exact",
+      "reason": "The only runtime timer matched the only static timer.",
+      "evidence": [
+        {
+          "kind": "timer-order",
+          "description": "Runtime timer 1 matched static timer command timer:timerRaceWorkflow:1 by start order.",
+          "eventIds": [5, 6],
+          "staticNodeId": "timer:timerRaceWorkflow:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static timer source is src/workflows/timer-race-workflow.ts:19.",
+          "staticNodeId": "timer:timerRaceWorkflow:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 6,
+      "observed": 3,
+      "skipped": 3,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 2,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 1,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 1,
+      "fired": 1,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

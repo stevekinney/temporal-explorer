@@ -1,0 +1,417 @@
+{
+  "$id": "https://temporal-explorer.dev/schemas/temporal-trace/v1",
+  "title": "temporal-trace/v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "temporal-trace/v1" },
+    "artifactId": { "type": "string", "minLength": 1 },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "temporalExplorerVersion": { "type": "string", "minLength": 1 },
+        "schemaVersion": { "type": "string", "minLength": 1 },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "projectRoot": { "type": "string" },
+            "configHash": { "type": "string" },
+            "tsconfigHash": { "type": "string" },
+            "packageMetadataHash": { "type": "string" },
+            "lockfileHash": { "type": "string" },
+            "sourceFileHashes": {
+              "type": "object",
+              "propertyNames": { "type": "string" },
+              "additionalProperties": { "type": "string" }
+            },
+            "temporalSdkVersions": {
+              "type": "object",
+              "propertyNames": { "type": "string" },
+              "additionalProperties": { "type": "string" }
+            }
+          },
+          "required": ["projectRoot", "configHash", "sourceFileHashes", "temporalSdkVersions"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["temporalExplorerVersion", "schemaVersion", "inputs"],
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "workflowType": { "type": "string", "minLength": 1 },
+        "workflowId": { "type": "string", "minLength": 1 },
+        "runId": { "type": "string", "minLength": 1 },
+        "status": {
+          "anyOf": [
+            { "type": "string", "const": "running" },
+            { "type": "string", "const": "completed" },
+            { "type": "string", "const": "failed" },
+            { "type": "string", "const": "canceled" },
+            { "type": "string", "const": "terminated" },
+            { "type": "string", "const": "timedOut" }
+          ]
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "closedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "durationMs": { "type": "number", "minimum": 0 }
+      },
+      "required": ["workflowType", "workflowId", "runId", "status", "startedAt"],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "namespace": { "type": "string", "minLength": 1 },
+        "taskQueue": { "type": "string", "minLength": 1 },
+        "eventCount": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+        "importedFrom": {
+          "anyOf": [
+            { "type": "string", "const": "file" },
+            { "type": "string", "const": "api" },
+            { "type": "string", "const": "cli" }
+          ]
+        }
+      },
+      "required": ["eventCount", "importedFrom"],
+      "additionalProperties": false
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "workflow-lifecycle" },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "started" },
+                  { "type": "string", "const": "completed" },
+                  { "type": "string", "const": "failed" },
+                  { "type": "string", "const": "canceled" }
+                ]
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": ["id", "kind", "status", "eventReferences", "payloadReferences"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "activity" },
+              "activityType": { "type": "string", "minLength": 1 },
+              "activityId": { "type": "string", "minLength": 1 },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "completed" },
+                  { "type": "string", "const": "failed" },
+                  { "type": "string", "const": "timedOut" },
+                  { "type": "string", "const": "canceled" },
+                  { "type": "string", "const": "pending" }
+                ]
+              },
+              "attempts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "attempt": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "scheduledEventId": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "startedEventId": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "closedEventId": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "status": {
+                      "anyOf": [
+                        { "type": "string", "const": "completed" },
+                        { "type": "string", "const": "failed" },
+                        { "type": "string", "const": "timedOut" },
+                        { "type": "string", "const": "canceled" },
+                        { "type": "string", "const": "pending" }
+                      ]
+                    }
+                  },
+                  "required": ["attempt", "scheduledEventId", "status"],
+                  "additionalProperties": false
+                }
+              },
+              "firstScheduledAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "closedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "durationMs": { "type": "number", "minimum": 0 },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "activityType",
+              "activityId",
+              "status",
+              "attempts",
+              "firstScheduledAt",
+              "eventReferences",
+              "payloadReferences"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "signal" },
+              "signalName": { "type": "string", "minLength": 1 },
+              "receivedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "payloadReferences": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 }
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "signalName",
+              "receivedAt",
+              "eventReferences",
+              "payloadReferences"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "timer" },
+              "timerId": { "type": "string", "minLength": 1 },
+              "status": {
+                "anyOf": [
+                  { "type": "string", "const": "fired" },
+                  { "type": "string", "const": "canceled" },
+                  { "type": "string", "const": "pending" }
+                ]
+              },
+              "startedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "closedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "durationText": { "type": "string", "minLength": 1 },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } }
+            },
+            "required": ["id", "kind", "timerId", "status", "startedAt", "eventReferences"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "const": "unmapped" },
+              "eventReferences": { "type": "array", "items": { "$ref": "#/$defs/__schema0" } },
+              "reason": { "type": "string", "minLength": 1 }
+            },
+            "required": ["id", "kind", "eventReferences", "reason"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "operationId": { "type": "string", "minLength": 1 },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "label": { "type": "string", "minLength": 1 },
+          "eventIds": {
+            "type": "array",
+            "items": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 }
+          }
+        },
+        "required": ["id", "operationId", "at", "label", "eventIds"],
+        "additionalProperties": false
+      }
+    },
+    "payloads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "eventId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+          "kind": {
+            "anyOf": [
+              { "type": "string", "const": "input" },
+              { "type": "string", "const": "result" },
+              { "type": "string", "const": "failure" },
+              { "type": "string", "const": "signal" },
+              { "type": "string", "const": "update" }
+            ]
+          },
+          "decoded": { "type": "boolean" },
+          "preview": {},
+          "redacted": { "type": "boolean" }
+        },
+        "required": ["id", "eventId", "kind", "decoded", "redacted"],
+        "additionalProperties": false
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "category": {
+            "anyOf": [
+              { "type": "string", "const": "configuration" },
+              { "type": "string", "const": "discovery" },
+              { "type": "string", "const": "type-extraction" },
+              { "type": "string", "const": "control-flow" },
+              { "type": "string", "const": "determinism" },
+              { "type": "string", "const": "history" },
+              { "type": "string", "const": "mapping" },
+              { "type": "string", "const": "rendering" },
+              { "type": "string", "const": "privacy" },
+              { "type": "string", "const": "compatibility" }
+            ]
+          },
+          "severity": {
+            "anyOf": [
+              { "type": "string", "const": "error" },
+              { "type": "string", "const": "warning" },
+              { "type": "string", "const": "info" }
+            ]
+          },
+          "message": { "type": "string", "minLength": 1 },
+          "source": { "$ref": "#/$defs/__schema1" },
+          "relatedSources": { "type": "array", "items": { "$ref": "#/$defs/__schema1" } },
+          "confidence": {
+            "anyOf": [
+              { "type": "string", "const": "exact" },
+              { "type": "string", "const": "inferred" },
+              { "type": "string", "const": "partial" },
+              { "type": "string", "const": "ambiguous" },
+              { "type": "string", "const": "dynamic" },
+              { "type": "string", "const": "unknown" }
+            ]
+          },
+          "documentationUrl": { "type": "string", "format": "uri" }
+        },
+        "required": ["code", "category", "severity", "message", "confidence"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "artifactId",
+    "metadata",
+    "execution",
+    "source",
+    "operations",
+    "timeline",
+    "payloads",
+    "diagnostics"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "eventType": { "type": "string", "minLength": 1 }
+      },
+      "required": ["eventId", "eventType"],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "object",
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "pathKind": {
+          "anyOf": [
+            { "type": "string", "const": "project-relative" },
+            { "type": "string", "const": "absolute" }
+          ]
+        },
+        "start": { "$ref": "#/$defs/__schema2" },
+        "end": { "$ref": "#/$defs/__schema2" },
+        "symbolName": { "type": "string", "minLength": 1 }
+      },
+      "required": ["path", "pathKind", "start", "end"],
+      "additionalProperties": false
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "line": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "column": { "type": "integer", "exclusiveMinimum": 0, "maximum": 9007199254740991 },
+        "offset": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }
+      },
+      "required": ["line", "column", "offset"],
+      "additionalProperties": false
+    }
+  }
+}

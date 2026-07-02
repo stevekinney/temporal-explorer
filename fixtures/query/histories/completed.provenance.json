@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "query",
+  "history": "completed",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "queryWorkflow",
+  "workflowId": "query-completed",
+  "runIdNormalization": { "replacement": "completed-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 15,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 1,
+    "11": 1,
+    "12": 1,
+    "26": 1
+  },
+  "contentSha256": "23bb983c37e7e6ddc7f96d110eba3bc2dd1fac60a9e773a032847035daf5a6f3"
+}

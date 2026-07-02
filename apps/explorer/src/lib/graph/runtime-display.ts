@@ -7,6 +7,7 @@ export type BadgeVariant = 'neutral' | 'success' | 'warning' | 'danger' | 'info'
 const badgeVariantsByState = {
   observed: 'success',
   completed: 'success',
+  fired: 'success',
   failed: 'danger',
   retried: 'warning',
   'timed out': 'danger',
@@ -47,12 +48,26 @@ export function operationDisplayName(operation: RuntimeOperation): string {
     return `Workflow ${operation.status}`;
   }
 
+  if (operation.kind === 'signal') {
+    return `Signal ${operation.signalName}`;
+  }
+
+  if (operation.kind === 'timer') {
+    return `Timer ${operation.timerId}`;
+  }
+
   return 'Unmapped operation';
 }
 
 export function operationKindLabel(operation: RuntimeOperation): string {
   if (operation.kind === 'workflow-lifecycle') return 'workflow';
   if (operation.kind === 'activity') return 'activity';
+  if (operation.kind === 'signal') return 'signal';
+  if (operation.kind === 'timer') return 'timer';
 
   return 'unmapped';
+}
+
+export function timerDurationText(operation: Extract<RuntimeOperation, { kind: 'timer' }>): string {
+  return operation.durationText ?? 'pending';
 }

@@ -34,7 +34,23 @@ export type FixtureHistoryDefinition = {
   scenario?: (context: FixtureScenarioContext) => Promise<void>;
   /** Expected terminal state of the Workflow Execution. */
   expectedOutcome: 'completed' | 'failed' | 'canceled';
+  /**
+   * Whether `fixtures:regenerate-artifacts` should produce committed
+   * `.temporal-explorer` artifacts. Stays false until the construct slice that
+   * owns the fixture is implemented, so committed artifacts are never
+   * silently incomplete.
+   */
+  generateArtifacts?: boolean;
 };
+
+/**
+ * Lets pending Workflow Tasks and command generation settle on the
+ * time-skipping test server before a scenario interacts with the Workflow.
+ * Ten seconds of skipped time is far below every fixture timer duration.
+ */
+async function settleWorkflowTasks(environment: TestWorkflowEnvironment): Promise<void> {
+  await environment.sleep('10 seconds');
+}
 
 /** Every generated fixture history, in generation order. */
 export const fixtureHistories: FixtureHistoryDefinition[] = [
@@ -54,6 +70,210 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       },
     ],
     expectedOutcome: 'completed',
+  },
+  {
+    fixture: 'approval',
+    history: 'approved',
+    workflowType: 'approvalWorkflow',
+    taskQueue: 'approval-task-queue',
+    workflowsPath: 'src/workflows/approval-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/approval/src/activities/approval-activities'),
+    args: [{ requestId: 'request-001' }],
+    scenario: async ({ environment, handle }) => {
+      await settleWorkflowTasks(environment);
+      await handle.signal('approve', { approvedBy: 'reviewer-1' });
+    },
+    expectedOutcome: 'completed',
+  },
+  {
+    fixture: 'timer-race',
+    history: 'signal-wins',
+    workflowType: 'timerRaceWorkflow',
+    taskQueue: 'timer-race-task-queue',
+    workflowsPath: 'src/workflows/timer-race-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/timer-race/src/activities/race-activities'),
+    args: [{ requestId: 'request-002' }],
+    scenario: async ({ environment, handle }) => {
+      await settleWorkflowTasks(environment);
+      await handle.signal('approve', 'reviewer-2');
+    },
+    expectedOutcome: 'completed',
+  },
+  {
+    fixture: 'timer-race',
+    history: 'timeout',
+    workflowType: 'timerRaceWorkflow',
+    taskQueue: 'timer-race-task-queue',
+    workflowsPath: 'src/workflows/timer-race-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/timer-race/src/activities/race-activities'),
+    args: [{ requestId: 'request-003' }],
+    expectedOutcome: 'completed',
+  },
+  {
+    fixture: 'query',
+    history: 'completed',
+    workflowType: 'queryWorkflow',
+    taskQueue: 'query-task-queue',
+    workflowsPath: 'src/workflows/query-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/query/src/activities/audit-activities'),
+    args: [{ requestId: 'request-004' }],
+    scenario: async ({ environment, handle }) => {
+      await settleWorkflowTasks(environment);
+      // Queries must not add events to history; the committed fixture proves it.
+      await handle.query('status');
+      await handle.signal('complete');
+    },
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'update',
+    history: 'updates',
+    workflowType: 'updateWorkflow',
+    taskQueue: 'update-task-queue',
+    workflowsPath: 'src/workflows/update-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/update/src/activities/address-activities'),
+    args: [{ requestId: 'request-005', initialStreet: '1 First Street' }],
+    scenario: async ({ environment, handle }) => {
+      await settleWorkflowTasks(environment);
+      await handle.executeUpdate('setAddress', {
+        args: [{ street: '2 Second Street', city: 'Portland' }],
+      });
+
+      try {
+        // The validator rejects an empty street before acceptance, so this
+        // update must not appear in Event History.
+        await handle.executeUpdate('setAddress', { args: [{ street: '', city: 'Nowhere' }] });
+        throw new Error('Expected the setAddress validator to reject an empty street.');
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Expected the setAddress')) {
+          throw error;
+        }
+      }
+
+      try {
+        // The handler throws after acceptance, producing a failed outcome.
+        await handle.executeUpdate('explode', { args: ['kaboom'] });
+        throw new Error('Expected the explode update handler to fail.');
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('Expected the explode')) {
+          throw error;
+        }
+      }
+    },
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'retry',
+    history: 'retry-success',
+    workflowType: 'retryWorkflow',
+    taskQueue: 'retry-task-queue',
+    workflowsPath: 'src/workflows/retry-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/retry/src/activities/charge-activities'),
+    args: [{ orderId: 'order-retry', failuresBeforeSuccess: 2 }],
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'retry',
+    history: 'failure',
+    workflowType: 'retryWorkflow',
+    taskQueue: 'retry-task-queue',
+    workflowsPath: 'src/workflows/retry-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/retry/src/activities/charge-activities'),
+    args: [{ orderId: 'order-doomed', failuresBeforeSuccess: 99 }],
+    expectedOutcome: 'failed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'child-workflow',
+    history: 'success',
+    workflowType: 'childWorkflowParent',
+    taskQueue: 'child-workflow-task-queue',
+    workflowsPath: 'src/workflows/child-workflow-parent.ts',
+    args: [{ orderId: 'order-child' }],
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'external',
+    history: 'signaled',
+    workflowType: 'externalWorkflowInteraction',
+    taskQueue: 'external-task-queue',
+    workflowsPath: 'src/workflows/external-interaction-workflow.ts',
+    args: [{ requestId: 'request-006' }],
+    scenario: async ({ environment, handle }) => {
+      const target = await environment.client.workflow.start('externalSignalTarget', {
+        workflowId: 'external-target-1',
+        taskQueue: 'external-task-queue',
+        args: [],
+      });
+      await settleWorkflowTasks(environment);
+      await handle.signal('targetReady', 'external-target-1');
+      await target.result();
+    },
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'cancellation',
+    history: 'canceled',
+    workflowType: 'cancellationWorkflow',
+    taskQueue: 'cancellation-task-queue',
+    workflowsPath: 'src/workflows/cancellation-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/cancellation/src/activities/resource-activities'),
+    args: [{ resourceId: 'resource-007' }],
+    scenario: async ({ environment, handle }) => {
+      await settleWorkflowTasks(environment);
+      await handle.cancel();
+    },
+    expectedOutcome: 'canceled',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'continue-as-new',
+    history: 'rollover',
+    workflowType: 'continueAsNewWorkflow',
+    taskQueue: 'continue-as-new-task-queue',
+    workflowsPath: 'src/workflows/continue-as-new-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/continue-as-new/src/activities/iteration-activities'),
+    args: [{ iteration: 0, maxIterations: 2 }],
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'patched',
+    history: 'patched-run',
+    workflowType: 'patchedWorkflow',
+    taskQueue: 'patched-task-queue',
+    workflowsPath: 'src/workflows/patched-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/patched/src/activities/charge-activities'),
+    args: [{ orderId: 'order-patched' }],
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
+  },
+  {
+    fixture: 'dynamic',
+    history: 'planned',
+    workflowType: 'dynamicWorkflow',
+    taskQueue: 'dynamic-task-queue',
+    workflowsPath: 'src/workflows/dynamic-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/dynamic/src/activities/step-activities'),
+    args: [{ requestId: 'request-008', plan: ['prepareShipment', 'notifyWarehouse'] }],
+    expectedOutcome: 'completed',
+    generateArtifacts: false,
   },
 ];
 

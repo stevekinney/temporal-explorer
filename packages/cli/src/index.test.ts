@@ -67,6 +67,31 @@ describe('temporal-explorer CLI scaffold', () => {
     expect(run.stdout).toContain('Temporal Workflow Explorer');
   });
 
+  it('checks a clean fixture and exits successfully', async () => {
+    const run = await runCommand(['check', '--project', fixtureRoot]);
+
+    expect(run.exitCode).toBe(0);
+    expect(run.stdout).toContain('Analysis passed with 0 warning(s).');
+  });
+
+  it('reports check diagnostics as JSON', async () => {
+    const run = await runCommand(['check', '--project', fixtureRoot, '--json']);
+    const parsed: unknown = JSON.parse(run.stdout);
+
+    expect(run.exitCode).toBe(0);
+    expect(isRecord(parsed) && parsed['errorCount']).toBe(0);
+    expect(isRecord(parsed) && Array.isArray(parsed['diagnostics'])).toBe(true);
+  });
+
+  it('lists signals and waits for the approval fixture', async () => {
+    const approvalRoot = new URL('../../../fixtures/approval', import.meta.url).pathname;
+    const run = await runCommand(['show', 'approvalWorkflow', '--project', approvalRoot]);
+
+    expect(run.exitCode).toBe(0);
+    expect(run.stdout).toContain('Signal approve(ApprovalRecord)');
+    expect(run.stdout).toContain('condition () => approval !== undefined');
+  });
+
   it('analyzes the basic order fixture as JSON', async () => {
     const run = await runCommand(['analyze', '--project', fixtureRoot, '--json']);
     const analysis = parseAnalysisJson(run.stdout);

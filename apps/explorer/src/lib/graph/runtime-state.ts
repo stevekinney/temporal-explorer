@@ -3,12 +3,12 @@ import type {
   RuntimeNodeMapping,
   RuntimeOperation,
   RuntimeTraceDocument,
-  TemporalCommand,
 } from '@temporal-explorer/schemas';
 
 export const runtimeOverlayStates = [
   'observed',
   'completed',
+  'fired',
   'failed',
   'retried',
   'timed out',
@@ -47,6 +47,14 @@ export function operationState(operation: RuntimeOperation | undefined): Runtime
     return workflowLifecycleState(operation.status);
   }
 
+  if (operation.kind === 'signal') {
+    return 'observed';
+  }
+
+  if (operation.kind === 'timer') {
+    return timerOperationState(operation.status);
+  }
+
   if (operation.attempts.length > 1) {
     return 'retried';
   }
@@ -54,28 +62,40 @@ export function operationState(operation: RuntimeOperation | undefined): Runtime
   return operation.status === 'timedOut' ? 'timed out' : operation.status;
 }
 
+/**
+ * Resolves the runtime overlay state for a static graph node (an Activity, Timer,
+ * Condition, or Signal command) by combining its overlay `observed` flag with the
+ * states of any Runtime Operations mapped to it. `fallbackObservedState` is returned
+ * when the node is observed but no mapped Operation reports a more specific state —
+ * for example a Signal that was received but has no exceptional status of its own.
+ */
 export function commandState(
-  command: TemporalCommand,
+  node: { id: string },
   overlay: ExecutionOverlayDocument | undefined,
   operations: RuntimeOperation[],
   mappingsByRuntimeOperationId: Map<string, RuntimeNodeMapping>,
+  fallbackObservedState: RuntimeOverlayState = 'completed',
 ): RuntimeOverlayState {
-  const overlayNode = overlay?.staticNodes.find((node) => node.id === command.id);
+  const overlayNode = overlay?.staticNodes.find((candidate) => candidate.id === node.id);
 
   if (overlayNode && !overlayNode.observed) {
     return 'not taken';
   }
 
   const mappedStates = operations
-    .filter(
-      (operation) => mappingsByRuntimeOperationId.get(operation.id)?.staticNodeId === command.id,
-    )
+    .filter((operation) => mappingsByRuntimeOperationId.get(operation.id)?.staticNodeId === node.id)
     .map(operationState);
   const priorityState = commandStatePriority.find((state) => mappedStates.includes(state));
 
-  return (
-    priorityState ?? (mappedStates.length > 0 || overlayNode?.observed ? 'completed' : 'not taken')
-  );
+  if (priorityState) {
+    return priorityState;
+  }
+
+  if (mappedStates.length > 0) {
+    return mappedStates[0] ?? fallbackObservedState;
+  }
+
+  return overlayNode?.observed ? fallbackObservedState : 'not taken';
 }
 
 export function workflowState(trace: RuntimeTraceDocument | undefined): RuntimeOverlayState {
@@ -109,4 +129,13 @@ function workflowLifecycleState(
   if (status === 'failed') return 'failed';
 
   return 'canceled';
+}
+
+function timerOperationState(
+  status: Extract<RuntimeOperation, { kind: 'timer' }>['status'],
+): RuntimeOverlayState {
+  if (status === 'fired') return 'fired';
+  if (status === 'canceled') return 'canceled';
+
+  return 'pending';
 }

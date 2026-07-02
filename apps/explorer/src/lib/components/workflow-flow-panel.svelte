@@ -361,6 +361,7 @@
         source={activeInspectorSource}
         eventReferences={activeInspectorEventReferences}
         reason={activeInspectorReason}
+        operation={selectedRuntimeOperation}
       />
     </div>
   </section>
@@ -481,7 +482,8 @@
   }
 
   .state-legend span[data-state='completed']::before,
-  .state-legend span[data-state='observed']::before {
+  .state-legend span[data-state='observed']::before,
+  .state-legend span[data-state='fired']::before {
     background: #18845b;
   }
 

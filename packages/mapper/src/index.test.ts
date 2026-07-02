@@ -116,4 +116,102 @@ describe('source-aware execution mapper', () => {
       'No static Activity command matched refundOrder occurrence 1.',
     ]);
   });
+
+  it('maps signals and canceled timers for the timer-race signal-wins overlay', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/timer-race/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const trace = runtimeTraceDocumentSchema.parse(
+      await Bun.file(
+        new URL(
+          '../../../fixtures/timer-race/.temporal-explorer/histories/signal-wins.trace.json',
+          import.meta.url,
+        ),
+      ).json(),
+    );
+    const overlay = createExecutionOverlay({
+      analysis,
+      trace,
+      workflowName: 'timerRaceWorkflow',
+    });
+    const signalMapping = overlay.mappings.find((mapping) =>
+      mapping.staticNodeId?.startsWith('signal:'),
+    );
+    const timerMapping = overlay.mappings.find((mapping) =>
+      mapping.staticNodeId?.startsWith('timer:'),
+    );
+
+    expect(validateArtifact(overlay).success).toBe(true);
+    expect(overlay.coverage.nodes.unmappedRuntimeOperations).toBe(0);
+    expect(signalMapping?.confidence).toBe('exact');
+    expect(signalMapping?.evidence.some((evidence) => evidence.kind === 'signal-name')).toBe(true);
+    expect(timerMapping?.confidence).toBe('exact');
+    expect(timerMapping?.evidence.some((evidence) => evidence.kind === 'timer-order')).toBe(true);
+    expect(overlay.coverage.timers).toEqual({
+      staticTotal: 1,
+      fired: 0,
+      canceled: 1,
+      pending: 0,
+    });
+    expect(overlay.staticNodes.find((node) => node.name === 'notifyExpired')?.observed).toBe(false);
+
+    const report = createOverlayReport(overlay);
+    expect(report).toContain('Signals');
+    expect(report).toContain('Timers');
+    expect(report).toContain('notifyExpired (not observed)');
+  });
+
+  it('marks unknown signals and surplus timers as unmapped', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/timer-race/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const trace = runtimeTraceDocumentSchema.parse(
+      await Bun.file(
+        new URL(
+          '../../../fixtures/timer-race/.temporal-explorer/histories/timeout.trace.json',
+          import.meta.url,
+        ),
+      ).json(),
+    );
+    const strangeOperations: RuntimeOperation[] = [
+      {
+        id: 'signal:mystery:90',
+        kind: 'signal',
+        signalName: 'mystery',
+        receivedAt: '2026-01-01T00:00:00.090Z',
+        eventReferences: [{ eventId: 90, eventType: 'WorkflowExecutionSignaled' }],
+        payloadReferences: [],
+      },
+      {
+        id: 'timer:9:91',
+        kind: 'timer',
+        timerId: '9',
+        status: 'fired',
+        startedAt: '2026-01-01T00:00:00.091Z',
+        eventReferences: [{ eventId: 91, eventType: 'TimerStarted' }],
+      },
+    ];
+    const overlay = createExecutionOverlay({
+      analysis,
+      trace: { ...trace, operations: [...trace.operations, ...strangeOperations] },
+      workflowName: 'timerRaceWorkflow',
+    });
+    const unmappedReasons = overlay.mappings
+      .filter((mapping) => !mapping.staticNodeId)
+      .map((mapping) => mapping.reason);
+
+    expect(unmappedReasons).toEqual([
+      'No static Signal definition matched mystery.',
+      'No static timer command matched runtime timer occurrence 2.',
+    ]);
+    expect(
+      overlay.mappings
+        .filter((mapping) => mapping.staticNodeId?.startsWith('timer:'))
+        .every((mapping) => mapping.confidence === 'inferred'),
+    ).toBe(true);
+  });
 });

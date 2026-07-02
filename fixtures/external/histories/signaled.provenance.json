@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "external",
+  "history": "signaled",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "externalWorkflowInteraction",
+  "workflowId": "external-signaled",
+  "runIdNormalization": { "replacement": "signaled-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 14,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "26": 1,
+    "37": 1,
+    "39": 1
+  },
+  "contentSha256": "9c66bb6ed6432a7d54c58f3205be1e6071dc54d3c34ba60253d9551ee104b999"
+}
