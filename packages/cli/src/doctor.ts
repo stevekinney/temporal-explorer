@@ -15,6 +15,7 @@ export type DoctorReport = {
   analysisArtifact: 'missing' | 'fresh' | 'stale';
   workflowFiles: { path: string; reason: string }[];
   diagnosticOverrides: Record<string, string>;
+  connections: { name: string; address: string; namespace: string }[];
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -75,6 +76,13 @@ export async function createDoctorReport(projectRoot: string | undefined): Promi
         : 'matched default workflow globs',
     })),
     diagnosticOverrides: project.configuration?.diagnostics ?? {},
+    connections: Object.entries(project.configuration?.connections ?? {}).map(
+      ([name, profile]) => ({
+        name,
+        address: profile.address ?? '(missing address)',
+        namespace: profile.namespace ?? 'default',
+      }),
+    ),
   };
 }
 
@@ -103,6 +111,14 @@ export function formatDoctorReport(report: DoctorReport): string {
 
     for (const [code, severity] of overrides) {
       lines.push(`  ${code}: ${severity}`);
+    }
+  }
+
+  if (report.connections.length > 0) {
+    lines.push('', 'Connection profiles');
+
+    for (const connection of report.connections) {
+      lines.push(`  ${connection.name}: ${connection.address} (${connection.namespace})`);
     }
   }
 

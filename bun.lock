@@ -105,6 +105,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@temporal-explorer/schemas": "workspace:*",
+        "@temporalio/client": "^1.18.1",
       },
       "devDependencies": {
         "@repo/typescript-configuration": "workspace:*",

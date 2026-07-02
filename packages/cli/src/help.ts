@@ -14,6 +14,8 @@ Commands:
   types [workflow]     Generate SDK-oriented .d.ts declaration artifacts
   check                Run diagnostics and exit non-zero for configured errors
   history import       Import a Temporal Event History file
+  history fetch        Fetch an Event History from a configured connection
+  runs list            List Workflow Executions on a configured connection
   trace <workflow>     Create a source-aware execution overlay
   report               Print a trace report
   aggregate <workflow> Aggregate retries, failures, and paths across local traces

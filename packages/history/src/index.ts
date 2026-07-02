@@ -98,6 +98,16 @@ export async function importEventHistoryFile(
   return parseEventHistory(parseOptions);
 }
 
+export {
+  createLiveClient,
+  fetchEventHistory,
+  listWorkflowRuns,
+  type FetchEventHistoryOptions,
+  type ListWorkflowRunsOptions,
+  type LiveClient,
+  type LiveConnectionOptions,
+  type WorkflowRunSummary,
+} from './live';
 export type { PayloadPreviewConfiguration } from './payloads';
 export type { HistoryProvenance, ParseEventHistoryOptions } from './trace-builder';
 export { parseEventHistory };

@@ -37,6 +37,17 @@ import {
 import { createTemporalExplorerResult, type TemporalExplorerResult } from './result';
 
 export {
+  createLiveClient,
+  fetchEventHistory,
+  listWorkflowRuns,
+  type FetchEventHistoryOptions,
+  type ListWorkflowRunsOptions,
+  type LiveClient,
+  type LiveConnectionOptions,
+  type WorkflowRunSummary,
+} from '@temporal-explorer/history';
+
+export {
   createAggregateReport,
   formatAggregateReport,
   type AggregateReport,

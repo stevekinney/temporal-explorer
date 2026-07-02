@@ -41,6 +41,7 @@
     "test": "turbo run test --concurrency=5",
     "test:cli": "bun test packages/cli",
     "test:fixtures": "bun run scripts/fixtures/test-fixtures.ts",
+    "test:live": "TEMPORAL_EXPLORER_LIVE_TESTS=1 bun test packages/history/src/live.test.ts packages/cli/src/live-commands.test.ts",
     "typecheck": "tsc --noEmit && turbo run typecheck",
     "ui:accessibility": "bun run scripts/ui/accessibility.ts",
     "ui:e2e": "bun run scripts/ui/e2e.ts",

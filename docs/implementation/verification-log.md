@@ -515,3 +515,11 @@ Follow-up: None.
 - Root-caused the `open-server.test.ts` flake: the fake explorer server exited on a 500ms timer that raced the CLI readiness probe under load. The fake now exits only after serving its first request, making the exit causally ordered; stable across repeated runs.
 - Generated `.d.ts` artifacts are excluded from Prettier: the declaration renderer owns their formatting and `snapshots:verify` enforces byte equality, so a second formatter only created churn.
 - `bun run validate` — pass end to end.
+
+## 2026-07-01: Stage 8 Library/CLI Live Connections and Stage 15 Closeout
+
+- `bun run test:live` — 3 tests against a real Temporal dev server (TestWorkflowEnvironment.createLocal): the library lists runs and fetches histories through the product's own connection path; the CLI resolves connection profiles from temporal-explorer.config.ts (including missing-profile and env-var secret errors), lists executions, and fetches a history into a standard redacted trace artifact.
+- Live fetch uses the identical parse pipeline as file import (`importedFrom: 'api'`), fulfilling the plan's "no separate live data model" requirement.
+- Time-skipping test servers do not implement visibility APIs; live tests use the full local dev server. Visibility is eventually consistent, so listing asserts poll with a capped retry (5 x 500ms).
+- Live integration tests are gated behind `bun run test:live` (env flag) because each spins a dev server and worker bundle; running them inside the default parallel suite starved unrelated tests into timeouts. The gate is part of stage and final acceptance runs.
+- `bun run validate` — pass end to end after the CLI command split (index.ts under the line budget, runtime commands in their own module).

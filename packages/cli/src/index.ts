@@ -1,38 +1,27 @@
 import {
   applySeverityOverrides,
-  createAggregateReport,
-  formatAggregateReport,
   getTemporalExplorerVersion,
   renderWorkflowMermaidFromArtifacts,
 } from '@temporal-explorer/api';
-import {
-  executionOverlayDocumentSchema,
-  runtimeTraceDocumentSchema,
-} from '@temporal-explorer/schemas';
 
 import { getPositionalArgs, parseFlags } from './arguments';
-import {
-  loadAnalysis,
-  loadOverlay,
-  loadReport,
-  loadRuntimeArtifacts,
-  loadTrace,
-  writeDeclarationArtifacts,
-  writeDocumentationArtifacts,
-} from './artifact-files';
-import { createDoctorReport, formatDoctorReport } from './doctor';
+import { loadAnalysis, writeDocumentationArtifacts } from './artifact-files';
+import type { CommandEnvironment } from './command-environment';
 import { formatList, formatShow } from './formatters';
 import { createHelpText } from './help';
 import { stableJson } from './json-format';
 import { startExplorerServer } from './open-server';
+import {
+  runAggregate,
+  runDoctor,
+  runHistory,
+  runReport,
+  runRuns,
+  runTrace,
+  runTypes,
+} from './runtime-commands';
 
 export { createHelpText } from './help';
-
-type CommandEnvironment = {
-  stdout: (text: string) => void | Promise<void>;
-  stderr: (text: string) => void | Promise<void>;
-  isInteractive: boolean;
-};
 
 async function runAnalyze(args: string[], environment: CommandEnvironment): Promise<number> {
   const flags = parseFlags(args);
@@ -76,60 +65,6 @@ async function runShow(args: string[], environment: CommandEnvironment): Promise
   return 0;
 }
 
-async function runHistory(args: string[], environment: CommandEnvironment): Promise<number> {
-  const [subcommand] = getPositionalArgs(args);
-
-  if (subcommand !== 'import') {
-    throw new Error('history requires the import subcommand in the current MVP slice.');
-  }
-
-  const flags = parseFlags(args);
-  const { trace, artifactPath, decodesPayloads } = await loadTrace(flags);
-
-  if (decodesPayloads) {
-    await environment.stderr(
-      `Warning: decoded payload previews will be written to ${artifactPath}.\n`,
-    );
-  }
-
-  if (flags.json) {
-    await environment.stdout(stableJson(trace));
-    return 0;
-  }
-
-  await environment.stdout(
-    `Imported ${trace.source.eventCount} history event(s) for ${trace.execution.workflowType} (${trace.execution.status}).\nWrote ${artifactPath}\n`,
-  );
-  return 0;
-}
-
-async function runTrace(args: string[], environment: CommandEnvironment): Promise<number> {
-  const [workflowName] = getPositionalArgs(args);
-
-  if (!workflowName) {
-    throw new Error('trace requires a Workflow name.');
-  }
-
-  const flags = parseFlags(args);
-  const { overlay, artifactPath } = await loadOverlay(flags, workflowName);
-
-  if (flags.json) {
-    await environment.stdout(stableJson(overlay));
-    return 0;
-  }
-
-  await environment.stdout(
-    `Mapped ${overlay.mappings.length} runtime operation(s) for ${overlay.workflow}; ${overlay.coverage.nodes.unmappedRuntimeOperations} unmapped.\nWrote ${artifactPath}\n`,
-  );
-  return 0;
-}
-
-async function runReport(args: string[], environment: CommandEnvironment): Promise<number> {
-  const flags = parseFlags(args);
-  await environment.stdout(await loadReport(flags));
-  return 0;
-}
-
 function formatCheckDiagnostic(diagnostic: {
   severity: string;
   code: string;
@@ -167,44 +102,6 @@ async function runCheck(args: string[], environment: CommandEnvironment): Promis
       : `Analysis passed with ${warnings.length} warning(s).\n`;
   await environment.stdout([...lines, summary].join('\n'));
   return errors.length > 0 ? 1 : 0;
-}
-
-async function runAggregate(args: string[], environment: CommandEnvironment): Promise<number> {
-  const [workflowName] = getPositionalArgs(args);
-
-  if (!workflowName) {
-    throw new Error('aggregate requires a Workflow name.');
-  }
-
-  const flags = parseFlags(args);
-  const { traces, overlays } = await loadRuntimeArtifacts(flags);
-  const report = createAggregateReport({
-    workflowType: workflowName,
-    traces: traces.map((artifact) => runtimeTraceDocumentSchema.parse(artifact)),
-    overlays: overlays.map((artifact) => executionOverlayDocumentSchema.parse(artifact)),
-  });
-
-  await environment.stdout(flags.json ? stableJson(report) : formatAggregateReport(report));
-  return 0;
-}
-
-async function runTypes(args: string[], environment: CommandEnvironment): Promise<number> {
-  const flags = parseFlags(args);
-  const [workflowName] = getPositionalArgs(args);
-  const { files, outputDirectory } = await writeDeclarationArtifacts(flags, workflowName);
-
-  await environment.stdout(
-    `Generated ${files.length} declaration file(s).\nWrote ${outputDirectory}\n`,
-  );
-  return 0;
-}
-
-async function runDoctor(args: string[], environment: CommandEnvironment): Promise<number> {
-  const flags = parseFlags(args);
-  const report = await createDoctorReport(flags.project);
-
-  await environment.stdout(flags.json ? stableJson(report) : formatDoctorReport(report));
-  return 0;
 }
 
 async function runDocs(args: string[], environment: CommandEnvironment): Promise<number> {
@@ -289,6 +186,7 @@ const commandHandlers = new Map<string, CommandHandler>([
   ['open', runOpen],
   ['report', runReport],
   ['render', runRender],
+  ['runs', runRuns],
   ['show', runShow],
   ['trace', runTrace],
   ['types', runTypes],

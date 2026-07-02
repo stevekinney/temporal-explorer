@@ -214,7 +214,7 @@ describe('temporal-explorer command edge cases', () => {
     expect(runs.map((run) => run.stderr)).toEqual([
       '--project requires a path.\n',
       'show requires a Workflow name.\n',
-      'history requires the import subcommand in the current MVP slice.\n',
+      'history requires the import or fetch subcommand.\n',
       'history import requires --file.\n',
       'trace requires a Workflow name.\n',
       'trace requires --history.\n',

@@ -5,6 +5,13 @@ export type ParsedFlags = {
   history?: string;
   port?: string;
   trace?: string;
+  connection?: string;
+  'workflow-id'?: string;
+  'workflow-type'?: string;
+  'run-id'?: string;
+  status?: string;
+  query?: string;
+  limit?: string;
   json: boolean;
 };
 
@@ -23,6 +30,13 @@ const stringFlagDefinitions = new Map<
   ['--history', { key: 'history', valueName: 'trace id' }],
   ['--port', { key: 'port', valueName: 'port' }],
   ['--trace', { key: 'trace', valueName: 'trace id' }],
+  ['--connection', { key: 'connection', valueName: 'profile name' }],
+  ['--workflow-id', { key: 'workflow-id', valueName: 'workflow id' }],
+  ['--workflow-type', { key: 'workflow-type', valueName: 'workflow type' }],
+  ['--run-id', { key: 'run-id', valueName: 'run id' }],
+  ['--status', { key: 'status', valueName: 'status' }],
+  ['--query', { key: 'query', valueName: 'visibility query' }],
+  ['--limit', { key: 'limit', valueName: 'count' }],
 ]);
 
 function readFlagValue(args: string[], index: number, flag: string, valueName: string): string {
