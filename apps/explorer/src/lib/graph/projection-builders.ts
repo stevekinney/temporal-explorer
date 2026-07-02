@@ -1,39 +1,44 @@
 import type {
   ExecutionOverlayDocument,
-  RuntimeNodeMapping,
-  RuntimeOperation,
-  RuntimeTimelineEntry,
   RuntimeTraceDocument,
-  SignalDefinition,
+  SourceLocation,
   TemporalCommand,
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
 import { sourceText } from './formatting';
-import type { RuntimeOperationRow, TemporalGraphNode, TimelineRow } from './projection';
+import type { ProjectionBuildContext, TemporalGraphNode } from './projection';
 import {
   confidenceForOperationIds,
   eventReferencesForOperationIds,
   findWorkflowRuntimeOperations,
-  operationEventReferences,
   operationLabel,
   runtimeOperationIdsForNode,
 } from './projection-helpers';
-import {
-  commandState,
-  operationState,
-  runtimeOperationRowState,
-  workflowState,
-  type RuntimeOverlayState,
-} from './runtime-state';
+import { commandState, workflowState, type RuntimeOverlayState } from './runtime-state';
 
-type ProjectionBuildContext = {
-  mappingsByRuntimeOperationId: Map<string, RuntimeNodeMapping>;
-  operationsById: Map<string, RuntimeOperation>;
+/** A static command that joins the sequential command chain, ordered by staticOrder. */
+type GraphCommand = TemporalCommand & {
+  kind:
+    | 'activity'
+    | 'timer'
+    | 'condition'
+    | 'child-workflow'
+    | 'external-workflow'
+    | 'continue-as-new'
+    | 'patch'
+    | 'dynamic';
 };
 
-/** A static command that renders as a node in the sequential command chain. */
-type GraphCommand = TemporalCommand & { kind: 'activity' | 'timer' | 'condition' };
+/**
+ * A cancellation scope: rendered as a node connected to the workflow node, but not
+ * part of the sequential command chain since it contains other commands rather than
+ * executing alongside them.
+ */
+type GraphScope = TemporalCommand & { kind: 'cancellation-scope' };
+
+/** A definition from the workflow's message surface (Signal, Query, or Update). */
+type MessageSurfaceDefinition = { id: string; name: string; source: SourceLocation };
 
 export function createWorkflowGraphNode(
   workflow: WorkflowDefinition,
@@ -59,7 +64,7 @@ export function createWorkflowGraphNode(
   };
 }
 
-/** Builds one node per Activity, Timer, and Condition command, ordered by staticOrder. */
+/** Builds one node per command that joins the sequential chain, ordered by staticOrder. */
 export function createCommandGraphNodes(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument | undefined,
@@ -72,6 +77,23 @@ export function createCommandGraphNodes(
     .map((command, index) => createCommandGraphNode(command, index, trace, overlay, context));
 }
 
+/**
+ * Builds one node per cancellation scope. Scopes render as nodes connected to the
+ * workflow node (like Signals) rather than joining the sequential command chain, since
+ * a scope contains other commands instead of executing alongside them.
+ */
+export function createScopeGraphNodes(
+  workflow: WorkflowDefinition,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode[] {
+  return workflow.temporalCommands
+    .filter(isScopeCommand)
+    .toSorted((left, right) => left.staticOrder - right.staticOrder)
+    .map((scope, index) => createScopeGraphNode(scope, index, trace, overlay, context));
+}
+
 /** Builds one node per static Signal declared on the workflow's message surface. */
 export function createSignalGraphNodes(
   workflow: WorkflowDefinition,
@@ -80,7 +102,31 @@ export function createSignalGraphNodes(
   context: ProjectionBuildContext,
 ): TemporalGraphNode[] {
   return workflow.messageSurface.signals.map((signal, index) =>
-    createSignalGraphNode(signal, index, trace, overlay, context),
+    createMessageSurfaceGraphNode('signal', signal, index, 40, trace, overlay, context),
+  );
+}
+
+/** Builds one node per static Query declared on the workflow's message surface. */
+export function createQueryGraphNodes(
+  workflow: WorkflowDefinition,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode[] {
+  return workflow.messageSurface.queries.map((query, index) =>
+    createMessageSurfaceGraphNode('query', query, index, 230, trace, overlay, context),
+  );
+}
+
+/** Builds one node per static Update declared on the workflow's message surface. */
+export function createUpdateGraphNodes(
+  workflow: WorkflowDefinition,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode[] {
+  return workflow.messageSurface.updates.map((update, index) =>
+    createMessageSurfaceGraphNode('update', update, index, 420, trace, overlay, context),
   );
 }
 
@@ -107,30 +153,6 @@ export function createUnmappedRuntimeNodes(
         confidence: 'unknown',
         fallbackPosition: { x: 320 + index * 280, y: 480 },
       })) ?? []
-  );
-}
-
-export function createTimelineRows(
-  trace: RuntimeTraceDocument | undefined,
-  workflowNodeId: string,
-  nodes: TemporalGraphNode[],
-  context: ProjectionBuildContext,
-): TimelineRow[] {
-  return (
-    trace?.timeline.map((entry) => createTimelineRow(entry, workflowNodeId, nodes, context)) ?? []
-  );
-}
-
-export function createRuntimeOperationRows(
-  trace: RuntimeTraceDocument | undefined,
-  workflowNodeId: string,
-  nodes: TemporalGraphNode[],
-  context: ProjectionBuildContext,
-): RuntimeOperationRow[] {
-  return (
-    trace?.operations.map((operation) =>
-      createRuntimeOperationRow(operation, workflowNodeId, nodes, context),
-    ) ?? []
   );
 }
 
@@ -169,105 +191,98 @@ function createCommandGraphNode(
   };
 }
 
-function createSignalGraphNode(
-  signal: SignalDefinition,
+function createScopeGraphNode(
+  scope: GraphScope,
   index: number,
   trace: RuntimeTraceDocument | undefined,
   overlay: ExecutionOverlayDocument | undefined,
   context: ProjectionBuildContext,
 ): TemporalGraphNode {
   const runtimeOperationIds = runtimeOperationIdsForNode(
-    signal.id,
+    scope.id,
     context.mappingsByRuntimeOperationId,
   );
 
   return {
-    id: signal.id,
-    label: signal.name,
-    kind: 'signal',
+    id: scope.id,
+    label: scope.name,
+    kind: 'cancellation-scope',
     state: commandState(
-      signal,
+      scope,
       overlay,
       trace?.operations ?? [],
       context.mappingsByRuntimeOperationId,
       'observed',
     ),
-    source: signal.source,
-    sourceText: sourceText(signal.source),
+    source: scope.source,
+    sourceText: sourceText(scope.source),
     runtimeOperationIds,
     eventReferences: eventReferencesForOperationIds(runtimeOperationIds, context.operationsById),
     confidence: confidenceForOperationIds(
       runtimeOperationIds,
       context.mappingsByRuntimeOperationId,
     ),
-    fallbackPosition: { x: 40, y: 320 + index * 160 },
+    fallbackPosition: { x: 610, y: 320 + index * 160 },
+  };
+}
+
+function createMessageSurfaceGraphNode(
+  kind: 'signal' | 'query' | 'update',
+  definition: MessageSurfaceDefinition,
+  index: number,
+  columnX: number,
+  trace: RuntimeTraceDocument | undefined,
+  overlay: ExecutionOverlayDocument | undefined,
+  context: ProjectionBuildContext,
+): TemporalGraphNode {
+  const runtimeOperationIds = runtimeOperationIdsForNode(
+    definition.id,
+    context.mappingsByRuntimeOperationId,
+  );
+
+  return {
+    id: definition.id,
+    label: definition.name,
+    kind,
+    state: commandState(
+      definition,
+      overlay,
+      trace?.operations ?? [],
+      context.mappingsByRuntimeOperationId,
+      'observed',
+    ),
+    source: definition.source,
+    sourceText: sourceText(definition.source),
+    runtimeOperationIds,
+    eventReferences: eventReferencesForOperationIds(runtimeOperationIds, context.operationsById),
+    confidence: confidenceForOperationIds(
+      runtimeOperationIds,
+      context.mappingsByRuntimeOperationId,
+    ),
+    fallbackPosition: { x: columnX, y: 320 + index * 160 },
   };
 }
 
 function fallbackObservedState(kind: GraphCommand['kind']): RuntimeOverlayState {
   if (kind === 'timer') return 'fired';
-  if (kind === 'condition') return 'observed';
+  if (kind === 'condition' || kind === 'patch') return 'observed';
 
-  return 'completed';
-}
-
-function createTimelineRow(
-  entry: RuntimeTimelineEntry,
-  workflowNodeId: string,
-  nodes: TemporalGraphNode[],
-  context: ProjectionBuildContext,
-): TimelineRow {
-  const operation = context.operationsById.get(entry.operationId);
-  const graphNodeId = graphNodeIdForOperation(
-    entry.operationId,
-    operation,
-    workflowNodeId,
-    context,
-  );
-  const node = graphNodeId ? nodes.find((candidate) => candidate.id === graphNodeId) : undefined;
-
-  return {
-    id: entry.id,
-    entry,
-    operation,
-    graphNodeId,
-    state: operationState(operation),
-    sourceText: node?.sourceText ?? 'not resolved',
-    eventReferences: operationEventReferences(operation),
-  };
-}
-
-function createRuntimeOperationRow(
-  operation: RuntimeOperation,
-  workflowNodeId: string,
-  nodes: TemporalGraphNode[],
-  context: ProjectionBuildContext,
-): RuntimeOperationRow {
-  const mapping = context.mappingsByRuntimeOperationId.get(operation.id);
-  const graphNodeId = graphNodeIdForOperation(operation.id, operation, workflowNodeId, context);
-  const node = graphNodeId ? nodes.find((candidate) => candidate.id === graphNodeId) : undefined;
-
-  return {
-    operation,
-    graphNodeId,
-    state: runtimeOperationRowState(mapping, operation),
-    sourceText: node?.sourceText ?? 'not resolved',
-    mapping,
-  };
-}
-
-function graphNodeIdForOperation(
-  operationId: string,
-  operation: RuntimeOperation | undefined,
-  workflowNodeId: string,
-  context: ProjectionBuildContext,
-): string | undefined {
-  return (
-    context.mappingsByRuntimeOperationId.get(operationId)?.staticNodeId ??
-    (operation?.kind === 'workflow-lifecycle' ? workflowNodeId : undefined)
-  );
+  return 'completed'; // activity, child-workflow, external-workflow, continue-as-new, dynamic
 }
 
 function isGraphCommand(command: TemporalCommand): command is GraphCommand {
-  return command.kind === 'activity' || command.kind === 'timer' || command.kind === 'condition';
+  return (
+    command.kind === 'activity' ||
+    command.kind === 'timer' ||
+    command.kind === 'condition' ||
+    command.kind === 'child-workflow' ||
+    command.kind === 'external-workflow' ||
+    command.kind === 'continue-as-new' ||
+    command.kind === 'patch' ||
+    command.kind === 'dynamic'
+  );
+}
+
+function isScopeCommand(command: TemporalCommand): command is GraphScope {
+  return command.kind === 'cancellation-scope';
 }

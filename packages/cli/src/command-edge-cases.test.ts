@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -7,17 +7,29 @@ import {
   validateArtifact,
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/api';
-import { describe, expect, it } from 'bun:test';
+import { beforeAll, describe, expect, it } from 'bun:test';
 
 import { formatShow } from './formatters';
 import { main } from './index';
 import { stableJson } from './json-format';
 
-const fixtureRoot = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
-const analysisArtifactPath = `${fixtureRoot}/.temporal-explorer/analysis.json`;
-const historyPath = `${fixtureRoot}/histories/success.json`;
-const traceArtifactPath = `${fixtureRoot}/.temporal-explorer/histories/success.trace.json`;
-const overlayArtifactPath = `${fixtureRoot}/.temporal-explorer/overlays/success.overlay.json`;
+// CLI commands write artifacts into their project directory, so these tests
+// run against a temporary copy of the committed basic-order fixture.
+let fixtureRoot = '';
+let analysisArtifactPath = '';
+let historyPath = '';
+let traceArtifactPath = '';
+let overlayArtifactPath = '';
+
+beforeAll(async () => {
+  const committedFixture = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
+  fixtureRoot = await mkdtemp(join(tmpdir(), 'temporal-explorer-cli-edge-'));
+  await cp(committedFixture, fixtureRoot, { recursive: true });
+  analysisArtifactPath = `${fixtureRoot}/.temporal-explorer/analysis.json`;
+  historyPath = `${fixtureRoot}/histories/success.json`;
+  traceArtifactPath = `${fixtureRoot}/.temporal-explorer/histories/success.trace.json`;
+  overlayArtifactPath = `${fixtureRoot}/.temporal-explorer/overlays/success.overlay.json`;
+});
 
 type CommandRun = {
   exitCode: number;

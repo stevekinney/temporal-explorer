@@ -82,15 +82,35 @@ export function formatShow(analysis: TemporalAnalysisDocument, workflowName: str
   appendSourceLines(
     lines,
     'Messages',
-    workflow.messageSurface.signals.map((signal) => {
-      const payload = signal.args.map((arg) => arg.display).join(', ');
-
-      return {
-        label: `Signal ${signal.name}(${payload})`,
-        path: signal.source.path,
-        line: signal.source.start.line,
-      };
-    }),
+    [
+      ...workflow.messageSurface.signals.map((signal) => ({
+        kind: 'Signal',
+        name: signal.name,
+        payload: signal.args.map((arg) => arg.display).join(', '),
+        result: undefined as string | undefined,
+        source: signal.source,
+      })),
+      ...workflow.messageSurface.queries.map((query) => ({
+        kind: 'Query',
+        name: query.name,
+        payload: query.args.map((arg) => arg.display).join(', '),
+        result: query.result?.display,
+        source: query.source,
+      })),
+      ...workflow.messageSurface.updates.map((update) => ({
+        kind: 'Update',
+        name: update.name,
+        payload: update.args.map((arg) => arg.display).join(', '),
+        result: update.result?.display,
+        source: update.source,
+      })),
+    ].map((message) => ({
+      label: `${message.kind} ${message.name}(${message.payload})${
+        message.result ? `: ${message.result}` : ''
+      }`,
+      path: message.source.path,
+      line: message.source.start.line,
+    })),
   );
 
   appendSourceLines(
@@ -104,6 +124,30 @@ export function formatShow(analysis: TemporalAnalysisDocument, workflowName: str
         line: command.source.start.line,
       })),
   );
+
+  const operationKinds = new Set([
+    'child-workflow',
+    'external-workflow',
+    'continue-as-new',
+    'patch',
+    'cancellation-scope',
+    'dynamic',
+  ]);
+  const operationCommands = workflow.temporalCommands.filter((command) =>
+    operationKinds.has(command.kind),
+  );
+
+  if (operationCommands.length > 0) {
+    appendSourceLines(
+      lines,
+      'Operations',
+      operationCommands.map((command) => ({
+        label: `${command.kind} ${command.name}`,
+        path: command.source.path,
+        line: command.source.start.line,
+      })),
+    );
+  }
 
   lines.push('', 'Diagnostics');
 

@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:dynamicWorkflow:trace:planned:planned-run-id",
+  "staticAnalysisId": "analysis:dynamic",
+  "runtimeTraceId": "trace:planned:planned-run-id",
+  "workflow": "dynamicWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:dynamicWorkflow",
+      "kind": "workflow",
+      "name": "dynamicWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/dynamic-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 12,
+          "column": 1,
+          "offset": 371
+        },
+        "end": {
+          "line": 27,
+          "column": 2,
+          "offset": 852
+        },
+        "symbolName": "dynamicWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:dynamicWorkflow:archiveRequest:0",
+      "kind": "activity",
+      "name": "archiveRequest",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/dynamic-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 14,
+          "column": 25,
+          "offset": 516
+        },
+        "end": {
+          "line": 14,
+          "column": 67,
+          "offset": 558
+        },
+        "symbolName": "archiveRequest"
+      }
+    },
+    {
+      "id": "dynamic:dynamicWorkflow:1",
+      "kind": "dynamic",
+      "name": "dynamicActivities[step]",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/dynamic-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 28,
+          "offset": 708
+        },
+        "end": {
+          "line": 18,
+          "column": 68,
+          "offset": 748
+        }
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:dynamicWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to dynamicWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type dynamicWorkflow matched static Workflow dynamicWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:dynamicWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/dynamic-workflow.ts:12.",
+          "staticNodeId": "workflow:dynamicWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:dynamicWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to dynamicWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type dynamicWorkflow matched static Workflow dynamicWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:dynamicWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/dynamic-workflow.ts:12.",
+          "staticNodeId": "workflow:dynamicWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:archiveRequest:5",
+      "staticNodeId": "activity-call:dynamicWorkflow:archiveRequest:0",
+      "confidence": "exact",
+      "reason": "Activity archiveRequest matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type archiveRequest matched static Activity command archiveRequest.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:dynamicWorkflow:archiveRequest:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:dynamicWorkflow:archiveRequest:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/dynamic-workflow.ts:14.",
+          "staticNodeId": "activity-call:dynamicWorkflow:archiveRequest:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:prepareShipment:11",
+      "staticNodeId": "dynamic:dynamicWorkflow:1",
+      "confidence": "dynamic",
+      "reason": "Activity prepareShipment was dispatched dynamically; the static call site cannot name it.",
+      "evidence": [
+        {
+          "kind": "dynamic-dispatch",
+          "description": "Runtime Activity prepareShipment attributed to dynamic dispatch site dynamicActivities[step].",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "dynamic:dynamicWorkflow:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/dynamic-workflow.ts:18.",
+          "staticNodeId": "dynamic:dynamicWorkflow:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:notifyWarehouse:17",
+      "staticNodeId": "dynamic:dynamicWorkflow:1",
+      "confidence": "dynamic",
+      "reason": "Activity notifyWarehouse was dispatched dynamically; the static call site cannot name it.",
+      "evidence": [
+        {
+          "kind": "dynamic-dispatch",
+          "description": "Runtime Activity notifyWarehouse attributed to dynamic dispatch site dynamicActivities[step].",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "dynamic:dynamicWorkflow:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/dynamic-workflow.ts:18.",
+          "staticNodeId": "dynamic:dynamicWorkflow:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 3,
+      "observed": 3,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

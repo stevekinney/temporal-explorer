@@ -22,6 +22,10 @@ Signature: `approvalWorkflow(input: ApprovalInput): Promise<ApprovalResult>`
 | ----: | --------- | ------------------------------ | --------------------------------------- | -------- | ---------- |
 |     1 | condition | `() => approval !== undefined` | `src/workflows/approval-workflow.ts:23` | no       | unknown    |
 
+## Temporal Operations
+
+- none
+
 ## Runtime Summary
 
 - Mapped runtime operations: 4/4

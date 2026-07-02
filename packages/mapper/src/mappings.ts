@@ -7,6 +7,17 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import {
+  createUnmappedMapping,
+  mapCancelRequestOperation,
+  mapChildWorkflowOperation,
+  mapContinueAsNewOperation,
+  mapDynamicActivityFallback,
+  mapExternalSignalOperation,
+  mapMarkerOperation,
+  mapUpdateOperation,
+} from './construct-mappings';
+
 function getEventIds(operation: RuntimeOperation): number[] {
   return operation.eventReferences.map((reference) => reference.eventId);
 }
@@ -133,24 +144,10 @@ function createTimerMapping(
   };
 }
 
-function createUnmappedMapping(operation: RuntimeOperation, reason: string): RuntimeNodeMapping {
-  return {
-    runtimeOperationId: operation.id,
-    confidence: 'unknown',
-    reason,
-    evidence: [
-      {
-        kind: 'unmapped',
-        description: reason,
-        eventIds: getEventIds(operation),
-      },
-    ],
-  };
-}
-
 function mapActivityOperation(
   operation: Extract<RuntimeOperation, { kind: 'activity' }>,
   activityCommands: TemporalCommand[],
+  dynamicCommands: TemporalCommand[],
   occurrences: Map<string, number>,
 ): RuntimeNodeMapping {
   const occurrence = occurrences.get(operation.activityType) ?? 0;
@@ -159,12 +156,17 @@ function mapActivityOperation(
     occurrence
   ];
 
-  return command
-    ? createActivityMapping(operation, command, occurrence)
-    : createUnmappedMapping(
-        operation,
-        `No static Activity command matched ${operation.activityType} occurrence ${occurrence + 1}.`,
-      );
+  if (command) {
+    return createActivityMapping(operation, command, occurrence);
+  }
+
+  return (
+    mapDynamicActivityFallback(operation, dynamicCommands) ??
+    createUnmappedMapping(
+      operation,
+      `No static Activity command matched ${operation.activityType} occurrence ${occurrence + 1}.`,
+    )
+  );
 }
 
 function mapSignalOperation(
@@ -200,46 +202,108 @@ function mapTimerOperation(
   return createTimerMapping(operation, command, occurrence, confidence);
 }
 
+type MappingContext = {
+  workflow: WorkflowDefinition;
+  trace: RuntimeTraceDocument;
+  activityCommands: TemporalCommand[];
+  timerCommands: TemporalCommand[];
+  dynamicCommands: TemporalCommand[];
+  childCommands: TemporalCommand[];
+  externalCommands: TemporalCommand[];
+  patchCommands: TemporalCommand[];
+  continueAsNewCommands: TemporalCommand[];
+  activityOccurrences: Map<string, number>;
+  childOccurrences: Map<string, number>;
+  externalOccurrences: Map<string, number>;
+  runtimeTimerCount: number;
+  timerOccurrence: number;
+};
+
+function mapCoreOperation(
+  operation: RuntimeOperation,
+  context: MappingContext,
+): RuntimeNodeMapping | undefined {
+  switch (operation.kind) {
+    case 'workflow-lifecycle':
+      return createWorkflowMapping(operation, context.workflow, context.trace);
+    case 'activity':
+      return mapActivityOperation(
+        operation,
+        context.activityCommands,
+        context.dynamicCommands,
+        context.activityOccurrences,
+      );
+    case 'signal':
+      return mapSignalOperation(operation, context.workflow.messageSurface.signals);
+    case 'timer': {
+      const mapping = mapTimerOperation(
+        operation,
+        context.timerCommands,
+        context.timerOccurrence,
+        context.runtimeTimerCount,
+      );
+      context.timerOccurrence += 1;
+      return mapping;
+    }
+    default:
+      return undefined;
+  }
+}
+
+function mapExtendedOperation(
+  operation: RuntimeOperation,
+  context: MappingContext,
+): RuntimeNodeMapping {
+  switch (operation.kind) {
+    case 'update':
+      return mapUpdateOperation(operation, context.workflow.messageSurface.updates);
+    case 'child-workflow':
+      return mapChildWorkflowOperation(operation, context.childCommands, context.childOccurrences);
+    case 'external-signal':
+      return mapExternalSignalOperation(
+        operation,
+        context.externalCommands,
+        context.externalOccurrences,
+      );
+    case 'marker':
+      return mapMarkerOperation(operation, context.patchCommands);
+    case 'continue-as-new':
+      return mapContinueAsNewOperation(operation, context.continueAsNewCommands);
+    case 'cancel-request':
+      return mapCancelRequestOperation(operation, context.workflow);
+    default:
+      return createUnmappedMapping(
+        operation,
+        `Runtime operation ${operation.id} is not supported yet.`,
+      );
+  }
+}
+
+function mapOperation(operation: RuntimeOperation, context: MappingContext): RuntimeNodeMapping {
+  return mapCoreOperation(operation, context) ?? mapExtendedOperation(operation, context);
+}
+
 /** Maps every runtime operation in a trace to a static node or an explicit unmapped reason. */
 export function createMappings(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument,
 ): RuntimeNodeMapping[] {
-  const activityCommands = getCommandsOfKind(workflow, 'activity');
-  const timerCommands = getCommandsOfKind(workflow, 'timer');
-  const activityOccurrences = new Map<string, number>();
-  const runtimeTimerCount = trace.operations.filter(
-    (operation) => operation.kind === 'timer',
-  ).length;
-  let timerOccurrence = 0;
+  const context: MappingContext = {
+    workflow,
+    trace,
+    activityCommands: getCommandsOfKind(workflow, 'activity'),
+    timerCommands: getCommandsOfKind(workflow, 'timer'),
+    dynamicCommands: getCommandsOfKind(workflow, 'dynamic'),
+    childCommands: getCommandsOfKind(workflow, 'child-workflow'),
+    externalCommands: getCommandsOfKind(workflow, 'external-workflow'),
+    patchCommands: getCommandsOfKind(workflow, 'patch'),
+    continueAsNewCommands: getCommandsOfKind(workflow, 'continue-as-new'),
+    activityOccurrences: new Map(),
+    childOccurrences: new Map(),
+    externalOccurrences: new Map(),
+    runtimeTimerCount: trace.operations.filter((operation) => operation.kind === 'timer').length,
+    timerOccurrence: 0,
+  };
 
-  return trace.operations.map((operation) => {
-    if (operation.kind === 'workflow-lifecycle') {
-      return createWorkflowMapping(operation, workflow, trace);
-    }
-
-    if (operation.kind === 'activity') {
-      return mapActivityOperation(operation, activityCommands, activityOccurrences);
-    }
-
-    if (operation.kind === 'signal') {
-      return mapSignalOperation(operation, workflow.messageSurface.signals);
-    }
-
-    if (operation.kind === 'timer') {
-      const mapping = mapTimerOperation(
-        operation,
-        timerCommands,
-        timerOccurrence,
-        runtimeTimerCount,
-      );
-      timerOccurrence += 1;
-      return mapping;
-    }
-
-    return createUnmappedMapping(
-      operation,
-      `Runtime operation ${operation.id} is not supported yet.`,
-    );
-  });
+  return trace.operations.map((operation) => mapOperation(operation, context));
 }

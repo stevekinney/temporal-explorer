@@ -20,6 +20,10 @@ Signature: `basicOrderWorkflow(input: OrderInput): Promise<OrderResult>`
 
 - none
 
+## Temporal Operations
+
+- none
+
 ## Runtime Summary
 
 - Mapped runtime operations: 5/5

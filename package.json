@@ -37,7 +37,7 @@
     "schema:validate": "bun run scripts/schema/validate-artifact.ts",
     "screenshots:verify": "bun run scripts/ui/screenshots-verify.ts",
     "snapshots:verify": "bun run scripts/snapshots/verify.ts",
-    "test": "turbo run test",
+    "test": "turbo run test --concurrency=5",
     "test:cli": "bun test packages/cli",
     "test:fixtures": "bun run scripts/fixtures/test-fixtures.ts",
     "typecheck": "tsc --noEmit && turbo run typecheck",
@@ -45,7 +45,7 @@
     "ui:e2e": "bun run scripts/ui/e2e.ts",
     "ui:e2e:graph": "bun run scripts/ui/e2e-graph.ts",
     "ui:server-lifecycle": "bun run scripts/ui/server-lifecycle.ts",
-    "validate": "bun run typecheck && turbo run lint test build && bun run format:check"
+    "validate": "bun run typecheck && turbo run lint test build --concurrency=5 && bun run format:check"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

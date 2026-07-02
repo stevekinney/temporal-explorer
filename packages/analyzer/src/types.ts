@@ -1,8 +1,11 @@
+import type { TemporalExplorerConfiguration } from './configuration';
+
 export type TemporalExplorerProject = {
   root: string;
   tsconfig: string;
   outputDirectory: string;
   workflowFiles: string[];
+  configuration?: TemporalExplorerConfiguration | undefined;
 };
 
 export type LoadTemporalExplorerProjectOptions = {

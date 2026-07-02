@@ -1,5 +1,5 @@
 const indentWidth = 2;
-const maxInlineLength = 100;
+const maxLineWidth = 100;
 
 function getIndent(level: number): string {
   return ' '.repeat(level * indentWidth);
@@ -22,7 +22,7 @@ function formatPrimitive(value: unknown): string {
   return JSON.stringify(value) ?? 'null';
 }
 
-function formatArray(values: unknown[], level: number): string {
+function formatArray(values: unknown[], level: number, linePrefixLength: number): string {
   if (values.length === 0) {
     return '[]';
   }
@@ -30,13 +30,17 @@ function formatArray(values: unknown[], level: number): string {
   if (values.every(isInlinePrimitive)) {
     const inline = `[${values.map(formatPrimitive).join(', ')}]`;
 
-    if (getIndent(level).length + inline.length <= maxInlineLength) {
+    // Prettier counts the full line including the property prefix; matching
+    // that keeps regenerated artifacts byte-stable under format:check.
+    if (linePrefixLength + inline.length <= maxLineWidth) {
       return inline;
     }
   }
 
   const itemIndent = getIndent(level + 1);
-  const items = values.map((item) => `${itemIndent}${formatJsonValue(item, level + 1)}`);
+  const items = values.map(
+    (item) => `${itemIndent}${formatJsonValue(item, level + 1, itemIndent.length)}`,
+  );
   return `[\n${items.join(',\n')}\n${getIndent(level)}]`;
 }
 
@@ -48,17 +52,17 @@ function formatObject(value: Record<string, unknown>, level: number): string {
   }
 
   const propertyIndent = getIndent(level + 1);
-  const properties = entries.map(
-    ([key, property]) =>
-      `${propertyIndent}${JSON.stringify(key)}: ${formatJsonValue(property, level + 1)}`,
-  );
+  const properties = entries.map(([key, property]) => {
+    const prefix = `${propertyIndent}${JSON.stringify(key)}: `;
+    return `${prefix}${formatJsonValue(property, level + 1, prefix.length)}`;
+  });
 
   return `{\n${properties.join(',\n')}\n${getIndent(level)}}`;
 }
 
-function formatJsonValue(value: unknown, level: number): string {
+function formatJsonValue(value: unknown, level: number, linePrefixLength: number): string {
   if (Array.isArray(value)) {
-    return formatArray(value, level);
+    return formatArray(value, level, linePrefixLength);
   }
 
   if (isRecord(value)) {
@@ -70,5 +74,5 @@ function formatJsonValue(value: unknown, level: number): string {
 
 export function stableJson(value: unknown): string {
   const normalized = JSON.parse(JSON.stringify(value)) as unknown;
-  return `${formatJsonValue(normalized, 0)}\n`;
+  return `${formatJsonValue(normalized, 0, 0)}\n`;
 }

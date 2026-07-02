@@ -9,6 +9,7 @@ import {
   importHistoryFromFile,
   loadTemporalExplorerProject,
   validateArtifact,
+  type DiagnosticSeverityOverride,
   type DocumentationFile,
   type ExecutionOverlayDocument,
   type RuntimeTraceDocument,
@@ -22,6 +23,7 @@ type LoadedAnalysis = {
   analysis: TemporalAnalysisDocument;
   artifactPath: string;
   projectRoot: string;
+  diagnosticOverrides: Record<string, DiagnosticSeverityOverride> | undefined;
 };
 
 /** Writes an artifact only after it validates against its runtime schema. */
@@ -107,6 +109,7 @@ export async function loadAnalysis(flags: ParsedFlags): Promise<LoadedAnalysis> 
     analysis: result.value,
     artifactPath,
     projectRoot: project.root,
+    diagnosticOverrides: project.configuration?.diagnostics,
   };
 }
 
@@ -157,26 +160,45 @@ function getTraceId(file: string): string {
   return basename(file, '.json');
 }
 
+type ConfiguredPayloadPreview = {
+  decodePayloads?: boolean;
+  redactKeys?: string[];
+  maxPreviewBytes?: number;
+};
+
 export async function loadTrace(flags: ParsedFlags): Promise<{
   trace: RuntimeTraceDocument;
   artifactPath: string;
+  decodesPayloads: boolean;
 }> {
   if (!flags.file) {
     throw new Error('history import requires --file.');
   }
 
-  const projectRoot = resolve(flags.project ?? process.cwd());
+  const project = await loadTemporalExplorerProject(flags.project ? { root: flags.project } : {});
+  const payloadsConfiguration = project.configuration?.history?.payloads;
+  const payloadPreview: ConfiguredPayloadPreview | undefined = payloadsConfiguration
+    ? {
+        decodePayloads: payloadsConfiguration.decode === true,
+        ...(payloadsConfiguration.redact ? { redactKeys: payloadsConfiguration.redact } : {}),
+        ...(payloadsConfiguration.maxPreviewBytes !== undefined
+          ? { maxPreviewBytes: payloadsConfiguration.maxPreviewBytes }
+          : {}),
+      }
+    : undefined;
   const result = await importHistoryFromFile({
-    projectRoot,
+    projectRoot: project.root,
     file: flags.file,
     importedFrom: 'file',
     traceId: getTraceId(flags.file),
+    ...(payloadPreview ? { payloadPreview } : {}),
   });
-  const artifactPath = await writeTraceArtifact(projectRoot, result.value, getTraceId(flags.file));
+  const artifactPath = await writeTraceArtifact(project.root, result.value, getTraceId(flags.file));
 
   return {
     trace: result.value,
     artifactPath,
+    decodesPayloads: payloadPreview?.decodePayloads === true,
   };
 }
 

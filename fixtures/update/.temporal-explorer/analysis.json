@@ -1,0 +1,312 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:update",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "update",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/update-workflow.ts": "bd687979cba72576e6b98e4f2f6cf7a4163d48bab0ba4ff3d46fa990d46ced18"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "update",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 198
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 337
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:updateWorkflow",
+      "name": "updateWorkflow",
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 1,
+          "offset": 593
+        },
+        "end": {
+          "line": 58,
+          "column": 2,
+          "offset": 1474
+        },
+        "symbolName": "updateWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "updateWorkflow:arg:0:input",
+            "display": "UpdateFixtureInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 23,
+                "column": 38,
+                "offset": 630
+              },
+              "end": {
+                "line": 23,
+                "column": 63,
+                "offset": 655
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "updateWorkflow:result",
+          "display": "Promise<UpdateFixtureResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": [
+          {
+            "id": "update:updateWorkflow:explode",
+            "name": "explode",
+            "source": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 30,
+                "offset": 448
+              },
+              "end": {
+                "line": 17,
+                "column": 69,
+                "offset": 487
+              },
+              "symbolName": "explode"
+            },
+            "args": [
+              {
+                "id": "update:explode:arg:0",
+                "display": "string",
+                "kind": "external",
+                "confidence": "exact"
+              }
+            ],
+            "result": {
+              "id": "update:explode:result",
+              "display": "void",
+              "kind": "primitive",
+              "confidence": "exact"
+            },
+            "handlerSource": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 44,
+                "column": 3,
+                "offset": 1101
+              },
+              "end": {
+                "line": 47,
+                "column": 5,
+                "offset": 1235
+              },
+              "symbolName": "explode"
+            },
+            "confidence": "exact"
+          },
+          {
+            "id": "update:updateWorkflow:setAddress",
+            "name": "setAddress",
+            "source": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 33,
+                "offset": 355
+              },
+              "end": {
+                "line": 16,
+                "column": 95,
+                "offset": 417
+              },
+              "symbolName": "setAddress"
+            },
+            "args": [
+              {
+                "id": "update:setAddress:arg:0",
+                "display": "ShippingAddress",
+                "kind": "external",
+                "confidence": "exact"
+              }
+            ],
+            "result": {
+              "id": "update:setAddress:result",
+              "display": "ShippingAddress",
+              "kind": "external",
+              "confidence": "exact"
+            },
+            "handlerSource": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 28,
+                "column": 3,
+                "offset": 827
+              },
+              "end": {
+                "line": 42,
+                "column": 4,
+                "offset": 1096
+              },
+              "symbolName": "setAddress"
+            },
+            "validatorSource": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 36,
+                "column": 18,
+                "offset": 978
+              },
+              "end": {
+                "line": 40,
+                "column": 8,
+                "offset": 1084
+              }
+            },
+            "confidence": "exact"
+          }
+        ]
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "condition:updateWorkflow:0",
+          "kind": "condition",
+          "name": "() => updatesApplied >= 1 && failedUpdates >= 1",
+          "source": {
+            "path": "src/workflows/update-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 49,
+              "column": 9,
+              "offset": 1246
+            },
+            "end": {
+              "line": 49,
+              "column": 67,
+              "offset": 1304
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:updateWorkflow:recordAddress:1",
+          "kind": "activity",
+          "name": "recordAddress",
+          "source": {
+            "path": "src/workflows/update-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 51,
+              "column": 24,
+              "offset": 1330
+            },
+            "end": {
+              "line": 51,
+              "column": 57,
+              "offset": 1363
+            },
+            "symbolName": "recordAddress"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:recordAddress",
+      "name": "recordAddress",
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 51,
+          "column": 24,
+          "offset": 1330
+        },
+        "end": {
+          "line": 51,
+          "column": 57,
+          "offset": 1363
+        },
+        "symbolName": "recordAddress"
+      },
+      "implementationSource": {
+        "path": "src/activities/address-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 1,
+          "offset": 308
+        },
+        "end": {
+          "line": 25,
+          "column": 2,
+          "offset": 471
+        },
+        "symbolName": "recordAddress"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

@@ -1,0 +1,8 @@
+flowchart TD
+  start(["continueAsNewWorkflow"])
+  activity_call_continueAsNewWorkflow_recordIteration_0["recordIteration"]
+  continue_as_new_continueAsNewWorkflow_1["continueAsNewWorkflow"]
+  complete(["complete"])
+  start --> activity_call_continueAsNewWorkflow_recordIteration_0
+  activity_call_continueAsNewWorkflow_recordIteration_0 --> continue_as_new_continueAsNewWorkflow_1
+  continue_as_new_continueAsNewWorkflow_1 --> complete

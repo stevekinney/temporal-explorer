@@ -73,15 +73,59 @@ function appendActivitiesSection(
   );
 }
 
+type MessageRow = {
+  kind: 'Signal' | 'Query' | 'Update';
+  id: string;
+  name: string;
+  payload: string;
+  source: string;
+  received: string;
+};
+
+function collectMessageRows(
+  workflow: WorkflowDefinition,
+  overlay: ExecutionOverlayDocument | undefined,
+): MessageRow[] {
+  const formatPayload = (args: { display: string }[]): string =>
+    args.map((arg) => `\`${arg.display}\``).join(', ') || 'none';
+
+  return [
+    ...workflow.messageSurface.signals.map((signal): MessageRow => ({
+      kind: 'Signal',
+      id: signal.id,
+      name: signal.name,
+      payload: formatPayload(signal.args),
+      source: formatSource(signal),
+      received: isObserved(signal.id, overlay) ? 'yes' : 'no',
+    })),
+    ...workflow.messageSurface.queries.map((query): MessageRow => ({
+      kind: 'Query',
+      id: query.id,
+      name: query.name,
+      payload: formatPayload(query.args),
+      source: formatSource(query),
+      received: 'not recorded',
+    })),
+    ...workflow.messageSurface.updates.map((update): MessageRow => ({
+      kind: 'Update',
+      id: update.id,
+      name: update.name,
+      payload: formatPayload(update.args),
+      source: formatSource(update),
+      received: isObserved(update.id, overlay) ? 'yes' : 'no',
+    })),
+  ];
+}
+
 function appendMessagesSection(
   lines: string[],
   workflow: WorkflowDefinition,
   overlay: ExecutionOverlayDocument | undefined,
 ): void {
   lines.push('', '## Messages', '');
-  const signals = workflow.messageSurface.signals;
+  const rows = collectMessageRows(workflow, overlay);
 
-  if (signals.length === 0) {
+  if (rows.length === 0) {
     lines.push('- none');
     return;
   }
@@ -90,13 +134,61 @@ function appendMessagesSection(
     ...createAlignedMarkdownTable(
       ['Kind', 'Name', 'Payload', 'Source', 'Received', 'Confidence'],
       ['left', 'left', 'left', 'left', 'left', 'left'],
-      signals.map((signal) => [
-        'Signal',
-        `\`${signal.name}\``,
-        signal.args.map((arg) => `\`${arg.display}\``).join(', ') || 'none',
-        `\`${formatSource(signal)}\``,
-        isObserved(signal.id, overlay) ? 'yes' : 'no',
-        getMappingConfidence(signal.id, overlay),
+      rows.map((row) => [
+        row.kind,
+        `\`${row.name}\``,
+        row.payload,
+        `\`${row.source}\``,
+        row.received,
+        row.kind === 'Query' ? 'exact' : getMappingConfidence(row.id, overlay),
+      ]),
+    ),
+  );
+
+  if (workflow.messageSurface.queries.length > 0) {
+    lines.push(
+      '',
+      'Queries are served from Workflow state and do not normally add events to Event History.',
+    );
+  }
+}
+
+const operationCommandKinds = [
+  'child-workflow',
+  'external-workflow',
+  'continue-as-new',
+  'patch',
+  'cancellation-scope',
+  'dynamic',
+] as const;
+
+function appendOperationsSection(
+  lines: string[],
+  workflow: WorkflowDefinition,
+  overlay: ExecutionOverlayDocument | undefined,
+): void {
+  const operations = operationCommandKinds
+    .flatMap((kind) => getCommandsOfKind(workflow, kind))
+    .toSorted((left, right) => left.staticOrder - right.staticOrder);
+
+  lines.push('', '## Temporal Operations', '');
+
+  if (operations.length === 0) {
+    lines.push('- none');
+    return;
+  }
+
+  lines.push(
+    ...createAlignedMarkdownTable(
+      ['Order', 'Kind', 'Target', 'Source', 'Observed', 'Confidence'],
+      ['right', 'left', 'left', 'left', 'left', 'left'],
+      operations.map((command) => [
+        String(command.staticOrder + 1),
+        command.kind,
+        `\`${command.name}\``,
+        `\`${formatSource(command)}\``,
+        isObserved(command.id, overlay) ? 'yes' : 'no',
+        getMappingConfidence(command.id, overlay),
       ]),
     ),
   );
@@ -181,10 +273,14 @@ export function renderWorkflowMarkdown(
   appendActivitiesSection(lines, workflow, overlay);
   appendMessagesSection(lines, workflow, overlay);
   appendWaitsSection(lines, workflow, overlay);
+  appendOperationsSection(lines, workflow, overlay);
   appendRuntimeSummary(lines, overlay);
 
   lines.push('', '## Warnings', '');
-  lines.push(workflow.diagnostics.length === 0 ? '- none' : '');
+
+  if (workflow.diagnostics.length === 0) {
+    lines.push('- none');
+  }
 
   for (const diagnostic of workflow.diagnostics) {
     lines.push(`- ${diagnostic.severity}: ${diagnostic.message}`);

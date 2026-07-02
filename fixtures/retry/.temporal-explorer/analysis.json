@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:retry",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "retry",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/retry-workflow.ts": "e58903e66a2e4ae06f7288d4473ff3cced9f63ec84a4128736f22eb1cd5f3f7f"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "retry",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 196
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 334
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:retryWorkflow",
+      "name": "retryWorkflow",
+      "source": {
+        "path": "src/workflows/retry-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 414
+        },
+        "end": {
+          "line": 23,
+          "column": 2,
+          "offset": 726
+        },
+        "symbolName": "retryWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "retryWorkflow:arg:0:input",
+            "display": "RetryInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/retry-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 15,
+                "column": 37,
+                "offset": 450
+              },
+              "end": {
+                "line": 15,
+                "column": 54,
+                "offset": 467
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "retryWorkflow:result",
+          "display": "Promise<RetryResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:retryWorkflow:flakyCharge:0",
+          "kind": "activity",
+          "name": "flakyCharge",
+          "source": {
+            "path": "src/workflows/retry-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 16,
+              "column": 24,
+              "offset": 516
+            },
+            "end": {
+              "line": 16,
+              "column": 90,
+              "offset": 582
+            },
+            "symbolName": "flakyCharge"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:flakyCharge",
+      "name": "flakyCharge",
+      "source": {
+        "path": "src/workflows/retry-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 24,
+          "offset": 516
+        },
+        "end": {
+          "line": 16,
+          "column": 90,
+          "offset": 582
+        },
+        "symbolName": "flakyCharge"
+      },
+      "implementationSource": {
+        "path": "src/activities/charge-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 330
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 727
+        },
+        "symbolName": "flakyCharge"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

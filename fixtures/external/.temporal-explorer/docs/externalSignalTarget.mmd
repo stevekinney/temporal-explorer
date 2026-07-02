@@ -1,0 +1,6 @@
+flowchart TD
+  start(["externalSignalTarget"])
+  condition_externalSignalTarget_0{"() => released"}
+  complete(["complete"])
+  start --> condition_externalSignalTarget_0
+  condition_externalSignalTarget_0 --> complete

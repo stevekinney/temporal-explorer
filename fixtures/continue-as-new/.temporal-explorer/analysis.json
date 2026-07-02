@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:continue-as-new",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "continue-as-new",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/continue-as-new-workflow.ts": "f75507485d554daed98a77624cb102cd7c0b1409f77b16e30c975736250e0c00"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "continue-as-new",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 207
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 355
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:continueAsNewWorkflow",
+      "name": "continueAsNewWorkflow",
+      "source": {
+        "path": "src/workflows/continue-as-new-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 332
+        },
+        "end": {
+          "line": 21,
+          "column": 2,
+          "offset": 724
+        },
+        "symbolName": "continueAsNewWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "continueAsNewWorkflow:arg:0:input",
+            "display": "IterationInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/continue-as-new-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 10,
+                "column": 45,
+                "offset": 376
+              },
+              "end": {
+                "line": 10,
+                "column": 66,
+                "offset": 397
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "continueAsNewWorkflow:result",
+          "display": "Promise<string>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:continueAsNewWorkflow:recordIteration:0",
+          "kind": "activity",
+          "name": "recordIteration",
+          "source": {
+            "path": "src/workflows/continue-as-new-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 11,
+              "column": 9,
+              "offset": 426
+            },
+            "end": {
+              "line": 11,
+              "column": 52,
+              "offset": 469
+            },
+            "symbolName": "recordIteration"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "continue-as-new:continueAsNewWorkflow:1",
+          "kind": "continue-as-new",
+          "name": "continueAsNewWorkflow",
+          "source": {
+            "path": "src/workflows/continue-as-new-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 14,
+              "column": 11,
+              "offset": 533
+            },
+            "end": {
+              "line": 17,
+              "column": 7,
+              "offset": 665
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:recordIteration",
+      "name": "recordIteration",
+      "source": {
+        "path": "src/workflows/continue-as-new-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 11,
+          "column": 9,
+          "offset": 426
+        },
+        "end": {
+          "line": 11,
+          "column": 52,
+          "offset": 469
+        },
+        "symbolName": "recordIteration"
+      },
+      "implementationSource": {
+        "path": "src/activities/iteration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 139
+        },
+        "end": {
+          "line": 14,
+          "column": 2,
+          "offset": 283
+        },
+        "symbolName": "recordIteration"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

@@ -1,3 +1,4 @@
+import { Client } from '@temporalio/client';
 import { TestWorkflowEnvironment } from '@temporalio/testing';
 import { Worker } from '@temporalio/worker';
 
@@ -49,6 +50,9 @@ async function executeFixtureWorkflow(
   const workflowUrl = new URL(definition.workflowsPath, fixtureRoot);
   const activities = definition.loadActivities ? await definition.loadActivities() : {};
   const workflowId = `${definition.fixture}-${definition.history}`;
+  const dataConverter = definition.loadDataConverter
+    ? await definition.loadDataConverter()
+    : undefined;
 
   const worker = await Worker.create({
     connection: environment.nativeConnection,
@@ -56,10 +60,21 @@ async function executeFixtureWorkflow(
     taskQueue: definition.taskQueue,
     workflowsPath: workflowUrl.pathname,
     activities,
+    ...(dataConverter ? { dataConverter } : {}),
   });
 
+  // Fixtures with a custom data converter need a dedicated client carrying the
+  // same codecs; such fixtures must not depend on time skipping.
+  const client = dataConverter
+    ? new Client({
+        connection: environment.connection,
+        ...(environment.namespace ? { namespace: environment.namespace } : {}),
+        dataConverter,
+      })
+    : environment.client;
+
   return await worker.runUntil(async () => {
-    const handle = await environment.client.workflow.start(definition.workflowType, {
+    const handle = await client.workflow.start(definition.workflowType, {
       workflowId,
       taskQueue: definition.taskQueue,
       args: definition.args,
@@ -86,10 +101,7 @@ async function executeFixtureWorkflow(
     // Fetch the first execution run explicitly so continue-as-new fixtures
     // capture the run that ends with WorkflowExecutionContinuedAsNew instead
     // of following the chain to the final run.
-    const firstRunHandle = environment.client.workflow.getHandle(
-      workflowId,
-      handle.firstExecutionRunId,
-    );
+    const firstRunHandle = client.workflow.getHandle(workflowId, handle.firstExecutionRunId);
 
     return {
       history: toJsonCompatible(await firstRunHandle.fetchHistory()),

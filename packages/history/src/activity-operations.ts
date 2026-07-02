@@ -199,11 +199,25 @@ function createActivityOperation(activity: MutableActivityExecution): RuntimeOpe
   };
 }
 
+function readStartedAttemptNumber(started: HistoryEvent | undefined): number | undefined {
+  if (!started) {
+    return undefined;
+  }
+
+  const attributes = readRecordField(started.raw, 'activityTaskStartedEventAttributes');
+  return readPositiveIntegerField(attributes, 'attempt');
+}
+
+/**
+ * Builds the attempt list for one Activity execution. Temporal collapses
+ * server-side retries: intermediate failed attempts never write events, so the
+ * ActivityTaskStarted `attempt` field is the honest total attempt count.
+ */
 function createActivityAttempts(activity: MutableActivityExecution): ActivityAttempt[] {
   if (activity.closed.length === 0) {
     return [
       {
-        attempt: 1,
+        attempt: readStartedAttemptNumber(activity.started[0]) ?? 1,
         scheduledEventId: activity.scheduled.eventId,
         ...(activity.started[0] ? { startedEventId: activity.started[0].eventId } : {}),
         status: 'pending',
@@ -212,7 +226,7 @@ function createActivityAttempts(activity: MutableActivityExecution): ActivityAtt
   }
 
   return activity.closed.map((closed, index) => ({
-    attempt: index + 1,
+    attempt: readStartedAttemptNumber(activity.started[index]) ?? index + 1,
     scheduledEventId: activity.scheduled.eventId,
     ...(activity.started[index] ? { startedEventId: activity.started[index].eventId } : {}),
     closedEventId: closed.event.eventId,

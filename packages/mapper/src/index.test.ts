@@ -163,6 +163,71 @@ describe('source-aware execution mapper', () => {
     expect(report).toContain('notifyExpired (not observed)');
   });
 
+  it('maps cancellation scopes by containment and explains the cleanup path', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/cancellation/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const trace = runtimeTraceDocumentSchema.parse(
+      await Bun.file(
+        new URL(
+          '../../../fixtures/cancellation/.temporal-explorer/histories/canceled.trace.json',
+          import.meta.url,
+        ),
+      ).json(),
+    );
+    const overlay = createExecutionOverlay({
+      analysis,
+      trace,
+      workflowName: 'cancellationWorkflow',
+    });
+    const byName = new Map(overlay.staticNodes.map((node) => [node.name, node]));
+
+    expect(validateArtifact(overlay).success).toBe(true);
+    expect(byName.get('useResources')?.observed).toBe(false);
+    expect(byName.get('releaseResources')?.observed).toBe(true);
+    expect(byName.get('cancellable')?.observed).toBe(true);
+    expect(byName.get('nonCancellable')?.observed).toBe(true);
+    expect(overlay.coverage.nodes.unmappedRuntimeOperations).toBe(0);
+
+    const report = createOverlayReport(overlay);
+    expect(report).toContain('releaseResources (observed)');
+    expect(report).toContain('useResources (not observed)');
+  });
+
+  it('maps update and patch operations with name and patch-id evidence', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/update/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const trace = runtimeTraceDocumentSchema.parse(
+      await Bun.file(
+        new URL(
+          '../../../fixtures/update/.temporal-explorer/histories/updates.trace.json',
+          import.meta.url,
+        ),
+      ).json(),
+    );
+    const overlay = createExecutionOverlay({
+      analysis,
+      trace,
+      workflowName: 'updateWorkflow',
+    });
+    const updateMappings = overlay.mappings.filter((mapping) =>
+      mapping.staticNodeId?.startsWith('update:'),
+    );
+
+    expect(updateMappings).toHaveLength(2);
+    expect(
+      updateMappings.every((mapping) =>
+        mapping.evidence.some((evidence) => evidence.kind === 'update-name'),
+      ),
+    ).toBe(true);
+    expect(updateMappings.every((mapping) => mapping.confidence === 'exact')).toBe(true);
+  });
+
   it('marks unknown signals and surplus timers as unmapped', async () => {
     const analysis = temporalAnalysisDocumentSchema.parse(
       await Bun.file(

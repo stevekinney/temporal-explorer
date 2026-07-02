@@ -11,8 +11,16 @@ import {
   importHistoryFromFile,
   loadTemporalExplorerProject,
   parseEventHistory,
+  renderMarkdown,
+  renderWorkflowJson,
+  runDiagnostics,
   temporalExplorerArtifactVersions,
 } from './index';
+
+import {
+  executionOverlayDocumentSchema,
+  runtimeTraceDocumentSchema,
+} from '@temporal-explorer/schemas';
 
 const fixtureRoot = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
 const analysisArtifactFile = Bun.file(`${fixtureRoot}/.temporal-explorer/analysis.json`);
@@ -153,5 +161,48 @@ describe('public API scaffold', () => {
       'index.md',
     ]);
     expect(result.value[0]?.contents).toContain('Payload previews: redacted by default');
+  });
+
+  it('matches committed CLI markdown and workflow JSON for parity', async () => {
+    const fixtureRoot = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
+    const analysisResult = await analyzeProject({ root: fixtureRoot });
+    const committedDocumentation = await Bun.file(
+      new URL(
+        '../../../fixtures/basic-order/.temporal-explorer/docs/basicOrderWorkflow.md',
+        import.meta.url,
+      ),
+    ).text();
+    const traceArtifact = await traceArtifactFile.json();
+    const overlayArtifact = await overlayArtifactFile.json();
+    const markdown = renderMarkdown({
+      analysis: analysisResult.value,
+      traces: [runtimeTraceDocumentSchema.parse(traceArtifact)],
+      overlays: [executionOverlayDocumentSchema.parse(overlayArtifact)],
+      workflowName: 'basicOrderWorkflow',
+    });
+
+    // Library markdown must be byte-identical to the committed CLI docs output.
+    expect(markdown.value).toBe(committedDocumentation);
+
+    const workflowJson = renderWorkflowJson({
+      analysis: analysisResult.value,
+      workflow: 'basicOrderWorkflow',
+    });
+    expect(workflowJson.value.name).toBe('basicOrderWorkflow');
+    expect(() =>
+      renderWorkflowJson({ analysis: analysisResult.value, workflow: 'missing' }),
+    ).toThrow('Workflow "missing" was not found.');
+  });
+
+  it('runs diagnostics through the library with CLI check parity', async () => {
+    const queryRoot = new URL('../../../fixtures/query', import.meta.url).pathname;
+    const queryDiagnostics = await runDiagnostics({ root: queryRoot });
+
+    expect(queryDiagnostics.value.map((diagnostic) => diagnostic.code)).toContain(
+      'TEA_QUERY_STATE_MUTATION',
+    );
+    expect(
+      queryDiagnostics.value.filter((diagnostic) => diagnostic.severity === 'error'),
+    ).toHaveLength(1);
   });
 });

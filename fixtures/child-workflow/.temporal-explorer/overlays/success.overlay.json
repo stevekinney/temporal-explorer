@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:childWorkflowParent:trace:success:success-run-id",
+  "staticAnalysisId": "analysis:child-workflow",
+  "runtimeTraceId": "trace:success:success-run-id",
+  "workflow": "childWorkflowParent",
+  "staticNodes": [
+    {
+      "id": "workflow:childWorkflowParent",
+      "kind": "workflow",
+      "name": "childWorkflowParent",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/child-workflow-parent.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 37,
+          "column": 1,
+          "offset": 682
+        },
+        "end": {
+          "line": 52,
+          "column": 2,
+          "offset": 1145
+        },
+        "symbolName": "childWorkflowParent"
+      }
+    },
+    {
+      "id": "child-workflow:childWorkflowParent:reserveInventoryChild:0",
+      "kind": "child-workflow",
+      "name": "reserveInventoryChild",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/child-workflow-parent.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 38,
+          "column": 25,
+          "offset": 793
+        },
+        "end": {
+          "line": 40,
+          "column": 5,
+          "offset": 875
+        },
+        "symbolName": "reserveInventoryChild"
+      }
+    },
+    {
+      "id": "child-workflow:childWorkflowParent:releaseNotificationChild:1",
+      "kind": "child-workflow",
+      "name": "releaseNotificationChild",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/child-workflow-parent.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 42,
+          "column": 24,
+          "offset": 901
+        },
+        "end": {
+          "line": 44,
+          "column": 5,
+          "offset": 984
+        },
+        "symbolName": "releaseNotificationChild"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:childWorkflowParent",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to childWorkflowParent.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type childWorkflowParent matched static Workflow childWorkflowParent.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:childWorkflowParent"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/child-workflow-parent.ts:37.",
+          "staticNodeId": "workflow:childWorkflowParent"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:childWorkflowParent",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to childWorkflowParent.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type childWorkflowParent matched static Workflow childWorkflowParent.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:childWorkflowParent"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/child-workflow-parent.ts:37.",
+          "staticNodeId": "workflow:childWorkflowParent"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "child-workflow:reserveInventoryChild:5",
+      "staticNodeId": "child-workflow:childWorkflowParent:reserveInventoryChild:0",
+      "confidence": "exact",
+      "reason": "Child Workflow reserveInventoryChild matched by Workflow type and command order.",
+      "evidence": [
+        {
+          "kind": "child-workflow-type",
+          "description": "Runtime child Workflow type reserveInventoryChild matched static command child-workflow:childWorkflowParent:reserveInventoryChild:0.",
+          "eventIds": [5, 6, 10],
+          "staticNodeId": "child-workflow:childWorkflowParent:reserveInventoryChild:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/child-workflow-parent.ts:38.",
+          "staticNodeId": "child-workflow:childWorkflowParent:reserveInventoryChild:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "child-workflow:releaseNotificationChild:14",
+      "staticNodeId": "child-workflow:childWorkflowParent:releaseNotificationChild:1",
+      "confidence": "exact",
+      "reason": "Child Workflow releaseNotificationChild matched by Workflow type and command order.",
+      "evidence": [
+        {
+          "kind": "child-workflow-type",
+          "description": "Runtime child Workflow type releaseNotificationChild matched static command child-workflow:childWorkflowParent:releaseNotificationChild:1.",
+          "eventIds": [14, 15, 19],
+          "staticNodeId": "child-workflow:childWorkflowParent:releaseNotificationChild:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/child-workflow-parent.ts:42.",
+          "staticNodeId": "child-workflow:childWorkflowParent:releaseNotificationChild:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 3,
+      "observed": 3,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 0,
+      "observed": 0,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

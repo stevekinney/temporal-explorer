@@ -1,4 +1,5 @@
 import {
+  applySeverityOverrides,
   getTemporalExplorerVersion,
   renderWorkflowMermaidFromArtifacts,
 } from '@temporal-explorer/api';
@@ -11,6 +12,7 @@ import {
   loadTrace,
   writeDocumentationArtifacts,
 } from './artifact-files';
+import { createDoctorReport, formatDoctorReport } from './doctor';
 import { formatList, formatShow } from './formatters';
 import { createHelpText } from './help';
 import { stableJson } from './json-format';
@@ -74,7 +76,13 @@ async function runHistory(args: string[], environment: CommandEnvironment): Prom
   }
 
   const flags = parseFlags(args);
-  const { trace, artifactPath } = await loadTrace(flags);
+  const { trace, artifactPath, decodesPayloads } = await loadTrace(flags);
+
+  if (decodesPayloads) {
+    await environment.stderr(
+      `Warning: decoded payload previews will be written to ${artifactPath}.\n`,
+    );
+  }
 
   if (flags.json) {
     await environment.stdout(stableJson(trace));
@@ -128,14 +136,15 @@ function formatCheckDiagnostic(diagnostic: {
 
 async function runCheck(args: string[], environment: CommandEnvironment): Promise<number> {
   const flags = parseFlags(args);
-  const { analysis } = await loadAnalysis(flags);
-  const errors = analysis.diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
-  const warnings = analysis.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
+  const { analysis, diagnosticOverrides } = await loadAnalysis(flags);
+  const diagnostics = applySeverityOverrides(analysis.diagnostics, diagnosticOverrides);
+  const errors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error');
+  const warnings = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
 
   if (flags.json) {
     await environment.stdout(
       stableJson({
-        diagnostics: analysis.diagnostics,
+        diagnostics,
         errorCount: errors.length,
         warningCount: warnings.length,
       }),
@@ -143,13 +152,21 @@ async function runCheck(args: string[], environment: CommandEnvironment): Promis
     return errors.length > 0 ? 1 : 0;
   }
 
-  const lines = analysis.diagnostics.map((diagnostic) => formatCheckDiagnostic(diagnostic));
+  const lines = diagnostics.map((diagnostic) => formatCheckDiagnostic(diagnostic));
   const summary =
     errors.length > 0
       ? `Analysis failed with ${errors.length} error(s) and ${warnings.length} warning(s).\n`
       : `Analysis passed with ${warnings.length} warning(s).\n`;
   await environment.stdout([...lines, summary].join('\n'));
   return errors.length > 0 ? 1 : 0;
+}
+
+async function runDoctor(args: string[], environment: CommandEnvironment): Promise<number> {
+  const flags = parseFlags(args);
+  const report = await createDoctorReport(flags.project);
+
+  await environment.stdout(flags.json ? stableJson(report) : formatDoctorReport(report));
+  return 0;
 }
 
 async function runDocs(args: string[], environment: CommandEnvironment): Promise<number> {
@@ -227,6 +244,7 @@ const commandHandlers = new Map<string, CommandHandler>([
   ['analyze', runAnalyze],
   ['check', runCheck],
   ['docs', runDocs],
+  ['doctor', runDoctor],
   ['history', runHistory],
   ['list', runList],
   ['open', runOpen],

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:retryWorkflow:trace:retry-success:retry-success-run-id",
+  "staticAnalysisId": "analysis:retry",
+  "runtimeTraceId": "trace:retry-success:retry-success-run-id",
+  "workflow": "retryWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:retryWorkflow",
+      "kind": "workflow",
+      "name": "retryWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/retry-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 414
+        },
+        "end": {
+          "line": 23,
+          "column": 2,
+          "offset": 726
+        },
+        "symbolName": "retryWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:retryWorkflow:flakyCharge:0",
+      "kind": "activity",
+      "name": "flakyCharge",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/retry-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 24,
+          "offset": 516
+        },
+        "end": {
+          "line": 16,
+          "column": 90,
+          "offset": 582
+        },
+        "symbolName": "flakyCharge"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:retryWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to retryWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type retryWorkflow matched static Workflow retryWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:retryWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/retry-workflow.ts:15.",
+          "staticNodeId": "workflow:retryWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:retryWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to retryWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type retryWorkflow matched static Workflow retryWorkflow.",
+          "eventIds": [11],
+          "staticNodeId": "workflow:retryWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/retry-workflow.ts:15.",
+          "staticNodeId": "workflow:retryWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:flakyCharge:5",
+      "staticNodeId": "activity-call:retryWorkflow:flakyCharge:0",
+      "confidence": "exact",
+      "reason": "Activity flakyCharge matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type flakyCharge matched static Activity command flakyCharge.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:retryWorkflow:flakyCharge:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:retryWorkflow:flakyCharge:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/retry-workflow.ts:16.",
+          "staticNodeId": "activity-call:retryWorkflow:flakyCharge:0"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 2,
+      "observed": 2,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 1,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

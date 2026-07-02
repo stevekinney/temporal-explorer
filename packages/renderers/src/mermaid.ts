@@ -10,18 +10,35 @@ function toMermaidLabel(value: string): string {
   return value.replaceAll('"', "'");
 }
 
-const flowCommandKinds = new Set<TemporalCommand['kind']>(['activity', 'timer', 'condition']);
+const flowCommandKinds = new Set<TemporalCommand['kind']>([
+  'activity',
+  'timer',
+  'condition',
+  'child-workflow',
+  'external-workflow',
+  'continue-as-new',
+  'patch',
+  'dynamic',
+]);
 
 function renderCommandNode(command: TemporalCommand): string {
   const id = toMermaidId(command.id);
   const label = toMermaidLabel(command.name);
 
-  if (command.kind === 'condition') {
+  if (command.kind === 'condition' || command.kind === 'patch') {
     return `  ${id}{"${label}"}`;
   }
 
   if (command.kind === 'timer') {
     return `  ${id}(("${label}"))`;
+  }
+
+  if (command.kind === 'child-workflow' || command.kind === 'external-workflow') {
+    return `  ${id}[["${label}"]]`;
+  }
+
+  if (command.kind === 'dynamic') {
+    return `  ${id}[/"${label}"/]`;
   }
 
   return `  ${id}["${label}"]`;

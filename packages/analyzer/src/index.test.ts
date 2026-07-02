@@ -126,16 +126,21 @@ describe('basic static analyzer slice', () => {
     expect(analysis.project.packageManager).toBe('pnpm');
     expect(analysis.sdk.temporalTypeScriptVersion).toBe('^1.18.1');
     expect(analysis.workers).toHaveLength(1);
-    expect(analysis.workflows[0]?.temporalCommands.map((command) => command.name)).toEqual([
-      'knownActivity',
-      'missingActivity',
+    expect(
+      analysis.workflows[0]?.temporalCommands.map((command) => [command.kind, command.name]),
+    ).toEqual([
+      ['activity', 'knownActivity'],
+      ['activity', 'missingActivity'],
+      ['dynamic', "activityProxy['dynamicActivity']"],
     ]);
     expect(analysis.activities.map((activity) => activity.confidence)).toEqual([
       'exact',
       'inferred',
     ]);
-    expect(analysis.diagnostics).toHaveLength(1);
-    expect(analysis.diagnostics[0]?.code).toBe('TEA_DYNAMIC_ACTIVITY_CALL');
+    expect(analysis.diagnostics.map((diagnostic) => diagnostic.code).toSorted()).toEqual([
+      'TEA_DYNAMIC_ACTIVITY_CALL',
+      'TEA_UNRESOLVED_ACTIVITY_IMPLEMENTATION',
+    ]);
   });
 
   it('reads optional package metadata defensively', async () => {

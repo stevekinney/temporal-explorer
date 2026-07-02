@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:payloadWorkflow:trace:encrypted:encrypted-run-id",
+  "staticAnalysisId": "analysis:payloads",
+  "runtimeTraceId": "trace:encrypted:encrypted-run-id",
+  "workflow": "payloadWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:payloadWorkflow",
+      "kind": "workflow",
+      "name": "payloadWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/payload-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 325
+        },
+        "end": {
+          "line": 12,
+          "column": 2,
+          "offset": 465
+        },
+        "symbolName": "payloadWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:payloadWorkflow:storeProfile:0",
+      "kind": "activity",
+      "name": "storeProfile",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/payload-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 11,
+          "column": 16,
+          "offset": 430
+        },
+        "end": {
+          "line": 11,
+          "column": 48,
+          "offset": 462
+        },
+        "symbolName": "storeProfile"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:payloadWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to payloadWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type payloadWorkflow matched static Workflow payloadWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:payloadWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/payload-workflow.ts:10.",
+          "staticNodeId": "workflow:payloadWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:payloadWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to payloadWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type payloadWorkflow matched static Workflow payloadWorkflow.",
+          "eventIds": [11],
+          "staticNodeId": "workflow:payloadWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/payload-workflow.ts:10.",
+          "staticNodeId": "workflow:payloadWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:storeProfile:5",
+      "staticNodeId": "activity-call:payloadWorkflow:storeProfile:0",
+      "confidence": "exact",
+      "reason": "Activity storeProfile matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type storeProfile matched static Activity command storeProfile.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:payloadWorkflow:storeProfile:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:payloadWorkflow:storeProfile:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/payload-workflow.ts:11.",
+          "staticNodeId": "activity-call:payloadWorkflow:storeProfile:0"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 2,
+      "observed": 2,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

@@ -1,0 +1,355 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:cancellation",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "cancellation",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/cancellation-workflow.ts": "332e72ea364bc6f96f88d719c2775bae5acea73118dd10080ce7e712dbc672fa"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "cancellation",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 205
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 350
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:cancellationWorkflow",
+      "name": "cancellationWorkflow",
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 378
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1004
+        },
+        "symbolName": "cancellationWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "cancellationWorkflow:arg:0:input",
+            "display": "CancellationInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 10,
+                "column": 44,
+                "offset": 421
+              },
+              "end": {
+                "line": 10,
+                "column": 68,
+                "offset": 445
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "cancellationWorkflow:result",
+          "display": "Promise<CancellationResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "cancellation-scope:cancellationWorkflow:0",
+          "kind": "cancellation-scope",
+          "name": "cancellable",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 12,
+              "column": 11,
+              "offset": 496
+            },
+            "end": {
+              "line": 16,
+              "column": 7,
+              "offset": 690
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:cancellationWorkflow:reserveResources:1",
+          "kind": "activity",
+          "name": "reserveResources",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 13,
+              "column": 13,
+              "offset": 552
+            },
+            "end": {
+              "line": 13,
+              "column": 58,
+              "offset": 597
+            },
+            "symbolName": "reserveResources"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "timer:cancellationWorkflow:2",
+          "kind": "timer",
+          "name": "'30 days'",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 14,
+              "column": 13,
+              "offset": 611
+            },
+            "end": {
+              "line": 14,
+              "column": 29,
+              "offset": 627
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:cancellationWorkflow:useResources:3",
+          "kind": "activity",
+          "name": "useResources",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 15,
+              "column": 13,
+              "offset": 641
+            },
+            "end": {
+              "line": 15,
+              "column": 54,
+              "offset": 682
+            },
+            "symbolName": "useResources"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        },
+        {
+          "id": "cancellation-scope:cancellationWorkflow:4",
+          "kind": "cancellation-scope",
+          "name": "nonCancellable",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 27,
+              "column": 11,
+              "offset": 867
+            },
+            "end": {
+              "line": 29,
+              "column": 7,
+              "offset": 979
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 4
+        },
+        {
+          "id": "activity-call:cancellationWorkflow:releaseResources:5",
+          "kind": "activity",
+          "name": "releaseResources",
+          "source": {
+            "path": "src/workflows/cancellation-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 28,
+              "column": 13,
+              "offset": 926
+            },
+            "end": {
+              "line": 28,
+              "column": 58,
+              "offset": 971
+            },
+            "symbolName": "releaseResources"
+          },
+          "confidence": "exact",
+          "staticOrder": 5
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:reserveResources",
+      "name": "reserveResources",
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 13,
+          "column": 13,
+          "offset": 552
+        },
+        "end": {
+          "line": 13,
+          "column": 58,
+          "offset": 597
+        },
+        "symbolName": "reserveResources"
+      },
+      "implementationSource": {
+        "path": "src/activities/resource-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 278
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 433
+        },
+        "symbolName": "reserveResources"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:useResources",
+      "name": "useResources",
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 13,
+          "offset": 641
+        },
+        "end": {
+          "line": 15,
+          "column": 54,
+          "offset": 682
+        },
+        "symbolName": "useResources"
+      },
+      "implementationSource": {
+        "path": "src/activities/resource-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 1,
+          "offset": 435
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 541
+        },
+        "symbolName": "useResources"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:releaseResources",
+      "name": "releaseResources",
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 13,
+          "offset": 926
+        },
+        "end": {
+          "line": 28,
+          "column": 58,
+          "offset": 971
+        },
+        "symbolName": "releaseResources"
+      },
+      "implementationSource": {
+        "path": "src/activities/resource-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 1,
+          "offset": 543
+        },
+        "end": {
+          "line": 32,
+          "column": 2,
+          "offset": 686
+        },
+        "symbolName": "releaseResources"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

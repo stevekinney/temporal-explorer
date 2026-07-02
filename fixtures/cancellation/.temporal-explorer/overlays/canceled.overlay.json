@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:cancellationWorkflow:trace:canceled:canceled-run-id",
+  "staticAnalysisId": "analysis:cancellation",
+  "runtimeTraceId": "trace:canceled:canceled-run-id",
+  "workflow": "cancellationWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:cancellationWorkflow",
+      "kind": "workflow",
+      "name": "cancellationWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 378
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1004
+        },
+        "symbolName": "cancellationWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:cancellationWorkflow:reserveResources:1",
+      "kind": "activity",
+      "name": "reserveResources",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 13,
+          "column": 13,
+          "offset": 552
+        },
+        "end": {
+          "line": 13,
+          "column": 58,
+          "offset": 597
+        },
+        "symbolName": "reserveResources"
+      }
+    },
+    {
+      "id": "activity-call:cancellationWorkflow:useResources:3",
+      "kind": "activity",
+      "name": "useResources",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 13,
+          "offset": 641
+        },
+        "end": {
+          "line": 15,
+          "column": 54,
+          "offset": 682
+        },
+        "symbolName": "useResources"
+      }
+    },
+    {
+      "id": "activity-call:cancellationWorkflow:releaseResources:5",
+      "kind": "activity",
+      "name": "releaseResources",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 13,
+          "offset": 926
+        },
+        "end": {
+          "line": 28,
+          "column": 58,
+          "offset": 971
+        },
+        "symbolName": "releaseResources"
+      }
+    },
+    {
+      "id": "timer:cancellationWorkflow:2",
+      "kind": "timer",
+      "name": "'30 days'",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 14,
+          "column": 13,
+          "offset": 611
+        },
+        "end": {
+          "line": 14,
+          "column": 29,
+          "offset": 627
+        }
+      }
+    },
+    {
+      "id": "cancellation-scope:cancellationWorkflow:0",
+      "kind": "cancellation-scope",
+      "name": "cancellable",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 12,
+          "column": 11,
+          "offset": 496
+        },
+        "end": {
+          "line": 16,
+          "column": 7,
+          "offset": 690
+        }
+      }
+    },
+    {
+      "id": "cancellation-scope:cancellationWorkflow:4",
+      "kind": "cancellation-scope",
+      "name": "nonCancellable",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/cancellation-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 27,
+          "column": 11,
+          "offset": 867
+        },
+        "end": {
+          "line": 29,
+          "column": 7,
+          "offset": 979
+        }
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:cancellationWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to cancellationWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type cancellationWorkflow matched static Workflow cancellationWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:cancellationWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/cancellation-workflow.ts:10.",
+          "staticNodeId": "workflow:cancellationWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:canceled",
+      "staticNodeId": "workflow:cancellationWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to cancellationWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type cancellationWorkflow matched static Workflow cancellationWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:cancellationWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/cancellation-workflow.ts:10.",
+          "staticNodeId": "workflow:cancellationWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveResources:5",
+      "staticNodeId": "activity-call:cancellationWorkflow:reserveResources:1",
+      "confidence": "exact",
+      "reason": "Activity reserveResources matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveResources matched static Activity command reserveResources.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:cancellationWorkflow:reserveResources:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:cancellationWorkflow:reserveResources:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/cancellation-workflow.ts:13.",
+          "staticNodeId": "activity-call:cancellationWorkflow:reserveResources:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:releaseResources:17",
+      "staticNodeId": "activity-call:cancellationWorkflow:releaseResources:5",
+      "confidence": "exact",
+      "reason": "Activity releaseResources matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type releaseResources matched static Activity command releaseResources.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:cancellationWorkflow:releaseResources:5"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 5.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:cancellationWorkflow:releaseResources:5"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/cancellation-workflow.ts:28.",
+          "staticNodeId": "activity-call:cancellationWorkflow:releaseResources:5"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "timer:1:11",
+      "staticNodeId": "timer:cancellationWorkflow:2",
+      "confidence": "exact",
+      "reason": "The only runtime timer matched the only static timer.",
+      "evidence": [
+        {
+          "kind": "timer-order",
+          "description": "Runtime timer 1 matched static timer command timer:cancellationWorkflow:2 by start order.",
+          "eventIds": [11, 16],
+          "staticNodeId": "timer:cancellationWorkflow:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static timer source is src/workflows/cancellation-workflow.ts:14.",
+          "staticNodeId": "timer:cancellationWorkflow:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "cancel-request:12",
+      "staticNodeId": "workflow:cancellationWorkflow",
+      "confidence": "exact",
+      "reason": "Cancellation was requested for the Workflow Execution.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Cancellation request belongs to Workflow cancellationWorkflow.",
+          "eventIds": [12],
+          "staticNodeId": "workflow:cancellationWorkflow"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 7,
+      "observed": 6,
+      "skipped": 1,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 3,
+      "observed": 2,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 1,
+      "fired": 0,
+      "canceled": 1,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

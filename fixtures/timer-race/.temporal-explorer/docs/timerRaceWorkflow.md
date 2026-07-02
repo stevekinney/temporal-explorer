@@ -24,6 +24,10 @@ Signature: `timerRaceWorkflow(input: RaceInput): Promise<RaceResult>`
 |     1 | condition | `() => approvedBy !== undefined` | `src/workflows/timer-race-workflow.ts:19` | no       | unknown    |
 |     2 | timer     | `'30 days'`                      | `src/workflows/timer-race-workflow.ts:19` | yes      | exact      |
 
+## Temporal Operations
+
+- none
+
 ## Runtime Summary
 
 - Mapped runtime operations: 5/5

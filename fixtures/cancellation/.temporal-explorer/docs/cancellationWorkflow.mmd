@@ -1,0 +1,12 @@
+flowchart TD
+  start(["cancellationWorkflow"])
+  activity_call_cancellationWorkflow_reserveResources_1["reserveResources"]
+  timer_cancellationWorkflow_2(("'30 days'"))
+  activity_call_cancellationWorkflow_useResources_3["useResources"]
+  activity_call_cancellationWorkflow_releaseResources_5["releaseResources"]
+  complete(["complete"])
+  start --> activity_call_cancellationWorkflow_reserveResources_1
+  activity_call_cancellationWorkflow_reserveResources_1 --> timer_cancellationWorkflow_2
+  timer_cancellationWorkflow_2 --> activity_call_cancellationWorkflow_useResources_3
+  activity_call_cancellationWorkflow_useResources_3 --> activity_call_cancellationWorkflow_releaseResources_5
+  activity_call_cancellationWorkflow_releaseResources_5 --> complete

@@ -1,0 +1,268 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:queryWorkflow:trace:completed:completed-run-id",
+  "staticAnalysisId": "analysis:query",
+  "runtimeTraceId": "trace:completed:completed-run-id",
+  "workflow": "queryWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:queryWorkflow",
+      "kind": "workflow",
+      "name": "queryWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 1,
+          "offset": 662
+        },
+        "end": {
+          "line": 56,
+          "column": 2,
+          "offset": 1477
+        },
+        "symbolName": "queryWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:queryWorkflow:recordAudit:0",
+      "kind": "activity",
+      "name": "recordAudit",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 45,
+          "column": 23,
+          "offset": 1239
+        },
+        "end": {
+          "line": 45,
+          "column": 62,
+          "offset": 1278
+        },
+        "symbolName": "recordAudit"
+      }
+    },
+    {
+      "id": "condition:queryWorkflow:1",
+      "kind": "condition",
+      "name": "() => done",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 48,
+          "column": 9,
+          "offset": 1329
+        },
+        "end": {
+          "line": 48,
+          "column": 30,
+          "offset": 1350
+        }
+      }
+    },
+    {
+      "id": "signal:queryWorkflow:complete",
+      "kind": "signal",
+      "name": "complete",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 31,
+          "offset": 534
+        },
+        "end": {
+          "line": 19,
+          "column": 55,
+          "offset": 558
+        },
+        "symbolName": "complete"
+      }
+    },
+    {
+      "id": "query:queryWorkflow:auditCount",
+      "kind": "query",
+      "name": "auditCount",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 32,
+          "offset": 398
+        },
+        "end": {
+          "line": 17,
+          "column": 75,
+          "offset": 441
+        },
+        "symbolName": "auditCount"
+      }
+    },
+    {
+      "id": "query:queryWorkflow:bump",
+      "kind": "query",
+      "name": "bump",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 33,
+          "offset": 475
+        },
+        "end": {
+          "line": 18,
+          "column": 60,
+          "offset": 502
+        },
+        "symbolName": "bump"
+      }
+    },
+    {
+      "id": "query:queryWorkflow:status",
+      "kind": "query",
+      "name": "status",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 28,
+          "offset": 331
+        },
+        "end": {
+          "line": 16,
+          "column": 62,
+          "offset": 365
+        },
+        "symbolName": "status"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:queryWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to queryWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type queryWorkflow matched static Workflow queryWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:queryWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/query-workflow.ts:25.",
+          "staticNodeId": "workflow:queryWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:queryWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to queryWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type queryWorkflow matched static Workflow queryWorkflow.",
+          "eventIds": [15],
+          "staticNodeId": "workflow:queryWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/query-workflow.ts:25.",
+          "staticNodeId": "workflow:queryWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordAudit:5",
+      "staticNodeId": "activity-call:queryWorkflow:recordAudit:0",
+      "confidence": "exact",
+      "reason": "Activity recordAudit matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordAudit matched static Activity command recordAudit.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:queryWorkflow:recordAudit:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:queryWorkflow:recordAudit:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/query-workflow.ts:45.",
+          "staticNodeId": "activity-call:queryWorkflow:recordAudit:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "signal:complete:11",
+      "staticNodeId": "signal:queryWorkflow:complete",
+      "confidence": "exact",
+      "reason": "Signal complete matched a static Signal definition by name.",
+      "evidence": [
+        {
+          "kind": "signal-name",
+          "description": "Runtime Signal complete matched static Signal complete.",
+          "eventIds": [11],
+          "staticNodeId": "signal:queryWorkflow:complete"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Signal source is src/workflows/query-workflow.ts:19.",
+          "staticNodeId": "signal:queryWorkflow:complete"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 7,
+      "observed": 3,
+      "skipped": 4,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 1,
+      "receivedSignals": ["complete"],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 3
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

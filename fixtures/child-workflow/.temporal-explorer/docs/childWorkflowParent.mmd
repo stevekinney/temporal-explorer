@@ -1,0 +1,8 @@
+flowchart TD
+  start(["childWorkflowParent"])
+  child_workflow_childWorkflowParent_reserveInventoryChild_0[["reserveInventoryChild"]]
+  child_workflow_childWorkflowParent_releaseNotificationChild_1[["releaseNotificationChild"]]
+  complete(["complete"])
+  start --> child_workflow_childWorkflowParent_reserveInventoryChild_0
+  child_workflow_childWorkflowParent_reserveInventoryChild_0 --> child_workflow_childWorkflowParent_releaseNotificationChild_1
+  child_workflow_childWorkflowParent_releaseNotificationChild_1 --> complete

@@ -246,3 +246,71 @@ Decision: Replay-assisted mapping is worth building as an optional precision lay
 Alternatives considered: Requiring replay for dynamic mapping (breaks history-without-source usage), or extracting file:line from replay stacks (unreliable under Bun, redundant with static sources).
 
 Verification impact: `bun run replay:spike` exercises the capture path over four committed histories. Production `--replay` mapping will be gated by mapper tests when implemented alongside Stage 9H dynamic boundaries.
+
+## 2026-07-01: Implement Stages 9B-9H as Layer Passes with Per-Slice Verification
+
+Context: The construct slices share the same schema, analyzer, parser, mapper, and renderer files. Implementing slice-by-slice would rewrite each file up to seven times.
+
+Decision: Design the full construct schema once (trace operations for updates, child Workflows, external signals, markers, continue-as-new, cancel requests; command kinds for children, external Workflows, patches, continue-as-new, cancellation scopes, dynamic dispatch), then implement each layer in one pass. Verification and progress accounting stay per-slice: every fixture has its own generated history, committed artifacts, `test:fixtures` assertions, and package tests.
+
+Alternatives considered: Strict slice-at-a-time implementation (repeated churn on shared files) or one merged "Stage 9" gate (loses the plan's per-slice completion signals).
+
+Verification impact: `bun run test:fixtures` runs 13 named fixture suites; each construct's acceptance is asserted against its own committed artifacts.
+
+## 2026-07-01: Read Retry Counts from ActivityTaskStarted Attempts
+
+Context: Temporal collapses server-side Activity retries — intermediate failed attempts never write events. A retrying Activity's history is Scheduled, then one Started event whose `attempt` field carries the true attempt number, then one terminal event.
+
+Decision: Attempt entries take their number from `activityTaskStartedEventAttributes.attempt`, and coverage counts an Activity as retried when any attempt number exceeds one or multiple close events exist. The fixture generator normalizes `lastFailure` stack traces to repository-relative paths.
+
+Verification impact: The retry fixture's `retry-success` trace shows one attempt entry with `attempt: 3` and coverage `retried: 1`; the `failure` trace shows a failed Activity and a failed execution.
+
+## 2026-07-01: Treat Rejected Updates as Absent from History by Design
+
+Context: Update validators reject before acceptance is written, so a rejected Update leaves no events. The update fixture's scenario sends one validator-rejected Update to prove it.
+
+Decision: The trace model represents only accepted/completed/failed Updates. Documentation and the trace model state that validator-rejected Updates cannot be observed from Event History, mirroring how Queries are documented as not appearing in history.
+
+Verification impact: The updates fixture history contains exactly two accepted/completed pairs; `test:fixtures` asserts completed and failed statuses and no third operation.
+
+## 2026-07-01: Decode core_patch Marker Details as SDK Metadata
+
+Context: Versioning support needs patch IDs, but payloads stay redacted by default.
+
+Decision: The parser decodes only the `core_patch` marker's `patch-data` payload (`{"id":...,"deprecated":...}`), which is SDK protocol metadata, not user data. All other marker payloads remain references.
+
+Verification impact: The patched fixture maps both markers to static `patched`/`deprecatePatch` calls by patch ID with exact confidence.
+
+## 2026-07-01: Infer Cancellation Scope Observation by Source Containment
+
+Context: Cancellation scopes produce no direct history events, but the report must explain which cleanup path ran.
+
+Decision: A `cancellation-scope` static node is marked observed when any observed command's source range is contained in the scope's range. The evidence is structural (`scope-containment`), not runtime.
+
+Verification impact: The cancellation overlay shows both scopes observed, the canceled `useResources` call skipped, and the non-cancellable `releaseResources` cleanup observed.
+
+## 2026-07-01: Represent Dynamic Dispatch as Static Nodes with Dynamic Attribution
+
+Context: `activities[step](...)` cannot be named statically, but runtime operations from it must not be dropped or left unexplained.
+
+Decision: The analyzer emits a `dynamic` command node per dynamic call site (following proxy aliases through `as` casts), keeps the warning diagnostic, and the mapper attributes otherwise-unmatched Activity operations to that node with `dynamic` confidence and `dynamic-dispatch` evidence. Replay (per the Stage 13 decision) can later upgrade these mappings.
+
+Verification impact: The dynamic overlay maps both runtime dynamic Activities with `dynamic` confidence and zero unmapped operations, and `TEA_DYNAMIC_ACTIVITY_CALL` appears in CLI, docs, and artifacts.
+
+## 2026-07-01: Isolate CLI Tests from Committed Fixture Artifacts
+
+Context: CLI tests previously wrote artifacts into the committed fixture directories. Once the api package's parity tests read the same files, turbo's parallel test execution raced: one suite rewrote `fixtures/basic-order/.temporal-explorer` while another read it.
+
+Decision: CLI tests run every command against a temporary copy of the committed fixture (`copyFixture`). Committed artifacts are refreshed only by `bun run fixtures:regenerate-artifacts`. This supersedes the earlier "CLI tests regenerate committed JSON artifacts" decision.
+
+Verification impact: `bun run validate` runs all suites concurrently without artifact races, and `git status` stays clean after any test run.
+
+## 2026-07-01: Bound Turbo Test Concurrency Instead of Raising Test Timeouts
+
+Context: Under full-suite load, single ts-morph analyses that take about two seconds in isolation exceeded bun's five-second test timeout, with a different suite failing on each run. Ten concurrent heavy suites oversubscribed the ten-core machine.
+
+Decision: `validate` and `test` run turbo with `--concurrency=5`. Test timeouts stay at their defaults; oversized tests are split rather than extended (the analyzer construct tests and the api parity tests each perform one compiler analysis per test).
+
+Alternatives considered: Raising bun's test timeout (masks slowness and violates the working agreement) or serializing all tests (needlessly slow).
+
+Verification impact: `bun run validate` passes repeatably with all suites green.

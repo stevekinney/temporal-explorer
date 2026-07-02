@@ -362,8 +362,8 @@
         <TabPanel value="messages">
           <WorkflowMessagesPanel
             signals={selectedWorkflow.messageSurface.signals}
-            queryCount={selectedWorkflow.messageSurface.queries.length}
-            updateCount={selectedWorkflow.messageSurface.updates.length}
+            queries={selectedWorkflow.messageSurface.queries}
+            updates={selectedWorkflow.messageSurface.updates}
             {graphProjection}
           />
         </TabPanel>

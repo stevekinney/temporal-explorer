@@ -1,9 +1,9 @@
 <script lang="ts" module>
-  import type { RuntimeOverlayState } from '$lib/graph/projection';
+  import type { RuntimeOverlayState, TemporalGraphNode } from '$lib/graph/projection';
 
   export type TemporalFlowNodeData = Record<string, unknown> & {
     label: string;
-    kind: 'workflow' | 'activity' | 'timer' | 'condition' | 'signal' | 'runtime';
+    kind: TemporalGraphNode['kind'];
     state: RuntimeOverlayState;
     sourceText: string;
     eventSummary: string;
@@ -95,6 +95,32 @@
     border-left-color: #c9436e;
   }
 
+  .temporal-flow-node[data-kind='query'] {
+    border-left-color: #a13d8f;
+  }
+
+  .temporal-flow-node[data-kind='update'] {
+    border-left-color: #d9668a;
+  }
+
+  .temporal-flow-node[data-kind='child-workflow'],
+  .temporal-flow-node[data-kind='external-workflow'] {
+    border-left-color: #1f8fce;
+  }
+
+  .temporal-flow-node[data-kind='continue-as-new'] {
+    border-left-color: #3f5b73;
+  }
+
+  .temporal-flow-node[data-kind='patch'] {
+    border-left-color: #c98a1d;
+  }
+
+  .temporal-flow-node[data-kind='cancellation-scope'] {
+    border-left-color: #8a98a3;
+  }
+
+  .temporal-flow-node[data-kind='dynamic'],
   .temporal-flow-node[data-kind='runtime'] {
     border-left-color: #7a4cc2;
   }

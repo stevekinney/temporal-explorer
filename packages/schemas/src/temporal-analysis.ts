@@ -102,6 +102,9 @@ export const temporalCommandSchema = z
       z.literal('update'),
       z.literal('child-workflow'),
       z.literal('external-workflow'),
+      z.literal('continue-as-new'),
+      z.literal('patch'),
+      z.literal('cancellation-scope'),
       z.literal('dynamic'),
     ]),
     name: z.string().min(1),
@@ -157,8 +160,8 @@ export const workflowDefinitionSchema = z
     messageSurface: z
       .object({
         signals: z.array(signalDefinitionSchema),
-        queries: z.array(z.unknown()),
-        updates: z.array(z.unknown()),
+        queries: z.array(queryDefinitionSchema),
+        updates: z.array(updateDefinitionSchema),
       })
       .strict(),
     state: z

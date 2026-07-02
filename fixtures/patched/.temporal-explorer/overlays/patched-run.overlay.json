@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:patchedWorkflow:trace:patched-run:patched-run-run-id",
+  "staticAnalysisId": "analysis:patched",
+  "runtimeTraceId": "trace:patched-run:patched-run-run-id",
+  "workflow": "patchedWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:patchedWorkflow",
+      "kind": "workflow",
+      "name": "patchedWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/patched-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 10,
+          "column": 1,
+          "offset": 343
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 726
+        },
+        "symbolName": "patchedWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:patchedWorkflow:newCharge:2",
+      "kind": "activity",
+      "name": "newCharge",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/patched-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 14,
+          "column": 13,
+          "offset": 529
+        },
+        "end": {
+          "line": 14,
+          "column": 48,
+          "offset": 564
+        },
+        "symbolName": "newCharge"
+      }
+    },
+    {
+      "id": "activity-call:patchedWorkflow:oldCharge:3",
+      "kind": "activity",
+      "name": "oldCharge",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/patched-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 13,
+          "offset": 577
+        },
+        "end": {
+          "line": 15,
+          "column": 48,
+          "offset": 612
+        },
+        "symbolName": "oldCharge"
+      }
+    },
+    {
+      "id": "patch:patchedWorkflow:0",
+      "kind": "patch",
+      "name": "legacy-tax-rounding",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/patched-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 11,
+          "column": 3,
+          "offset": 430
+        },
+        "end": {
+          "line": 11,
+          "column": 40,
+          "offset": 467
+        }
+      }
+    },
+    {
+      "id": "patch:patchedWorkflow:1",
+      "kind": "patch",
+      "name": "use-modern-charge",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/patched-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 13,
+          "column": 19,
+          "offset": 488
+        },
+        "end": {
+          "line": 13,
+          "column": 47,
+          "offset": 516
+        }
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:patchedWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to patchedWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type patchedWorkflow matched static Workflow patchedWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:patchedWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/patched-workflow.ts:10.",
+          "staticNodeId": "workflow:patchedWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:patchedWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to patchedWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type patchedWorkflow matched static Workflow patchedWorkflow.",
+          "eventIds": [15],
+          "staticNodeId": "workflow:patchedWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/patched-workflow.ts:10.",
+          "staticNodeId": "workflow:patchedWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:newCharge:9",
+      "staticNodeId": "activity-call:patchedWorkflow:newCharge:2",
+      "confidence": "exact",
+      "reason": "Activity newCharge matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type newCharge matched static Activity command newCharge.",
+          "eventIds": [9, 10, 11],
+          "staticNodeId": "activity-call:patchedWorkflow:newCharge:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [9, 10, 11],
+          "staticNodeId": "activity-call:patchedWorkflow:newCharge:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/patched-workflow.ts:14.",
+          "staticNodeId": "activity-call:patchedWorkflow:newCharge:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "marker:core_patch:5",
+      "staticNodeId": "patch:patchedWorkflow:0",
+      "confidence": "exact",
+      "reason": "Patch marker legacy-tax-rounding matched a static patch call by patch ID.",
+      "evidence": [
+        {
+          "kind": "patch-id",
+          "description": "Runtime patch marker legacy-tax-rounding matched static patch patch:patchedWorkflow:0.",
+          "eventIds": [5],
+          "staticNodeId": "patch:patchedWorkflow:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/patched-workflow.ts:11.",
+          "staticNodeId": "patch:patchedWorkflow:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "marker:core_patch:7",
+      "staticNodeId": "patch:patchedWorkflow:1",
+      "confidence": "exact",
+      "reason": "Patch marker use-modern-charge matched a static patch call by patch ID.",
+      "evidence": [
+        {
+          "kind": "patch-id",
+          "description": "Runtime patch marker use-modern-charge matched static patch patch:patchedWorkflow:1.",
+          "eventIds": [7],
+          "staticNodeId": "patch:patchedWorkflow:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/patched-workflow.ts:13.",
+          "staticNodeId": "patch:patchedWorkflow:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 5,
+      "observed": 4,
+      "skipped": 1,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 2,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

@@ -1,4 +1,5 @@
 import type { WorkflowHandle } from '@temporalio/client';
+import type { DataConverter } from '@temporalio/common';
 import type { TestWorkflowEnvironment } from '@temporalio/testing';
 
 /** Context passed to a fixture scenario while its Workflow Execution is running. */
@@ -32,6 +33,12 @@ export type FixtureHistoryDefinition = {
   args: unknown[];
   /** Optional interaction with the running Workflow before awaiting its result. */
   scenario?: (context: FixtureScenarioContext) => Promise<void>;
+  /**
+   * Loads a custom data converter (payload codecs) applied to both the worker
+   * and a dedicated client. Fixtures using one must not rely on time skipping,
+   * because the dedicated client lacks the time-skipping interceptor.
+   */
+  loadDataConverter?: () => Promise<DataConverter>;
   /** Expected terminal state of the Workflow Execution. */
   expectedOutcome: 'completed' | 'failed' | 'canceled';
   /**
@@ -128,7 +135,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await handle.signal('complete');
     },
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'update',
@@ -167,7 +173,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       }
     },
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'retry',
@@ -179,7 +184,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await import('../../fixtures/retry/src/activities/charge-activities'),
     args: [{ orderId: 'order-retry', failuresBeforeSuccess: 2 }],
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'retry',
@@ -191,7 +195,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await import('../../fixtures/retry/src/activities/charge-activities'),
     args: [{ orderId: 'order-doomed', failuresBeforeSuccess: 99 }],
     expectedOutcome: 'failed',
-    generateArtifacts: false,
   },
   {
     fixture: 'child-workflow',
@@ -201,7 +204,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
     workflowsPath: 'src/workflows/child-workflow-parent.ts',
     args: [{ orderId: 'order-child' }],
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'external',
@@ -221,7 +223,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await target.result();
     },
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'cancellation',
@@ -237,7 +238,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await handle.cancel();
     },
     expectedOutcome: 'canceled',
-    generateArtifacts: false,
   },
   {
     fixture: 'continue-as-new',
@@ -249,7 +249,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await import('../../fixtures/continue-as-new/src/activities/iteration-activities'),
     args: [{ iteration: 0, maxIterations: 2 }],
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'patched',
@@ -261,7 +260,6 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await import('../../fixtures/patched/src/activities/charge-activities'),
     args: [{ orderId: 'order-patched' }],
     expectedOutcome: 'completed',
-    generateArtifacts: false,
   },
   {
     fixture: 'dynamic',
@@ -273,7 +271,28 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
       await import('../../fixtures/dynamic/src/activities/step-activities'),
     args: [{ requestId: 'request-008', plan: ['prepareShipment', 'notifyWarehouse'] }],
     expectedOutcome: 'completed',
-    generateArtifacts: false,
+  },
+  {
+    fixture: 'payloads',
+    history: 'encrypted',
+    workflowType: 'payloadWorkflow',
+    taskQueue: 'payloads-task-queue',
+    workflowsPath: 'src/workflows/payload-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/payloads/src/activities/profile-activities'),
+    loadDataConverter: async () => {
+      const { payloadCodec } = await import('./payload-codec');
+      return { payloadCodecs: [payloadCodec] };
+    },
+    args: [
+      {
+        accountId: 'account-009',
+        password: 'hunter2',
+        creditCard: '4111-1111-1111-1111',
+        note: 'contains sensitive fields on purpose',
+      },
+    ],
+    expectedOutcome: 'completed',
   },
 ];
 

@@ -9,9 +9,51 @@ import type {
 
 import { getCommandsOfKind } from './mappings';
 
-const commandNodeKinds = ['activity', 'timer', 'condition'] as const;
+const commandNodeKinds = [
+  'activity',
+  'timer',
+  'condition',
+  'child-workflow',
+  'external-workflow',
+  'continue-as-new',
+  'patch',
+  'cancellation-scope',
+  'dynamic',
+] as const;
 
-/** Builds the static node list (workflow, commands, signals) with observed flags. */
+const messageNodeKinds = [
+  { surface: 'signals', kind: 'signal' },
+  { surface: 'queries', kind: 'query' },
+  { surface: 'updates', kind: 'update' },
+] as const;
+
+/**
+ * Marks cancellation scopes observed when any observed command's source range
+ * is contained within the scope's source range. Scopes have no direct history
+ * events, so containment is the honest inference.
+ */
+function markObservedScopes(nodes: StaticOverlayNode[]): void {
+  const observedSources = nodes
+    .filter((node) => node.observed && node.kind !== 'cancellation-scope' && node.source)
+    .map((node) => node.source);
+
+  for (const node of nodes) {
+    if (node.kind !== 'cancellation-scope' || node.observed || !node.source) {
+      continue;
+    }
+
+    const scope = node.source;
+    node.observed = observedSources.some(
+      (candidate) =>
+        candidate !== undefined &&
+        candidate.path === scope.path &&
+        candidate.start.offset >= scope.start.offset &&
+        candidate.end.offset <= scope.end.offset,
+    );
+  }
+}
+
+/** Builds the static node list (workflow, commands, messages) with observed flags. */
 export function createStaticNodes(
   workflow: WorkflowDefinition,
   mappings: RuntimeNodeMapping[],
@@ -39,16 +81,19 @@ export function createStaticNodes(
     }
   }
 
-  for (const signal of workflow.messageSurface.signals) {
-    nodes.push({
-      id: signal.id,
-      kind: 'signal',
-      name: signal.name,
-      observed: observed.has(signal.id),
-      source: signal.source,
-    });
+  for (const { surface, kind } of messageNodeKinds) {
+    for (const message of workflow.messageSurface[surface]) {
+      nodes.push({
+        id: message.id,
+        kind,
+        name: message.name,
+        observed: observed.has(message.id),
+        source: message.source,
+      });
+    }
   }
 
+  markObservedScopes(nodes);
   return nodes;
 }
 
@@ -82,13 +127,20 @@ function createMessageCoverage(
         .map((operation) => operation.signalName),
     ),
   ].toSorted((left, right) => left.localeCompare(right));
+  const receivedUpdates = [
+    ...new Set(
+      trace.operations
+        .filter((operation) => operation.kind === 'update')
+        .map((operation) => operation.updateName),
+    ),
+  ].toSorted((left, right) => left.localeCompare(right));
 
   return {
     staticSignals: workflow.messageSurface.signals.length,
     receivedSignals,
-    staticUpdates: 0,
-    receivedUpdates: [],
-    staticQueries: 0,
+    staticUpdates: workflow.messageSurface.updates.length,
+    receivedUpdates,
+    staticQueries: workflow.messageSurface.queries.length,
   };
 }
 
@@ -128,7 +180,13 @@ export function createCoverage(
     activities: {
       staticTotal: staticNodes.filter((node) => node.kind === 'activity').length,
       observed: observedActivityIds.size,
-      retried: activityOperations.filter((operation) => operation.attempts.length > 1).length,
+      // Temporal collapses server-side retries into one started event whose
+      // attempt number carries the true count.
+      retried: activityOperations.filter(
+        (operation) =>
+          operation.attempts.length > 1 ||
+          operation.attempts.some((attempt) => attempt.attempt > 1),
+      ).length,
       failed: activityOperations.filter((operation) => operation.status !== 'completed').length,
     },
     messages: createMessageCoverage(workflow, trace),

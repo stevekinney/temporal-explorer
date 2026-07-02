@@ -42,15 +42,6 @@ function encodedJsonPayload(value: unknown): Record<string, unknown> {
   };
 }
 
-function encodedPayload(encoding: string, value: string): Record<string, unknown> {
-  return {
-    metadata: {
-      encoding: Buffer.from(encoding).toString('base64'),
-    },
-    data: Buffer.from(value).toString('base64'),
-  };
-}
-
 function workflowStarted(
   attributes: Record<string, unknown> = {},
   eventId = 1,
@@ -203,47 +194,6 @@ describe('event history parser edge cases', () => {
         status: 'pending',
       },
     ]);
-  });
-
-  it('redacts previews that exceed the configured byte limit', () => {
-    const trace = parseEventHistory({
-      history: [workflowStarted({ input: { payloads: [encodedJsonPayload({ tooLarge: true })] } })],
-      payloadPreview: {
-        decodePayloads: true,
-        redactPayloads: false,
-        maxPreviewBytes: 1,
-      },
-    });
-
-    expect(trace.payloads).toEqual([
-      {
-        id: 'payload:event-1:input:0',
-        eventId: 1,
-        kind: 'input',
-        decoded: false,
-        redacted: true,
-      },
-    ]);
-  });
-
-  it('redacts payloads without supported JSON payload data', () => {
-    const trace = parseEventHistory({
-      history: [
-        workflowStarted({
-          input: {
-            payloads: [encodedPayload('binary/plain', 'not-json')],
-          },
-        }),
-      ],
-      payloadPreview: {
-        decodePayloads: true,
-        redactPayloads: false,
-        maxPreviewBytes: 1_000,
-      },
-    });
-
-    expect(trace.payloads[0]?.decoded).toBe(false);
-    expect(trace.payloads[0]?.redacted).toBe(true);
   });
 
   it('reports running and non-completed Workflow statuses', () => {

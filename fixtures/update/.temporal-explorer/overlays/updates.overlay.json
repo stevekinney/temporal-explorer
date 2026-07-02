@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:updateWorkflow:trace:updates:updates-run-id",
+  "staticAnalysisId": "analysis:update",
+  "runtimeTraceId": "trace:updates:updates-run-id",
+  "workflow": "updateWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:updateWorkflow",
+      "kind": "workflow",
+      "name": "updateWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 1,
+          "offset": 593
+        },
+        "end": {
+          "line": 58,
+          "column": 2,
+          "offset": 1474
+        },
+        "symbolName": "updateWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:updateWorkflow:recordAddress:1",
+      "kind": "activity",
+      "name": "recordAddress",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 51,
+          "column": 24,
+          "offset": 1330
+        },
+        "end": {
+          "line": 51,
+          "column": 57,
+          "offset": 1363
+        },
+        "symbolName": "recordAddress"
+      }
+    },
+    {
+      "id": "condition:updateWorkflow:0",
+      "kind": "condition",
+      "name": "() => updatesApplied >= 1 && failedUpdates >= 1",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 49,
+          "column": 9,
+          "offset": 1246
+        },
+        "end": {
+          "line": 49,
+          "column": 67,
+          "offset": 1304
+        }
+      }
+    },
+    {
+      "id": "update:updateWorkflow:explode",
+      "kind": "update",
+      "name": "explode",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 30,
+          "offset": 448
+        },
+        "end": {
+          "line": 17,
+          "column": 69,
+          "offset": 487
+        },
+        "symbolName": "explode"
+      }
+    },
+    {
+      "id": "update:updateWorkflow:setAddress",
+      "kind": "update",
+      "name": "setAddress",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/update-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 33,
+          "offset": 355
+        },
+        "end": {
+          "line": 16,
+          "column": 95,
+          "offset": 417
+        },
+        "symbolName": "setAddress"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:updateWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to updateWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type updateWorkflow matched static Workflow updateWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:updateWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/update-workflow.ts:23.",
+          "staticNodeId": "workflow:updateWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:updateWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to updateWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type updateWorkflow matched static Workflow updateWorkflow.",
+          "eventIds": [24],
+          "staticNodeId": "workflow:updateWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/update-workflow.ts:23.",
+          "staticNodeId": "workflow:updateWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordAddress:18",
+      "staticNodeId": "activity-call:updateWorkflow:recordAddress:1",
+      "confidence": "exact",
+      "reason": "Activity recordAddress matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordAddress matched static Activity command recordAddress.",
+          "eventIds": [18, 19, 20],
+          "staticNodeId": "activity-call:updateWorkflow:recordAddress:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [18, 19, 20],
+          "staticNodeId": "activity-call:updateWorkflow:recordAddress:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/update-workflow.ts:51.",
+          "staticNodeId": "activity-call:updateWorkflow:recordAddress:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "update:setAddress:8",
+      "staticNodeId": "update:updateWorkflow:setAddress",
+      "confidence": "exact",
+      "reason": "Update setAddress matched a static Update definition by name.",
+      "evidence": [
+        {
+          "kind": "update-name",
+          "description": "Runtime Update setAddress matched static Update setAddress.",
+          "eventIds": [8, 9],
+          "staticNodeId": "update:updateWorkflow:setAddress"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Update source is src/workflows/update-workflow.ts:16.",
+          "staticNodeId": "update:updateWorkflow:setAddress"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "update:explode:16",
+      "staticNodeId": "update:updateWorkflow:explode",
+      "confidence": "exact",
+      "reason": "Update explode matched a static Update definition by name.",
+      "evidence": [
+        {
+          "kind": "update-name",
+          "description": "Runtime Update explode matched static Update explode.",
+          "eventIds": [16, 17],
+          "staticNodeId": "update:updateWorkflow:explode"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Update source is src/workflows/update-workflow.ts:17.",
+          "staticNodeId": "update:updateWorkflow:explode"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 5,
+      "observed": 4,
+      "skipped": 1,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 2,
+      "receivedUpdates": ["explode", "setAddress"],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

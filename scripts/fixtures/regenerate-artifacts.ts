@@ -30,11 +30,19 @@ async function runCli(args: string[]): Promise<void> {
   }
 }
 
+/** Fixtures that prove static analysis behavior and have no generated history. */
+const staticOnlyFixtures = ['diagnostics'];
+
 const fixtureFilter = getFlagValue('--fixture');
 const artifactDefinitions = fixtureHistories.filter(
   (definition) => definition.generateArtifacts !== false,
 );
-const fixtures = [...new Set(artifactDefinitions.map((definition) => definition.fixture))]
+const fixtures = [
+  ...new Set([
+    ...artifactDefinitions.map((definition) => definition.fixture),
+    ...staticOnlyFixtures,
+  ]),
+]
   .filter((fixture) => !fixtureFilter || fixture === fixtureFilter)
   .toSorted((left, right) => left.localeCompare(right));
 

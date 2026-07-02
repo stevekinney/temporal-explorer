@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "temporal-trace/v1",
+  "artifactId": "trace:success:success-run-id",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-trace/v1",
+    "inputs": {
+      "projectRoot": "child-workflow",
+      "configHash": "3da32efd4e61dd1e3b9944cd4431e9390a99357dc2da1e65a65818421fbfa8be",
+      "sourceFileHashes": {},
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.18.1"
+      }
+    }
+  },
+  "execution": {
+    "workflowType": "childWorkflowParent",
+    "workflowId": "child-workflow-success",
+    "runId": "success-run-id",
+    "status": "completed",
+    "startedAt": "2026-01-01T00:00:00.001Z",
+    "closedAt": "2026-01-01T00:00:00.023Z",
+    "durationMs": 22
+  },
+  "source": {
+    "taskQueue": "child-workflow-task-queue",
+    "eventCount": 23,
+    "importedFrom": "file"
+  },
+  "operations": [
+    {
+      "id": "workflow:start",
+      "kind": "workflow-lifecycle",
+      "status": "started",
+      "eventReferences": [
+        {
+          "eventId": 1,
+          "eventType": "WorkflowExecutionStarted"
+        }
+      ],
+      "payloadReferences": ["payload:event-1:input:0"]
+    },
+    {
+      "id": "workflow:completed",
+      "kind": "workflow-lifecycle",
+      "status": "completed",
+      "eventReferences": [
+        {
+          "eventId": 23,
+          "eventType": "WorkflowExecutionCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-23:result:0"]
+    },
+    {
+      "id": "child-workflow:reserveInventoryChild:5",
+      "kind": "child-workflow",
+      "workflowType": "reserveInventoryChild",
+      "childWorkflowId": "success-run-id-2",
+      "childRunId": "success-run-id-3",
+      "status": "completed",
+      "initiatedAt": "2026-01-01T00:00:00.005Z",
+      "closedAt": "2026-01-01T00:00:00.010Z",
+      "eventReferences": [
+        {
+          "eventId": 5,
+          "eventType": "StartChildWorkflowExecutionInitiated"
+        },
+        {
+          "eventId": 6,
+          "eventType": "ChildWorkflowExecutionStarted"
+        },
+        {
+          "eventId": 10,
+          "eventType": "ChildWorkflowExecutionCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-5:input:0", "payload:event-10:result:0"]
+    },
+    {
+      "id": "child-workflow:releaseNotificationChild:14",
+      "kind": "child-workflow",
+      "workflowType": "releaseNotificationChild",
+      "childWorkflowId": "success-run-id-4",
+      "childRunId": "success-run-id-5",
+      "status": "completed",
+      "initiatedAt": "2026-01-01T00:00:00.014Z",
+      "closedAt": "2026-01-01T00:00:00.019Z",
+      "eventReferences": [
+        {
+          "eventId": 14,
+          "eventType": "StartChildWorkflowExecutionInitiated"
+        },
+        {
+          "eventId": 15,
+          "eventType": "ChildWorkflowExecutionStarted"
+        },
+        {
+          "eventId": 19,
+          "eventType": "ChildWorkflowExecutionCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-14:input:0", "payload:event-19:result:0"]
+    }
+  ],
+  "timeline": [
+    {
+      "id": "timeline:1",
+      "operationId": "workflow:start",
+      "at": "2026-01-01T00:00:00.001Z",
+      "label": "Workflow started",
+      "eventIds": [1]
+    },
+    {
+      "id": "timeline:5",
+      "operationId": "child-workflow:reserveInventoryChild:5",
+      "at": "2026-01-01T00:00:00.005Z",
+      "label": "Child reserveInventoryChild initiated",
+      "eventIds": [5]
+    },
+    {
+      "id": "timeline:10",
+      "operationId": "child-workflow:reserveInventoryChild:5",
+      "at": "2026-01-01T00:00:00.010Z",
+      "label": "Child reserveInventoryChild completed",
+      "eventIds": [10]
+    },
+    {
+      "id": "timeline:14",
+      "operationId": "child-workflow:releaseNotificationChild:14",
+      "at": "2026-01-01T00:00:00.014Z",
+      "label": "Child releaseNotificationChild initiated",
+      "eventIds": [14]
+    },
+    {
+      "id": "timeline:19",
+      "operationId": "child-workflow:releaseNotificationChild:14",
+      "at": "2026-01-01T00:00:00.019Z",
+      "label": "Child releaseNotificationChild completed",
+      "eventIds": [19]
+    },
+    {
+      "id": "timeline:23",
+      "operationId": "workflow:completed",
+      "at": "2026-01-01T00:00:00.023Z",
+      "label": "Workflow closed",
+      "eventIds": [23]
+    }
+  ],
+  "payloads": [
+    {
+      "id": "payload:event-1:input:0",
+      "eventId": 1,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-23:result:0",
+      "eventId": 23,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-5:input:0",
+      "eventId": 5,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-10:result:0",
+      "eventId": 10,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-14:input:0",
+      "eventId": 14,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-19:result:0",
+      "eventId": 19,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    }
+  ],
+  "diagnostics": []
+}

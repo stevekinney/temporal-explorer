@@ -9,6 +9,7 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import { loadConfiguration } from './configuration';
 import { getPackageManager, readPackageJson } from './package-metadata';
 import { createSourceFileHashes, discoverFiles, hashFile, toProjectPath } from './paths';
 import type {
@@ -18,6 +19,14 @@ import type {
 } from './types';
 import { analyzeWorkerFiles, analyzeWorkflowSourceFile } from './workflow-analysis';
 
+export {
+  applySeverityOverrides,
+  defineConfig,
+  type DiagnosticSeverityOverride,
+  type TemporalConnectionProfile,
+  type TemporalExplorerConfiguration,
+} from './configuration';
+export { createSourceFileHashes, toProjectPath } from './paths';
 export type {
   AnalyzeWorkflowFilesOptions,
   LoadTemporalExplorerProjectOptions,
@@ -27,20 +36,41 @@ export type {
 const workflowGlobs = ['src/**/workflows/**/*.ts', 'src/**/*.workflow.ts'];
 const workerGlobs = ['src/**/worker*.ts', 'src/**/workers/**/*.ts'];
 
+async function resolveWorkflowFiles(
+  root: string,
+  options: LoadTemporalExplorerProjectOptions,
+  configuration: Awaited<ReturnType<typeof loadConfiguration>>,
+): Promise<string[]> {
+  if (options.workflowFiles) {
+    return options.workflowFiles.map((file) => resolve(root, file));
+  }
+
+  return await discoverFiles(root, configuration?.temporal?.workflowGlobs ?? workflowGlobs);
+}
+
+function resolveProjectPaths(
+  options: LoadTemporalExplorerProjectOptions,
+  configuration: Awaited<ReturnType<typeof loadConfiguration>>,
+): { tsconfigName: string; outputName: string } {
+  return {
+    tsconfigName: options.tsconfig ?? configuration?.tsconfig ?? 'tsconfig.json',
+    outputName: options.outputDirectory ?? configuration?.output?.directory ?? '.temporal-explorer',
+  };
+}
+
 export async function loadTemporalExplorerProject(
   options: LoadTemporalExplorerProjectOptions = {},
 ): Promise<TemporalExplorerProject> {
   const root = resolve(options.root ?? process.cwd());
-  const tsconfig = resolve(root, options.tsconfig ?? 'tsconfig.json');
-  const workflowFiles =
-    options.workflowFiles?.map((file) => resolve(root, file)) ??
-    (await discoverFiles(root, workflowGlobs));
+  const configuration = await loadConfiguration(resolve(root, 'temporal-explorer.config.ts'));
+  const { tsconfigName, outputName } = resolveProjectPaths(options, configuration);
 
   return {
     root,
-    tsconfig,
-    workflowFiles,
-    outputDirectory: resolve(root, options.outputDirectory ?? '.temporal-explorer'),
+    tsconfig: resolve(root, tsconfigName),
+    workflowFiles: await resolveWorkflowFiles(root, options, configuration),
+    outputDirectory: resolve(root, outputName),
+    ...(configuration ? { configuration } : {}),
   };
 }
 

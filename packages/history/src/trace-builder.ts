@@ -1,13 +1,19 @@
 import type { PayloadReference, RuntimeTraceDocument } from '@temporal-explorer/schemas';
 
 import { createActivityOperations } from './activity-operations';
+import { createChildWorkflowOperations } from './child-workflow-operations';
 import { createUnknownEventDiagnostics } from './diagnostics';
+import { createExternalSignalOperations } from './external-signal-operations';
 import { parseEventHistoryEvents, readRecordField, readStringField } from './history-json';
+import { createMarkerOperations } from './marker-operations';
 import type { PayloadPreviewConfiguration } from './payloads';
 import { createSignalOperations } from './signal-operations';
 import { createTimeline } from './timeline';
 import { createTimerOperations } from './timer-operations';
+import { createUpdateOperations } from './update-operations';
 import {
+  createCancelRequestOperations,
+  createContinueAsNewOperations,
   createWorkflowExecution,
   createWorkflowLifecycle,
   type WorkflowLifecycle,
@@ -67,10 +73,17 @@ export function parseEventHistory(options: ParseEventHistoryOptions): RuntimeTra
   const payloads: PayloadReference[] = [];
   const configuration = options.payloadPreview ?? {};
   const lifecycle = createWorkflowLifecycle(events, payloads, configuration, options.provenance);
-  const activityOperations = createActivityOperations(events, payloads, configuration);
-  const signalOperations = createSignalOperations(events, payloads, configuration);
-  const timerOperations = createTimerOperations(events);
-  const detailOperations = [...activityOperations, ...signalOperations, ...timerOperations];
+  const detailOperations = [
+    ...createActivityOperations(events, payloads, configuration),
+    ...createSignalOperations(events, payloads, configuration),
+    ...createTimerOperations(events),
+    ...createUpdateOperations(events, payloads, configuration),
+    ...createChildWorkflowOperations(events, payloads, configuration),
+    ...createExternalSignalOperations(events, payloads, configuration),
+    ...createMarkerOperations(events),
+    ...createCancelRequestOperations(events),
+    ...createContinueAsNewOperations(events, payloads, configuration),
+  ];
 
   return {
     schemaVersion: 'temporal-trace/v1',

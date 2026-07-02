@@ -12,14 +12,16 @@ import type {
 import { formatEventReferences, sourceText } from './formatting';
 import {
   createCommandGraphNodes,
-  createRuntimeOperationRows,
+  createQueryGraphNodes,
+  createScopeGraphNodes,
   createSignalGraphNodes,
-  createTimelineRows,
   createUnmappedRuntimeNodes,
+  createUpdateGraphNodes,
   createWorkflowGraphNode,
 } from './projection-builders';
 import { createGraphEdges } from './projection-edges';
 import { createStatusCounts } from './projection-helpers';
+import { createRuntimeOperationRows, createTimelineRows } from './projection-rows';
 import { runtimeOverlayStates, runtimeStateToken, type RuntimeOverlayState } from './runtime-state';
 
 export {
@@ -30,10 +32,30 @@ export {
   type RuntimeOverlayState,
 };
 
+/** Shared lookups passed to every graph node and row builder. */
+export type ProjectionBuildContext = {
+  mappingsByRuntimeOperationId: Map<string, RuntimeNodeMapping>;
+  operationsById: Map<string, RuntimeOperation>;
+};
+
 export type TemporalGraphNode = {
   id: string;
   label: string;
-  kind: 'workflow' | 'activity' | 'timer' | 'condition' | 'signal' | 'runtime';
+  kind:
+    | 'workflow'
+    | 'activity'
+    | 'timer'
+    | 'condition'
+    | 'signal'
+    | 'query'
+    | 'update'
+    | 'child-workflow'
+    | 'external-workflow'
+    | 'continue-as-new'
+    | 'patch'
+    | 'cancellation-scope'
+    | 'dynamic'
+    | 'runtime';
   state: RuntimeOverlayState;
   source: SourceLocation | undefined;
   sourceText: string;
@@ -102,14 +124,24 @@ export function buildGraphProjection({
   const workflowNode = createWorkflowGraphNode(workflow, trace, context);
   const commandNodes = createCommandGraphNodes(workflow, trace, overlay, context);
   const signalNodes = createSignalGraphNodes(workflow, trace, overlay, context);
+  const queryNodes = createQueryGraphNodes(workflow, trace, overlay, context);
+  const updateNodes = createUpdateGraphNodes(workflow, trace, overlay, context);
+  const scopeNodes = createScopeGraphNodes(workflow, trace, overlay, context);
+  const messageSurfaceNodes = [...signalNodes, ...queryNodes, ...updateNodes];
   const mappedRuntimeOperationIds = new Set(
     Array.from(mappingsByRuntimeOperationId.keys()).filter((operationId) =>
       Boolean(mappingsByRuntimeOperationId.get(operationId)?.staticNodeId),
     ),
   );
   const unmappedRuntimeNodes = createUnmappedRuntimeNodes(trace, mappedRuntimeOperationIds);
-  const nodes = [workflowNode, ...commandNodes, ...signalNodes, ...unmappedRuntimeNodes];
-  const edges = createGraphEdges(workflowNode, commandNodes, signalNodes);
+  const nodes = [
+    workflowNode,
+    ...commandNodes,
+    ...messageSurfaceNodes,
+    ...scopeNodes,
+    ...unmappedRuntimeNodes,
+  ];
+  const edges = createGraphEdges(workflowNode, commandNodes, messageSurfaceNodes, scopeNodes);
   const timelineRows = createTimelineRows(trace, workflow.id, nodes, context);
   const runtimeOperationRows = createRuntimeOperationRows(trace, workflow.id, nodes, context);
   const edgesById = new Map(edges.map((edge) => [edge.id, edge]));

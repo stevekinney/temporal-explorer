@@ -489,3 +489,13 @@ Follow-up: None.
 - `bun run fixtures:validate` (14 histories, 11 artifacts), `bun run test:fixtures`, `bun run snapshots:verify` (9 documents) — pass.
 - Stage 12 groundwork landed: JSON Schema documents are emitted from the Zod schemas, drift-checked, and verified against committed artifacts with an independent (non-TypeScript) validator; CLI artifact writes are schema-validated before hitting disk.
 - Stage 13 spike landed: `bun run replay:spike` proves replay resolves dynamic dispatch, branch outcomes, and command sequences; decision recorded in decisions.md.
+
+## 2026-07-01: Stages 9B-9H Package Layers, Configuration, and Doctor
+
+- `bun run fixtures:regenerate-artifacts` — pass for all 12 fixtures; every overlay reports zero unmapped runtime operations.
+- `bun run test:fixtures` — 13 named fixture suites pass (basic-order history/overlay, approval, timer-race, query, update, retry, child-workflow, external, cancellation, continue-as-new, patched, dynamic).
+- `bun run fixtures:validate` — 14 histories, 40 artifacts. `bun run snapshots:verify` — 42 documentation snapshots. `bun run fixtures:verify-no-drift` — pass.
+- `bun test packages` — 84 tests pass across analyzer, history, mapper, schemas, api, cli after new construct coverage.
+- `bunx temporal-explorer check --project fixtures/query` — exits 1 on TEA_QUERY_STATE_MUTATION at the exact source line; CLI test also proves configured severities (`error` escalation and `off` suppression) through temporal-explorer.config.ts.
+- `bunx temporal-explorer doctor` — reports root, configuration source, tsconfig, output directory, artifact freshness (hash comparison), and per-file workflow discovery reasons; covered by CLI tests in text and JSON modes.
+- Semantic spot checks: cancellation overlay shows the canceled path skipped and non-cancellable cleanup observed with scope containment; patched overlay explains the executed version branch without replay; retry traces carry server-collapsed attempt numbers; update trace shows completed and failed outcomes with the validator-rejected update absent by design; dynamic overlay attributes both dynamic Activities with dynamic confidence.

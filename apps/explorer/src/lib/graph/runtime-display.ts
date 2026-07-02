@@ -56,16 +56,29 @@ export function operationDisplayName(operation: RuntimeOperation): string {
     return `Timer ${operation.timerId}`;
   }
 
-  return 'Unmapped operation';
+  return extendedOperationDisplayName(operation) ?? 'Unmapped operation';
 }
 
-export function operationKindLabel(operation: RuntimeOperation): string {
-  if (operation.kind === 'workflow-lifecycle') return 'workflow';
-  if (operation.kind === 'activity') return 'activity';
-  if (operation.kind === 'signal') return 'signal';
-  if (operation.kind === 'timer') return 'timer';
+function extendedOperationDisplayName(
+  operation: Exclude<
+    RuntimeOperation,
+    { kind: 'activity' | 'workflow-lifecycle' | 'signal' | 'timer' }
+  >,
+): string | undefined {
+  if (operation.kind === 'update') return `Update ${operation.updateName}`;
+  if (operation.kind === 'child-workflow') return `Child workflow ${operation.workflowType}`;
+  if (operation.kind === 'external-signal') return `External signal ${operation.signalName}`;
+  if (operation.kind === 'marker') return `Patch ${operation.patchId ?? operation.markerName}`;
+  if (operation.kind === 'continue-as-new') return 'Continue as new';
+  if (operation.kind === 'cancel-request') return 'Cancellation requested';
 
-  return 'unmapped';
+  return undefined; // unmapped
+}
+
+/** Every Runtime Operation kind other than `workflow-lifecycle` already reads well as
+ * its own display label (`activity`, `signal`, `update`, `marker`, ...). */
+export function operationKindLabel(operation: RuntimeOperation): string {
+  return operation.kind === 'workflow-lifecycle' ? 'workflow' : operation.kind;
 }
 
 export function timerDurationText(operation: Extract<RuntimeOperation, { kind: 'timer' }>): string {

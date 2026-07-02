@@ -62,6 +62,54 @@
         <strong>{formatTimestamp(operation.receivedAt)}</strong>
       </section>
     {/if}
+    {#if operation?.kind === 'update'}
+      <section>
+        <span>Update status</span>
+        <strong>{operation.status}</strong>
+      </section>
+    {/if}
+    {#if operation?.kind === 'child-workflow'}
+      <section>
+        <span>Child workflow type</span>
+        <strong>{operation.workflowType}</strong>
+      </section>
+      <section>
+        <span>Child workflow run</span>
+        <strong
+          >{operation.childWorkflowId}{operation.childRunId
+            ? ` / ${operation.childRunId}`
+            : ''}</strong
+        >
+      </section>
+    {/if}
+    {#if operation?.kind === 'external-signal'}
+      <section>
+        <span>External signal target</span>
+        <strong
+          >{operation.targetWorkflowId}{operation.targetRunId
+            ? ` / ${operation.targetRunId}`
+            : ''}</strong
+        >
+      </section>
+    {/if}
+    {#if operation?.kind === 'marker'}
+      <section>
+        <span>Patch ID</span>
+        <strong>{operation.patchId ?? operation.markerName}</strong>
+      </section>
+      {#if operation.deprecated !== undefined}
+        <section>
+          <span>Deprecated</span>
+          <strong>{operation.deprecated ? 'yes' : 'no'}</strong>
+        </section>
+      {/if}
+    {/if}
+    {#if operation?.kind === 'continue-as-new'}
+      <section>
+        <span>Continue-as-new run</span>
+        <strong>{operation.newRunId ?? 'unknown'}</strong>
+      </section>
+    {/if}
   </div>
 </aside>
 

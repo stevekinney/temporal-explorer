@@ -127,6 +127,116 @@ describe('event history parser', () => {
     expect(trace.timeline.filter((entry) => entry.label.startsWith('Timer'))).toHaveLength(2);
   });
 
+  it('collapses update lifecycle events with success and failure outcomes', async () => {
+    const history = await Bun.file(
+      new URL('../../../fixtures/update/histories/updates.json', import.meta.url),
+    ).json();
+    const trace = parseEventHistory({ history, traceId: 'updates', historyHash: 'updates-hash' });
+    const updates = trace.operations.filter((operation) => operation.kind === 'update');
+
+    expect(validateArtifact(trace).success).toBe(true);
+    expect(
+      updates.map((update) => update.kind === 'update' && [update.updateName, update.status]),
+    ).toEqual([
+      ['setAddress', 'completed'],
+      ['explode', 'failed'],
+    ]);
+    expect(trace.timeline.some((entry) => entry.label === 'Update setAddress accepted')).toBe(true);
+  });
+
+  it('collapses child workflow, marker, and cancellation events', async () => {
+    const childHistory = await Bun.file(
+      new URL('../../../fixtures/child-workflow/histories/success.json', import.meta.url),
+    ).json();
+    const childTrace = parseEventHistory({
+      history: childHistory,
+      traceId: 'success',
+      historyHash: 'child-hash',
+    });
+    const children = childTrace.operations.filter(
+      (operation) => operation.kind === 'child-workflow',
+    );
+
+    expect(
+      children.map(
+        (child) => child.kind === 'child-workflow' && [child.workflowType, child.status],
+      ),
+    ).toEqual([
+      ['reserveInventoryChild', 'completed'],
+      ['releaseNotificationChild', 'completed'],
+    ]);
+
+    const patchedHistory = await Bun.file(
+      new URL('../../../fixtures/patched/histories/patched-run.json', import.meta.url),
+    ).json();
+    const patchedTrace = parseEventHistory({
+      history: patchedHistory,
+      traceId: 'patched-run',
+      historyHash: 'patched-hash',
+    });
+    const markers = patchedTrace.operations.filter((operation) => operation.kind === 'marker');
+
+    expect(
+      markers.map(
+        (marker) => marker.kind === 'marker' && [marker.patchId, marker.deprecated ?? false],
+      ),
+    ).toEqual([
+      ['legacy-tax-rounding', true],
+      ['use-modern-charge', false],
+    ]);
+
+    const canceledHistory = await Bun.file(
+      new URL('../../../fixtures/cancellation/histories/canceled.json', import.meta.url),
+    ).json();
+    const canceledTrace = parseEventHistory({
+      history: canceledHistory,
+      traceId: 'canceled',
+      historyHash: 'canceled-hash',
+    });
+
+    expect(canceledTrace.execution.status).toBe('canceled');
+    expect(canceledTrace.operations.some((operation) => operation.kind === 'cancel-request')).toBe(
+      true,
+    );
+  });
+
+  it('parses continue-as-new and external signal events', async () => {
+    const rolloverHistory = await Bun.file(
+      new URL('../../../fixtures/continue-as-new/histories/rollover.json', import.meta.url),
+    ).json();
+    const rolloverTrace = parseEventHistory({
+      history: rolloverHistory,
+      traceId: 'rollover',
+      historyHash: 'rollover-hash',
+    });
+    const rollover = rolloverTrace.operations.find(
+      (operation) => operation.kind === 'continue-as-new',
+    );
+
+    expect(rolloverTrace.execution.status).toBe('continued-as-new');
+    expect(rollover?.kind === 'continue-as-new' && rollover.newRunId).toBe('rollover-run-id-2');
+
+    const signaledHistory = await Bun.file(
+      new URL('../../../fixtures/external/histories/signaled.json', import.meta.url),
+    ).json();
+    const signaledTrace = parseEventHistory({
+      history: signaledHistory,
+      traceId: 'signaled',
+      historyHash: 'signaled-hash',
+    });
+    const externalSignal = signaledTrace.operations.find(
+      (operation) => operation.kind === 'external-signal',
+    );
+
+    expect(
+      externalSignal?.kind === 'external-signal' && [
+        externalSignal.signalName,
+        externalSignal.status,
+        externalSignal.targetWorkflowId,
+      ],
+    ).toEqual(['release', 'signaled', 'external-target-1']);
+  });
+
   it('keeps unclosed timers pending', () => {
     const trace = parseEventHistory({
       history: {

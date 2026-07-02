@@ -1,0 +1,8 @@
+flowchart TD
+  start(["updateWorkflow"])
+  condition_updateWorkflow_0{"() => updatesApplied >= 1 && failedUpdates >= 1"}
+  activity_call_updateWorkflow_recordAddress_1["recordAddress"]
+  complete(["complete"])
+  start --> condition_updateWorkflow_0
+  condition_updateWorkflow_0 --> activity_call_updateWorkflow_recordAddress_1
+  activity_call_updateWorkflow_recordAddress_1 --> complete

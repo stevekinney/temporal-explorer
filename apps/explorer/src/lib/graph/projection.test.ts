@@ -23,6 +23,7 @@ import {
 } from './runtime-state';
 
 const fixtureRoot = new URL('../../../../../fixtures/basic-order/', import.meta.url).pathname;
+const retryFixtureRoot = new URL('../../../../../fixtures/retry/', import.meta.url).pathname;
 
 function isActivityOperation(
   operation: RuntimeOperation,
@@ -184,5 +185,29 @@ describe('explorer graph projection', () => {
     expect(runtimeOperationRowState(mappingWithoutStaticNode, unmappedOperation)).toBe('unmapped');
     expect(runtimeOperationRowState(ambiguousMapping, activity)).toBe('ambiguous');
     expect(commandState(command, overlay, trace.operations, new Map())).toBe('not taken');
+  });
+
+  it('treats a compacted single attempt record with attempt > 1 as retried', async () => {
+    const success = await loadExplorerArtifacts(retryFixtureRoot);
+    const successTrace = success.traces.find((candidate) =>
+      candidate.artifactId.includes(':retry-success:'),
+    );
+    const successActivity = successTrace?.operations.find(isActivityOperation);
+
+    if (!successActivity) throw new Error('Expected the retry-success activity fixture.');
+
+    expect(successActivity.attempts).toHaveLength(1);
+    expect(successActivity.attempts[0]?.attempt).toBe(3);
+    expect(operationState(successActivity)).toBe('retried');
+
+    const failure = await loadExplorerArtifacts(retryFixtureRoot);
+    const failureTrace = failure.traces.find((candidate) =>
+      candidate.artifactId.includes(':failure:'),
+    );
+    const failureActivity = failureTrace?.operations.find(isActivityOperation);
+
+    if (!failureActivity) throw new Error('Expected the retry failure activity fixture.');
+
+    expect(operationState(failureActivity)).toBe('failed');
   });
 });

@@ -24,65 +24,42 @@ import {
   type DocumentationFile,
 } from '@temporal-explorer/renderers';
 import {
-  artifactSchemaVersions,
   executionOverlayDocumentSchema,
   runtimeTraceDocumentSchema,
   temporalAnalysisDocumentSchema,
   validateArtifact,
-  type ArtifactMetadata,
   type Diagnostic,
   type ExecutionOverlayDocument,
   type RuntimeTraceDocument,
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
 
-export type ArtifactReference = {
-  path: string;
-  schemaVersion: string;
-};
+import { createTemporalExplorerResult, type TemporalExplorerResult } from './result';
 
-export type TemporalExplorerResult<T> = {
-  value: T;
-  diagnostics: Diagnostic[];
-  warnings: Diagnostic[];
-  artifacts: ArtifactReference[];
-  metadata: ArtifactMetadata;
-};
+export {
+  applySeverityOverrides,
+  createSourceFileHashes,
+  defineConfig,
+  toProjectPath,
+  type DiagnosticSeverityOverride,
+  type TemporalConnectionProfile,
+  type TemporalExplorerConfiguration,
+} from '@temporal-explorer/analyzer';
 
-export const temporalExplorerArtifactVersions = artifactSchemaVersions;
-
-/** Returns the package version used in generated artifacts during the MVP implementation. */
-export function getTemporalExplorerVersion(): string {
-  return '0.0.0-mvp';
-}
-
-/** Wraps a library value in the shared structured result contract. */
-export function createTemporalExplorerResult<T>(
-  value: T,
-  options: {
-    diagnostics?: Diagnostic[];
-    warnings?: Diagnostic[];
-    artifacts?: ArtifactReference[];
-    metadata?: ArtifactMetadata;
-  } = {},
-): TemporalExplorerResult<T> {
-  return {
-    value,
-    diagnostics: options.diagnostics ?? [],
-    warnings: options.warnings ?? [],
-    artifacts: options.artifacts ?? [],
-    metadata: options.metadata ?? {
-      temporalExplorerVersion: getTemporalExplorerVersion(),
-      schemaVersion: temporalExplorerArtifactVersions.analysis,
-      inputs: {
-        projectRoot: '',
-        configHash: '',
-        sourceFileHashes: {},
-        temporalSdkVersions: {},
-      },
-    },
-  };
-}
+export {
+  renderMarkdown,
+  renderWorkflowJson,
+  runDiagnostics,
+  type RenderMarkdownOptions,
+  type RenderWorkflowJsonOptions,
+} from './library-parity';
+export {
+  createTemporalExplorerResult,
+  getTemporalExplorerVersion,
+  temporalExplorerArtifactVersions,
+  type ArtifactReference,
+  type TemporalExplorerResult,
+} from './result';
 
 function isTemporalExplorerProject(value: unknown): value is TemporalExplorerProject {
   const candidate =

@@ -51,6 +51,9 @@ export const workflowLifecycleOperationSchema = z
       z.literal('completed'),
       z.literal('failed'),
       z.literal('canceled'),
+      z.literal('terminated'),
+      z.literal('timedOut'),
+      z.literal('continued-as-new'),
     ]),
     eventReferences: z.array(eventReferenceSchema),
     payloadReferences: z.array(z.string().min(1)),
@@ -103,6 +106,91 @@ export const timerOperationSchema = z
   })
   .strict();
 
+export const updateOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('update'),
+    updateId: z.string().min(1),
+    updateName: z.string().min(1),
+    status: z.union([z.literal('accepted'), z.literal('completed'), z.literal('failed')]),
+    acceptedAt: z.string().datetime(),
+    closedAt: z.string().datetime().optional(),
+    eventReferences: z.array(eventReferenceSchema),
+    payloadReferences: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export const childWorkflowOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('child-workflow'),
+    workflowType: z.string().min(1),
+    childWorkflowId: z.string().min(1),
+    childRunId: z.string().min(1).optional(),
+    status: z.union([
+      z.literal('initiated'),
+      z.literal('startFailed'),
+      z.literal('started'),
+      z.literal('completed'),
+      z.literal('failed'),
+      z.literal('canceled'),
+      z.literal('timedOut'),
+      z.literal('terminated'),
+    ]),
+    initiatedAt: z.string().datetime(),
+    closedAt: z.string().datetime().optional(),
+    eventReferences: z.array(eventReferenceSchema),
+    payloadReferences: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export const externalSignalOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('external-signal'),
+    signalName: z.string().min(1),
+    targetWorkflowId: z.string().min(1),
+    targetRunId: z.string().min(1).optional(),
+    status: z.union([z.literal('initiated'), z.literal('signaled'), z.literal('failed')]),
+    initiatedAt: z.string().datetime(),
+    closedAt: z.string().datetime().optional(),
+    eventReferences: z.array(eventReferenceSchema),
+    payloadReferences: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export const markerOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('marker'),
+    markerName: z.string().min(1),
+    patchId: z.string().min(1).optional(),
+    deprecated: z.boolean().optional(),
+    recordedAt: z.string().datetime(),
+    eventReferences: z.array(eventReferenceSchema),
+  })
+  .strict();
+
+export const continueAsNewOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('continue-as-new'),
+    newRunId: z.string().min(1).optional(),
+    occurredAt: z.string().datetime(),
+    eventReferences: z.array(eventReferenceSchema),
+    payloadReferences: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export const cancelRequestOperationSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: z.literal('cancel-request'),
+    requestedAt: z.string().datetime(),
+    eventReferences: z.array(eventReferenceSchema),
+  })
+  .strict();
+
 export const unmappedHistoryOperationSchema = z
   .object({
     id: z.string().min(1),
@@ -117,6 +205,12 @@ export const runtimeOperationSchema = z.discriminatedUnion('kind', [
   activityExecutionOperationSchema,
   signalDeliveryOperationSchema,
   timerOperationSchema,
+  updateOperationSchema,
+  childWorkflowOperationSchema,
+  externalSignalOperationSchema,
+  markerOperationSchema,
+  continueAsNewOperationSchema,
+  cancelRequestOperationSchema,
   unmappedHistoryOperationSchema,
 ]);
 
@@ -147,6 +241,7 @@ export const runtimeTraceDocumentSchema = z
           z.literal('canceled'),
           z.literal('terminated'),
           z.literal('timedOut'),
+          z.literal('continued-as-new'),
         ]),
         startedAt: z.string().datetime(),
         closedAt: z.string().datetime().optional(),

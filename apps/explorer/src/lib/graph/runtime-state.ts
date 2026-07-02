@@ -43,23 +43,109 @@ export function operationState(operation: RuntimeOperation | undefined): Runtime
     return 'unmapped';
   }
 
-  if (operation.kind === 'workflow-lifecycle') {
-    return workflowLifecycleState(operation.status);
+  if (isAlwaysObservedOperation(operation)) {
+    return 'observed';
   }
 
-  if (operation.kind === 'signal') {
-    return 'observed';
+  if (operation.kind === 'workflow-lifecycle') {
+    return workflowLifecycleState(operation.status);
   }
 
   if (operation.kind === 'timer') {
     return timerOperationState(operation.status);
   }
 
-  if (operation.attempts.length > 1) {
-    return 'retried';
+  if (operation.kind === 'update') {
+    return updateOperationState(operation.status);
   }
 
-  return operation.status === 'timedOut' ? 'timed out' : operation.status;
+  if (operation.kind === 'child-workflow') {
+    return childWorkflowOperationState(operation.status);
+  }
+
+  if (operation.kind === 'external-signal') {
+    return externalSignalOperationState(operation.status);
+  }
+
+  return activityOperationState(operation);
+}
+
+/**
+ * Signal deliveries, patch markers, continue-as-new transitions, and cancellation
+ * requests are all one-shot facts recorded in history rather than actions with a
+ * pass/fail outcome, so they always render as `observed`.
+ */
+function isAlwaysObservedOperation(
+  operation: RuntimeOperation,
+): operation is Extract<
+  RuntimeOperation,
+  { kind: 'signal' | 'marker' | 'continue-as-new' | 'cancel-request' }
+> {
+  return (
+    operation.kind === 'signal' ||
+    operation.kind === 'marker' ||
+    operation.kind === 'continue-as-new' ||
+    operation.kind === 'cancel-request'
+  );
+}
+
+/**
+ * A terminal or in-flight status is always more informative than the fact that an
+ * Activity was retried along the way, so those statuses take priority — mirroring
+ * `commandStatePriority` below. `retried` is reported only once the Activity finally
+ * completed after more than one attempt.
+ */
+function activityOperationState(
+  operation: Extract<RuntimeOperation, { kind: 'activity' }>,
+): RuntimeOverlayState {
+  if (operation.status === 'failed') return 'failed';
+  if (operation.status === 'timedOut') return 'timed out';
+  if (operation.status === 'canceled') return 'canceled';
+  if (operation.status === 'pending') return 'pending';
+  if (isRetriedActivity(operation)) return 'retried';
+
+  return 'completed';
+}
+
+/**
+ * An Activity was retried if its history contains more than one attempt record, or
+ * if the most recent attempt's own `attempt` counter is greater than 1 — fixtures
+ * may compact a multi-attempt history into a single attempt record that reports the
+ * final attempt number rather than one record per attempt.
+ */
+function isRetriedActivity(operation: Extract<RuntimeOperation, { kind: 'activity' }>): boolean {
+  const lastAttemptNumber = operation.attempts.at(-1)?.attempt ?? 1;
+
+  return operation.attempts.length > 1 || lastAttemptNumber > 1;
+}
+
+function updateOperationState(
+  status: Extract<RuntimeOperation, { kind: 'update' }>['status'],
+): RuntimeOverlayState {
+  if (status === 'failed') return 'failed';
+  if (status === 'completed') return 'completed';
+
+  return 'pending';
+}
+
+function childWorkflowOperationState(
+  status: Extract<RuntimeOperation, { kind: 'child-workflow' }>['status'],
+): RuntimeOverlayState {
+  if (status === 'completed') return 'completed';
+  if (status === 'failed' || status === 'startFailed') return 'failed';
+  if (status === 'canceled' || status === 'terminated') return 'canceled';
+  if (status === 'timedOut') return 'timed out';
+
+  return 'pending';
+}
+
+function externalSignalOperationState(
+  status: Extract<RuntimeOperation, { kind: 'external-signal' }>['status'],
+): RuntimeOverlayState {
+  if (status === 'signaled') return 'completed';
+  if (status === 'failed') return 'failed';
+
+  return 'pending';
 }
 
 /**
@@ -106,6 +192,7 @@ export function workflowState(trace: RuntimeTraceDocument | undefined): RuntimeO
   if (trace.execution.status === 'timedOut') return 'timed out';
   if (trace.execution.status === 'running') return 'pending';
   if (trace.execution.status === 'terminated') return 'canceled';
+  if (trace.execution.status === 'continued-as-new') return 'observed';
 
   return trace.execution.status;
 }
@@ -127,8 +214,10 @@ function workflowLifecycleState(
   if (status === 'started') return 'observed';
   if (status === 'completed') return 'completed';
   if (status === 'failed') return 'failed';
+  if (status === 'timedOut') return 'timed out';
+  if (status === 'continued-as-new') return 'observed';
 
-  return 'canceled';
+  return 'canceled'; // canceled | terminated
 }
 
 function timerOperationState(

@@ -1,0 +1,12 @@
+flowchart TD
+  start(["patchedWorkflow"])
+  patch_patchedWorkflow_0{"legacy-tax-rounding"}
+  patch_patchedWorkflow_1{"use-modern-charge"}
+  activity_call_patchedWorkflow_newCharge_2["newCharge"]
+  activity_call_patchedWorkflow_oldCharge_3["oldCharge"]
+  complete(["complete"])
+  start --> patch_patchedWorkflow_0
+  patch_patchedWorkflow_0 --> patch_patchedWorkflow_1
+  patch_patchedWorkflow_1 --> activity_call_patchedWorkflow_newCharge_2
+  activity_call_patchedWorkflow_newCharge_2 --> activity_call_patchedWorkflow_oldCharge_3
+  activity_call_patchedWorkflow_oldCharge_3 --> complete

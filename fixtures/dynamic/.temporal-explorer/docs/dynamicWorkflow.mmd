@@ -1,0 +1,8 @@
+flowchart TD
+  start(["dynamicWorkflow"])
+  activity_call_dynamicWorkflow_archiveRequest_0["archiveRequest"]
+  dynamic_dynamicWorkflow_1[/"dynamicActivities[step]"/]
+  complete(["complete"])
+  start --> activity_call_dynamicWorkflow_archiveRequest_0
+  activity_call_dynamicWorkflow_archiveRequest_0 --> dynamic_dynamicWorkflow_1
+  dynamic_dynamicWorkflow_1 --> complete

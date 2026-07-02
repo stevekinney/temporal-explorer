@@ -1,0 +1,8 @@
+flowchart TD
+  start(["queryWorkflow"])
+  activity_call_queryWorkflow_recordAudit_0["recordAudit"]
+  condition_queryWorkflow_1{"() => done"}
+  complete(["complete"])
+  start --> activity_call_queryWorkflow_recordAudit_0
+  activity_call_queryWorkflow_recordAudit_0 --> condition_queryWorkflow_1
+  condition_queryWorkflow_1 --> complete

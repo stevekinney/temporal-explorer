@@ -45,24 +45,40 @@ function isProxyActivitiesCall(call: CallExpression): boolean {
   );
 }
 
+function unwrapCasts(node: Node): Node {
+  let current = node;
+
+  while (Node.isAsExpression(current) || Node.isParenthesizedExpression(current)) {
+    current = current.getExpression();
+  }
+
+  return current;
+}
+
+/**
+ * Finds every variable holding an Activity proxy, including aliases created
+ * through `as` casts of an existing proxy variable. Two passes handle aliases
+ * declared before their source in document order.
+ */
 export function findActivityProxyVariables(sourceFile: SourceFile): Set<string> {
   const proxyVariables = new Set<string>();
 
-  for (const declaration of sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
-    const initializer = declaration.getInitializer();
+  for (let pass = 0; pass < 2; pass += 1) {
+    for (const declaration of sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
+      const nameNode = declaration.getNameNode();
+      const initializer = declaration.getInitializer();
 
-    if (
-      !initializer ||
-      !Node.isCallExpression(initializer) ||
-      !isProxyActivitiesCall(initializer)
-    ) {
-      continue;
-    }
+      if (!initializer || !Node.isIdentifier(nameNode)) {
+        continue;
+      }
 
-    const nameNode = declaration.getNameNode();
+      const unwrapped = unwrapCasts(initializer);
 
-    if (Node.isIdentifier(nameNode)) {
-      proxyVariables.add(nameNode.getText());
+      if (Node.isCallExpression(unwrapped) && isProxyActivitiesCall(unwrapped)) {
+        proxyVariables.add(nameNode.getText());
+      } else if (Node.isIdentifier(unwrapped) && proxyVariables.has(unwrapped.getText())) {
+        proxyVariables.add(nameNode.getText());
+      }
     }
   }
 

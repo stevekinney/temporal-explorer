@@ -13,6 +13,11 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import {
+  findDuplicateMessageDiagnostics,
+  findNondeterministicApiDiagnostics,
+  findUnsafeImportDiagnostics,
+} from './determinism-diagnostics';
 import { analyzeQueryHandler, analyzeUpdateValidator } from './handler-diagnostics';
 import { createSourceLocation } from './paths';
 import { findActivityProxyVariables, isNamedImportFrom, temporalWorkerModule } from './symbols';
@@ -130,6 +135,7 @@ function analyzeWorkflowFunction(
   const diagnostics = [
     ...collected.diagnostics,
     ...analyzeMessageHandlers(root, registrations, proxyVariables),
+    ...findNondeterministicApiDiagnostics(root, functionDeclaration),
   ];
 
   return {
@@ -163,7 +169,8 @@ function analyzeWorkflowFunction(
 function analyzeActivities(
   root: string,
   workflow: WorkflowDefinition,
-  activitySourceFile?: SourceFile,
+  activitySourceFile: SourceFile | undefined,
+  diagnostics: Diagnostic[],
 ): ActivityDefinition[] {
   return workflow.temporalCommands
     .filter((command) => command.kind === 'activity')
@@ -173,6 +180,17 @@ function analyzeActivities(
         command.name,
         root,
       );
+
+      if (!implementationSource) {
+        diagnostics.push({
+          code: 'TEA_UNRESOLVED_ACTIVITY_IMPLEMENTATION',
+          category: 'discovery',
+          severity: 'warning',
+          message: `Activity implementation for ${command.name} could not be resolved statically.`,
+          source: command.source,
+          confidence: 'inferred',
+        });
+      }
 
       return {
         id: `activity:${command.name}`,
@@ -228,7 +246,10 @@ export function analyzeWorkflowSourceFile(
 } {
   const workflows: WorkflowDefinition[] = [];
   const activities: ActivityDefinition[] = [];
-  const diagnostics: Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [
+    ...findUnsafeImportDiagnostics(root, sourceFile),
+    ...findDuplicateMessageDiagnostics(root, sourceFile),
+  ];
   const proxyVariables = findActivityProxyVariables(sourceFile);
   const activitySourceFile = findNamespaceImportSource(sourceFile);
 
@@ -239,7 +260,7 @@ export function analyzeWorkflowSourceFile(
 
     const workflow = analyzeWorkflowFunction(root, functionDeclaration, proxyVariables);
     workflows.push(workflow);
-    activities.push(...analyzeActivities(root, workflow, activitySourceFile));
+    activities.push(...analyzeActivities(root, workflow, activitySourceFile, diagnostics));
     diagnostics.push(...workflow.diagnostics);
   }
 

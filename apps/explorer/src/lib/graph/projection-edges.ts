@@ -1,18 +1,21 @@
 import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 
 /**
- * Builds the graph edges: a sequential chain across Activity, Timer, and Condition
- * commands (in staticOrder) so the flow view shows waits between them, plus a
- * separate `signal` edge from each Signal node into the workflow node.
+ * Builds the graph edges: a sequential chain across the command nodes (in
+ * staticOrder) so the flow view shows waits between them, plus a `signal`/`query`/
+ * `update` edge from each message-surface node into the workflow node, and a `scope`
+ * edge from each cancellation scope node into the workflow node.
  */
 export function createGraphEdges(
   workflowNode: TemporalGraphNode,
   commandNodes: TemporalGraphNode[],
-  signalNodes: TemporalGraphNode[],
+  messageSurfaceNodes: TemporalGraphNode[],
+  scopeNodes: TemporalGraphNode[],
 ): TemporalGraphEdge[] {
   return [
     ...createSequentialGraphEdges(workflowNode, commandNodes),
-    ...createSignalGraphEdges(workflowNode, signalNodes),
+    ...createNodeToWorkflowEdges(workflowNode, messageSurfaceNodes, (node) => node.kind),
+    ...createNodeToWorkflowEdges(workflowNode, scopeNodes, () => 'scope'),
   ];
 }
 
@@ -39,25 +42,37 @@ function createSequentialGraphEdges(
   });
 }
 
-function createSignalGraphEdges(
+/** Builds a directed edge from each node into the workflow node, labeled via `labelForNode`. */
+function createNodeToWorkflowEdges(
   workflowNode: TemporalGraphNode,
-  signalNodes: TemporalGraphNode[],
+  nodes: TemporalGraphNode[],
+  labelForNode: (node: TemporalGraphNode) => string,
 ): TemporalGraphEdge[] {
-  return signalNodes.map((node) => ({
+  return nodes.map((node) => ({
     id: `edge:${node.id}->${workflowNode.id}`,
     source: node.id,
     target: workflowNode.id,
-    label: 'signal',
+    label: labelForNode(node),
     state: node.state,
     runtimeOperationIds: node.runtimeOperationIds,
     eventReferences: node.eventReferences,
   }));
 }
 
-function sequentialEdgeLabel(kind: TemporalGraphNode['kind'], occurrence: number): string {
-  if (kind === 'activity') return `Activity ${occurrence}`;
-  if (kind === 'timer') return `Timer ${occurrence}`;
-  if (kind === 'condition') return `Condition ${occurrence}`;
+const sequentialEdgeLabelPrefixes: Partial<Record<TemporalGraphNode['kind'], string>> = {
+  activity: 'Activity',
+  timer: 'Timer',
+  condition: 'Condition',
+  'child-workflow': 'Child workflow',
+  'external-workflow': 'External workflow',
+  patch: 'Patch',
+  dynamic: 'Dynamic',
+};
 
-  return 'Workflow path';
+function sequentialEdgeLabel(kind: TemporalGraphNode['kind'], occurrence: number): string {
+  if (kind === 'continue-as-new') return 'Continue as new';
+
+  const prefix = sequentialEdgeLabelPrefixes[kind];
+
+  return prefix ? `${prefix} ${occurrence}` : 'Workflow path';
 }

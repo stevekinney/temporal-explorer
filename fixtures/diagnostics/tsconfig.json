@@ -1,0 +1,9 @@
+{
+  "extends": "../../packages/typescript-configuration/library.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": ["bun", "node"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", ".temporal-explorer"]
+}

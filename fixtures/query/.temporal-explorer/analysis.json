@@ -1,0 +1,414 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:query",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.0-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "query",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/query-workflow.ts": "b047bc40dc9ccbe0fcdd46776b9ecd403f59a53624e70bff552a9514a22b1902"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "query",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 195
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 333
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:queryWorkflow",
+      "name": "queryWorkflow",
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 1,
+          "offset": 662
+        },
+        "end": {
+          "line": 56,
+          "column": 2,
+          "offset": 1477
+        },
+        "symbolName": "queryWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "queryWorkflow:arg:0:input",
+            "display": "QueryFixtureInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 25,
+                "column": 37,
+                "offset": 698
+              },
+              "end": {
+                "line": 25,
+                "column": 61,
+                "offset": 722
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "queryWorkflow:result",
+          "display": "Promise<QueryFixtureResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [
+          {
+            "id": "signal:queryWorkflow:complete",
+            "name": "complete",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 31,
+                "offset": 534
+              },
+              "end": {
+                "line": 19,
+                "column": 55,
+                "offset": 558
+              },
+              "symbolName": "complete"
+            },
+            "args": [],
+            "handlerSource": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 40,
+                "column": 3,
+                "offset": 1134
+              },
+              "end": {
+                "line": 42,
+                "column": 5,
+                "offset": 1190
+              },
+              "symbolName": "complete"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "queries": [
+          {
+            "id": "query:queryWorkflow:auditCount",
+            "name": "auditCount",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 32,
+                "offset": 398
+              },
+              "end": {
+                "line": 17,
+                "column": 75,
+                "offset": 441
+              },
+              "symbolName": "auditCount"
+            },
+            "args": [
+              {
+                "id": "query:auditCount:arg:0",
+                "display": "string",
+                "kind": "external",
+                "confidence": "exact"
+              }
+            ],
+            "result": {
+              "id": "query:auditCount:result",
+              "display": "number",
+              "kind": "external",
+              "confidence": "exact"
+            },
+            "handlerSource": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 32,
+                "column": 3,
+                "offset": 919
+              },
+              "end": {
+                "line": 35,
+                "column": 4,
+                "offset": 1043
+              },
+              "symbolName": "auditCount"
+            },
+            "confidence": "exact"
+          },
+          {
+            "id": "query:queryWorkflow:bump",
+            "name": "bump",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 33,
+                "offset": 475
+              },
+              "end": {
+                "line": 18,
+                "column": 60,
+                "offset": 502
+              },
+              "symbolName": "bump"
+            },
+            "args": [],
+            "result": {
+              "id": "query:bump:result",
+              "display": "number",
+              "kind": "external",
+              "confidence": "exact"
+            },
+            "handlerSource": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 36,
+                "column": 3,
+                "offset": 1047
+              },
+              "end": {
+                "line": 39,
+                "column": 5,
+                "offset": 1130
+              },
+              "symbolName": "bump"
+            },
+            "confidence": "exact"
+          },
+          {
+            "id": "query:queryWorkflow:status",
+            "name": "status",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 28,
+                "offset": 331
+              },
+              "end": {
+                "line": 16,
+                "column": 62,
+                "offset": 365
+              },
+              "symbolName": "status"
+            },
+            "args": [],
+            "result": {
+              "id": "query:status:result",
+              "display": "OrderStatus",
+              "kind": "external",
+              "confidence": "exact"
+            },
+            "handlerSource": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 31,
+                "column": 3,
+                "offset": 878
+              },
+              "end": {
+                "line": 31,
+                "column": 40,
+                "offset": 915
+              },
+              "symbolName": "status"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": []
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:queryWorkflow:recordAudit:0",
+          "kind": "activity",
+          "name": "recordAudit",
+          "source": {
+            "path": "src/workflows/query-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 45,
+              "column": 23,
+              "offset": 1239
+            },
+            "end": {
+              "line": 45,
+              "column": 62,
+              "offset": 1278
+            },
+            "symbolName": "recordAudit"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "condition:queryWorkflow:1",
+          "kind": "condition",
+          "name": "() => done",
+          "source": {
+            "path": "src/workflows/query-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 48,
+              "column": 9,
+              "offset": 1329
+            },
+            "end": {
+              "line": 48,
+              "column": 30,
+              "offset": 1350
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [],
+      "diagnostics": [
+        {
+          "code": "TEA_QUERY_STATE_MUTATION",
+          "category": "determinism",
+          "severity": "error",
+          "message": "Query handler bump mutates Workflow state: bumpCount += 1",
+          "source": {
+            "path": "src/workflows/query-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 37,
+              "column": 5,
+              "offset": 1088
+            },
+            "end": {
+              "line": 37,
+              "column": 19,
+              "offset": 1102
+            }
+          },
+          "confidence": "exact"
+        }
+      ]
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:recordAudit",
+      "name": "recordAudit",
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 45,
+          "column": 23,
+          "offset": 1239
+        },
+        "end": {
+          "line": 45,
+          "column": 62,
+          "offset": 1278
+        },
+        "symbolName": "recordAudit"
+      },
+      "implementationSource": {
+        "path": "src/activities/audit-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 281
+        },
+        "end": {
+          "line": 21,
+          "column": 2,
+          "offset": 411
+        },
+        "symbolName": "recordAudit"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": [
+    {
+      "code": "TEA_QUERY_STATE_MUTATION",
+      "category": "determinism",
+      "severity": "error",
+      "message": "Query handler bump mutates Workflow state: bumpCount += 1",
+      "source": {
+        "path": "src/workflows/query-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 37,
+          "column": 5,
+          "offset": 1088
+        },
+        "end": {
+          "line": 37,
+          "column": 19,
+          "offset": 1102
+        }
+      },
+      "confidence": "exact"
+    }
+  ]
+}

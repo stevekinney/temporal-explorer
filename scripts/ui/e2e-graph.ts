@@ -6,6 +6,7 @@ import { warmUpServer } from './warm-up-server';
 
 const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url).pathname;
 const timerRaceFixtureRoot = new URL('../../fixtures/timer-race/', import.meta.url).pathname;
+const cancellationFixtureRoot = new URL('../../fixtures/cancellation/', import.meta.url).pathname;
 
 async function runGraphInteractionTest(): Promise<void> {
   const server = await startExplorerServer({ projectRoot: fixtureRoot, trace: 'success' });
@@ -78,5 +79,39 @@ async function runTimerRaceGraphTest(): Promise<void> {
   console.log('Timer race graph interaction test passed.');
 }
 
+async function runCancellationGraphTest(): Promise<void> {
+  const server = await startExplorerServer({
+    projectRoot: cancellationFixtureRoot,
+    trace: 'canceled',
+  });
+  await warmUpServer(server.url);
+  const browser = await chromium.launch();
+
+  try {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 980 } });
+    const assertNoBrowserErrors = collectBrowserErrors(page);
+
+    await page.goto(server.url, { waitUntil: 'networkidle' });
+    await page.getByRole('tab', { name: /Flow/ }).click();
+
+    const useResourcesNode = page.locator('.temporal-flow-node', { hasText: 'useResources' });
+    await useResourcesNode.waitFor();
+    await expect(useResourcesNode).toHaveAttribute('data-state', 'not-taken');
+
+    const releaseResourcesNode = page.locator('.temporal-flow-node', {
+      hasText: 'releaseResources',
+    });
+    await expect(releaseResourcesNode).toHaveAttribute('data-state', 'completed');
+
+    assertNoBrowserErrors();
+  } finally {
+    await browser.close();
+    await server.stop();
+  }
+
+  console.log('Cancellation graph interaction test passed.');
+}
+
 await runGraphInteractionTest();
 await runTimerRaceGraphTest();
+await runCancellationGraphTest();

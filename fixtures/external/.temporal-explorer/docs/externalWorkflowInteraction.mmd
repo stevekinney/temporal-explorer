@@ -1,0 +1,8 @@
+flowchart TD
+  start(["externalWorkflowInteraction"])
+  condition_externalWorkflowInteraction_0{"() => targetWorkflowId !== undefined"}
+  external_workflow_externalWorkflowInteraction_release_1[["release"]]
+  complete(["complete"])
+  start --> condition_externalWorkflowInteraction_0
+  condition_externalWorkflowInteraction_0 --> external_workflow_externalWorkflowInteraction_release_1
+  external_workflow_externalWorkflowInteraction_release_1 --> complete

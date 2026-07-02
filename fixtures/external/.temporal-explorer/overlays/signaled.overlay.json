@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:externalWorkflowInteraction:trace:signaled:signaled-run-id",
+  "staticAnalysisId": "analysis:external",
+  "runtimeTraceId": "trace:signaled:signaled-run-id",
+  "workflow": "externalWorkflowInteraction",
+  "staticNodes": [
+    {
+      "id": "workflow:externalWorkflowInteraction",
+      "kind": "workflow",
+      "name": "externalWorkflowInteraction",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/external-interaction-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 1,
+          "offset": 615
+        },
+        "end": {
+          "line": 49,
+          "column": 2,
+          "offset": 1154
+        },
+        "symbolName": "externalWorkflowInteraction"
+      }
+    },
+    {
+      "id": "condition:externalWorkflowInteraction:0",
+      "kind": "condition",
+      "name": "() => targetWorkflowId !== undefined",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/external-interaction-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 40,
+          "column": 9,
+          "offset": 886
+        },
+        "end": {
+          "line": 40,
+          "column": 56,
+          "offset": 933
+        }
+      }
+    },
+    {
+      "id": "external-workflow:externalWorkflowInteraction:release:1",
+      "kind": "external-workflow",
+      "name": "release",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/external-interaction-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 43,
+          "column": 9,
+          "offset": 1019
+        },
+        "end": {
+          "line": 43,
+          "column": 37,
+          "offset": 1047
+        },
+        "symbolName": "release"
+      }
+    },
+    {
+      "id": "signal:externalWorkflowInteraction:targetReady",
+      "kind": "signal",
+      "name": "targetReady",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/external-interaction-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 34,
+          "offset": 309
+        },
+        "end": {
+          "line": 17,
+          "column": 71,
+          "offset": 346
+        },
+        "symbolName": "targetReady"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:externalWorkflowInteraction",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to externalWorkflowInteraction.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type externalWorkflowInteraction matched static Workflow externalWorkflowInteraction.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:externalWorkflowInteraction"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/external-interaction-workflow.ts:31.",
+          "staticNodeId": "workflow:externalWorkflowInteraction"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:externalWorkflowInteraction",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to externalWorkflowInteraction.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type externalWorkflowInteraction matched static Workflow externalWorkflowInteraction.",
+          "eventIds": [14],
+          "staticNodeId": "workflow:externalWorkflowInteraction"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/external-interaction-workflow.ts:31.",
+          "staticNodeId": "workflow:externalWorkflowInteraction"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "signal:targetReady:5",
+      "staticNodeId": "signal:externalWorkflowInteraction:targetReady",
+      "confidence": "exact",
+      "reason": "Signal targetReady matched a static Signal definition by name.",
+      "evidence": [
+        {
+          "kind": "signal-name",
+          "description": "Runtime Signal targetReady matched static Signal targetReady.",
+          "eventIds": [5],
+          "staticNodeId": "signal:externalWorkflowInteraction:targetReady"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Signal source is src/workflows/external-interaction-workflow.ts:17.",
+          "staticNodeId": "signal:externalWorkflowInteraction:targetReady"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "external-signal:release:9",
+      "staticNodeId": "external-workflow:externalWorkflowInteraction:release:1",
+      "confidence": "exact",
+      "reason": "External signal release matched by signal name.",
+      "evidence": [
+        {
+          "kind": "external-signal-name",
+          "description": "Runtime external signal release matched static command external-workflow:externalWorkflowInteraction:release:1.",
+          "eventIds": [9, 10],
+          "staticNodeId": "external-workflow:externalWorkflowInteraction:release:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static source is src/workflows/external-interaction-workflow.ts:43.",
+          "staticNodeId": "external-workflow:externalWorkflowInteraction:release:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 3,
+      "skipped": 1,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 0,
+      "observed": 0,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 1,
+      "receivedSignals": ["targetReady"],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

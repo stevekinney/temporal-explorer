@@ -31,7 +31,23 @@ export function operationLabel(operation: RuntimeOperation): string {
     return `Timer ${operation.timerId}`;
   }
 
-  return 'Unmapped history operation';
+  return extendedOperationLabel(operation) ?? 'Unmapped history operation';
+}
+
+function extendedOperationLabel(
+  operation: Exclude<
+    RuntimeOperation,
+    { kind: 'activity' | 'workflow-lifecycle' | 'signal' | 'timer' }
+  >,
+): string | undefined {
+  if (operation.kind === 'update') return `Update ${operation.updateName}`;
+  if (operation.kind === 'child-workflow') return `Child workflow ${operation.workflowType}`;
+  if (operation.kind === 'external-signal') return `External signal ${operation.signalName}`;
+  if (operation.kind === 'marker') return `Patch ${operation.patchId ?? operation.markerName}`;
+  if (operation.kind === 'continue-as-new') return 'Continue as new';
+  if (operation.kind === 'cancel-request') return 'Cancellation requested';
+
+  return undefined; // unmapped
 }
 
 export function operationEventReferences(
@@ -58,6 +74,16 @@ export function eventReferencesForOperationIds(
   );
 }
 
+/** Worst-first: the first of these present across mapped operations wins. */
+const confidencePriority: RuntimeNodeMapping['confidence'][] = [
+  'ambiguous',
+  'dynamic',
+  'inferred',
+  'partial',
+  'unknown',
+  'exact',
+];
+
 export function confidenceForOperationIds(
   runtimeOperationIds: string[],
   mappingsByRuntimeOperationId: Map<string, RuntimeNodeMapping>,
@@ -67,12 +93,7 @@ export function confidenceForOperationIds(
     return mapping ? [mapping.confidence] : [];
   });
 
-  if (confidences.includes('ambiguous')) return 'ambiguous';
-  if (confidences.includes('inferred')) return 'inferred';
-  if (confidences.includes('unknown')) return 'unknown';
-  if (confidences.includes('exact')) return 'exact';
-
-  return 'unknown';
+  return confidencePriority.find((candidate) => confidences.includes(candidate)) ?? 'unknown';
 }
 
 export function createStatusCounts(nodes: TemporalGraphNode[]): Map<RuntimeOverlayState, number> {
