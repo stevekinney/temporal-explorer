@@ -523,3 +523,10 @@ Follow-up: None.
 - Time-skipping test servers do not implement visibility APIs; live tests use the full local dev server. Visibility is eventually consistent, so listing asserts poll with a capped retry (5 x 500ms).
 - Live integration tests are gated behind `bun run test:live` (env flag) because each spins a dev server and worker bundle; running them inside the default parallel suite starved unrelated tests into timeouts. The gate is part of stage and final acceptance runs.
 - `bun run validate` — pass end to end after the CLI command split (index.ts under the line budget, runtime commands in their own module).
+
+## 2026-07-01: Stage 13 Production Replay, Stage 18 Examples, Stage 20 Packaging
+
+- `bunx temporal-explorer trace dynamicWorkflow --project fixtures/dynamic --history planned --replay` — both dynamic-dispatch mappings upgrade from `dynamic` to `inferred` with `replay-command-sequence` evidence naming the resolved Activity types. Committed artifacts stay in the default non-replay form.
+- Mapper tests cover replay confirmation and the mismatch path (wrong replayed name leaves confidence untouched).
+- `bun run examples:library` — all three plan usage modes pass (direct workflow files, Event History overlay, project discovery).
+- `bun run release:dry-run` — dist bundles for CLI/api/schemas build with externalized deps, every published entrypoint smoke-tests against fixtures, and npm pack dry-runs a 9-file tarball. Bundled `.d.ts` for dist remains the recorded packaging gap.
