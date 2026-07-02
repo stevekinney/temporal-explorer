@@ -21,4 +21,11 @@ await $`bun build packages/cli/src/bin.ts --target=bun --outdir=dist/cli --entry
 await $`bun build packages/api/src/index.ts --target=bun --outdir=dist/api --entry-naming index.js ${externals}`.quiet();
 await $`bun build packages/schemas/src/index.ts --target=bun --outdir=dist/schemas --entry-naming index.js ${externals}`.quiet();
 
-console.log('Built dist/cli, dist/api, and dist/schemas.');
+// The explorer UI ships as a self-contained adapter-node server (see
+// apps/explorer/vite.config.ts's `ssr.noExternal: true`) so `open` can spawn
+// it without the app's devDependencies or a node_modules tree present.
+await $`bun run build`.cwd('apps/explorer').quiet();
+await $`mkdir -p dist/explorer`;
+await $`cp -R apps/explorer/build dist/explorer/build`;
+
+console.log('Built dist/cli, dist/api, dist/schemas, and dist/explorer.');

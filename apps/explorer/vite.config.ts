@@ -7,7 +7,7 @@ export default defineConfig({
   },
   plugins: [sveltekit()],
   ssr: {
-    noExternal: ['@lostgradient/cinder'],
+    noExternal: true,
   },
   server: {
     host: '127.0.0.1',

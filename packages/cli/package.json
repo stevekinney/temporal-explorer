@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@temporal-explorer/api": "workspace:*"
+    "@temporal-explorer/api": "workspace:*",
+    "@temporal-explorer/explorer": "workspace:*"
   },
   "devDependencies": {
     "@repo/typescript-configuration": "workspace:*",

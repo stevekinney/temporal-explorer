@@ -15,7 +15,25 @@ export type RunningExplorerServer = {
   waitForExit: () => Promise<number>;
 };
 
-const explorerAppRoot = fileURLToPath(new URL('../../../apps/explorer/', import.meta.url));
+// Resolves relative to wherever this module actually runs from: the
+// published dist bundle (dist/cli/index.js, sibling to dist/explorer) or
+// the TypeScript source under packages/cli/src (sibling to apps/explorer).
+const explorerServerEntryCandidates = [
+  fileURLToPath(new URL('../explorer/build/index.js', import.meta.url)),
+  fileURLToPath(new URL('../../../apps/explorer/build/index.js', import.meta.url)),
+];
+
+async function resolveExplorerServerEntry(): Promise<string> {
+  for (const candidate of explorerServerEntryCandidates) {
+    if (await Bun.file(candidate).exists()) {
+      return candidate;
+    }
+  }
+
+  throw new Error(
+    `Could not find the built explorer server. Looked in: ${explorerServerEntryCandidates.join(', ')}. Run "bun run build" first.`,
+  );
+}
 
 function ensurePort(port: number): void {
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {
@@ -91,12 +109,13 @@ export async function startExplorerServer(
   await verifyAnalysisArtifact(projectRoot);
 
   const port = await findAvailablePort(options.port ?? 5173);
+  const entry = await resolveExplorerServerEntry();
   const process = Bun.spawn({
-    cmd: ['bun', 'run', 'dev', '--', '--host', '127.0.0.1', '--port', String(port)],
-    cwd: explorerAppRoot,
+    cmd: ['bun', entry],
     env: {
       ...Bun.env,
       PORT: String(port),
+      HOST: '127.0.0.1',
       TEMPORAL_EXPLORER_PROJECT: projectRoot,
     },
     stdout: options.inheritOutput ? 'inherit' : 'ignore',
@@ -106,7 +125,7 @@ export async function startExplorerServer(
   if (options.trace) {
     url.searchParams.set('trace', options.trace);
   }
-  const serverReadinessUrl = `http://127.0.0.1:${port}/@vite/client`;
+  const serverReadinessUrl = `http://127.0.0.1:${port}/`;
   let stopped = false;
 
   async function stop(): Promise<void> {

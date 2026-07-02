@@ -6,6 +6,7 @@
       "name": "project-name",
       "dependencies": {
         "@temporalio/client": "^1.18.1",
+        "temporal-explorer": "^0.0.0-mvp",
         "ts-morph": "^28.0.0",
         "zod": "^4.4.3",
       },
@@ -97,6 +98,7 @@
       },
       "dependencies": {
         "@temporal-explorer/api": "workspace:*",
+        "@temporal-explorer/explorer": "workspace:*",
       },
       "devDependencies": {
         "@repo/typescript-configuration": "workspace:*",
@@ -1282,6 +1284,8 @@
     "swc-loader": ["swc-loader@0.2.7", "", { "dependencies": { "@swc/counter": "^0.1.3" }, "peerDependencies": { "@swc/core": "^1.2.147", "webpack": ">=2" } }, "sha512-nwYWw3Fh9ame3Rtm7StS9SBLpHRRnYcK7bnpF3UKZmesAK0gw2/ADvlURFAINmPvKtDLzp+GBiP9yLoEjg6S9w=="],
 
     "tapable": ["tapable@2.3.3", "", {}, "sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A=="],
+
+    "temporal-explorer": ["temporal-explorer@0.0.0-mvp", "", { "dependencies": { "@temporalio/client": "^1.18.1", "ts-morph": "^28.0.0", "zod": "^4.4.3" }, "bin": { "temporal-explorer": "dist/cli/index.js" } }, "sha512-jzS7cgSS7Zp4I4a9wI+nV9uIOgvYe78S/3tDOyEp0pSowKiNvRxR23yfk19jXvQ1FHsuq/3bBMVr4ZNzysT4iw=="],
 
     "terser": ["terser@5.48.0", "", { "dependencies": { "@jridgewell/source-map": "^0.3.3", "acorn": "^8.15.0", "commander": "^2.20.0", "source-map-support": "~0.5.20" }, "bin": { "terser": "bin/terser" } }, "sha512-J/9An6vs9Us6wKRriSFXBWdRZapREHqFzdNUKk0pmu804EMR6dr6winwo7e5JDxN4xahxQsuysyYFwlwj4XN/Q=="],
 
