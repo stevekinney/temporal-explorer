@@ -6,6 +6,6 @@
 
 ## Artifacts
 
-- Static analysis: `analysis:../../fixtures/basic-order`
+- Static analysis: `analysis:basic-order`
 - Runtime trace: `trace:success:success-run-id` (completed)
 - Execution overlay: `overlay:basicOrderWorkflow:trace:success:success-run-id`

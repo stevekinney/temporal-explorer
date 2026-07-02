@@ -1,3 +1,5 @@
+import { readdir } from 'node:fs/promises';
+
 import { validateArtifact } from '@temporal-explorer/schemas';
 
 type ValidationSummary = {
@@ -5,7 +7,7 @@ type ValidationSummary = {
   artifacts: number;
 };
 
-const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url);
+const fixturesRoot = new URL('../../fixtures/', import.meta.url);
 
 async function readJsonFile(url: URL): Promise<unknown> {
   return await Bun.file(url).json();
@@ -47,23 +49,65 @@ function assertProvenanceShape(value: unknown, path: string): void {
   }
 }
 
-async function validateHistoryFixtures(summary: ValidationSummary): Promise<void> {
-  const historyUrl = new URL('histories/success.json', fixtureRoot);
-  const provenanceUrl = new URL('histories/success.provenance.json', fixtureRoot);
+async function listFixtureDirectories(): Promise<string[]> {
+  const entries = await readdir(fixturesRoot.pathname, { withFileTypes: true });
 
-  assertHistoryShape(await readJsonFile(historyUrl), historyUrl.pathname);
-  assertProvenanceShape(await readJsonFile(provenanceUrl), provenanceUrl.pathname);
-  summary.histories += 1;
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .toSorted((left, right) => left.localeCompare(right));
 }
 
-async function validateArtifactFixtures(summary: ValidationSummary): Promise<void> {
-  const artifactDirectory = new URL('.temporal-explorer/', fixtureRoot);
-  const glob = new Bun.Glob('**/*.json');
+async function validateHistoryFixtures(fixture: string, summary: ValidationSummary): Promise<void> {
+  const historiesDirectory = new URL(`${fixture}/histories/`, fixturesRoot);
+  const glob = new Bun.Glob('*.json');
+  const historyNames: string[] = [];
 
-  for await (const relativePath of glob.scan({
-    cwd: artifactDirectory.pathname,
-    onlyFiles: true,
-  })) {
+  try {
+    for await (const fileName of glob.scan({
+      cwd: historiesDirectory.pathname,
+      onlyFiles: true,
+    })) {
+      if (!fileName.endsWith('.provenance.json')) {
+        historyNames.push(fileName.replace(/\.json$/u, ''));
+      }
+    }
+  } catch {
+    return;
+  }
+
+  for (const historyName of historyNames.toSorted((left, right) => left.localeCompare(right))) {
+    const historyUrl = new URL(`${historyName}.json`, historiesDirectory);
+    const provenanceUrl = new URL(`${historyName}.provenance.json`, historiesDirectory);
+
+    assertHistoryShape(await readJsonFile(historyUrl), historyUrl.pathname);
+
+    if (!(await Bun.file(provenanceUrl).exists())) {
+      throw new Error(`${historyUrl.pathname} is missing its provenance file.`);
+    }
+
+    assertProvenanceShape(await readJsonFile(provenanceUrl), provenanceUrl.pathname);
+    summary.histories += 1;
+  }
+}
+
+async function validateArtifactFixtures(
+  fixture: string,
+  summary: ValidationSummary,
+): Promise<void> {
+  const artifactDirectory = new URL(`${fixture}/.temporal-explorer/`, fixturesRoot);
+  const glob = new Bun.Glob('**/*.json');
+  let relativePaths: string[] = [];
+
+  try {
+    relativePaths = await Array.fromAsync(
+      glob.scan({ cwd: artifactDirectory.pathname, onlyFiles: true }),
+    );
+  } catch {
+    return;
+  }
+
+  for (const relativePath of relativePaths.toSorted((left, right) => left.localeCompare(right))) {
     const artifactUrl = new URL(relativePath, artifactDirectory);
     const artifact = await readJsonFile(artifactUrl);
     const result = validateArtifact(artifact);
@@ -82,8 +126,14 @@ const summary: ValidationSummary = {
   artifacts: 0,
 };
 
-await validateHistoryFixtures(summary);
-await validateArtifactFixtures(summary);
+for (const fixture of await listFixtureDirectories()) {
+  await validateHistoryFixtures(fixture, summary);
+  await validateArtifactFixtures(fixture, summary);
+}
+
+if (summary.histories === 0) {
+  throw new Error('No fixture histories were found.');
+}
 
 console.log(`Validated ${summary.histories} history fixture(s).`);
 console.log(`Validated ${summary.artifacts} Temporal Explorer artifact fixture(s).`);

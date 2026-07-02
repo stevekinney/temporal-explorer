@@ -1,33 +1,68 @@
+import { readdir } from 'node:fs/promises';
+
 import { createDocumentationSetFromArtifacts } from '@temporal-explorer/api';
 
-const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url);
-const documentationDirectory = new URL('.temporal-explorer/docs/', fixtureRoot);
+const fixturesRoot = new URL('../../fixtures/', import.meta.url);
 
-async function readJsonFixture(path: string): Promise<unknown> {
-  return await Bun.file(new URL(path, fixtureRoot)).json();
+async function readJsonFile(url: URL): Promise<unknown> {
+  return await Bun.file(url).json();
 }
 
 function stableStringify(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
-async function verifyDocumentationSnapshots(): Promise<void> {
-  const analysisArtifact = await readJsonFixture('.temporal-explorer/analysis.json');
-  const traceArtifact = await readJsonFixture('.temporal-explorer/histories/success.trace.json');
-  const overlayArtifact = await readJsonFixture('.temporal-explorer/overlays/success.overlay.json');
-  const firstRender = createDocumentationSetFromArtifacts({
-    analysisArtifact,
-    traceArtifacts: [traceArtifact],
-    overlayArtifacts: [overlayArtifact],
-  }).value;
-  const secondRender = createDocumentationSetFromArtifacts({
-    analysisArtifact,
-    traceArtifacts: [traceArtifact],
-    overlayArtifacts: [overlayArtifact],
-  }).value;
+async function listDirectories(url: URL): Promise<string[]> {
+  const entries = await readdir(url.pathname, { withFileTypes: true });
+
+  return entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .toSorted((left, right) => left.localeCompare(right));
+}
+
+async function readJsonArtifacts(directory: URL, suffix: string): Promise<unknown[]> {
+  let entries: string[] = [];
+
+  try {
+    entries = await readdir(directory.pathname);
+  } catch {
+    return [];
+  }
+
+  return await Promise.all(
+    entries
+      .filter((entry) => entry.endsWith(suffix))
+      .toSorted((left, right) => left.localeCompare(right))
+      .map((entry) => readJsonFile(new URL(entry, directory))),
+  );
+}
+
+async function verifyFixtureDocumentationSnapshots(fixture: string): Promise<number> {
+  const fixtureRoot = new URL(`${fixture}/`, fixturesRoot);
+  const artifactRoot = new URL('.temporal-explorer/', fixtureRoot);
+  const documentationDirectory = new URL('docs/', artifactRoot);
+  const analysisUrl = new URL('analysis.json', artifactRoot);
+
+  if (!(await Bun.file(analysisUrl).exists())) {
+    return 0;
+  }
+
+  const analysisArtifact = await readJsonFile(analysisUrl);
+  const traceArtifacts = await readJsonArtifacts(
+    new URL('histories/', artifactRoot),
+    '.trace.json',
+  );
+  const overlayArtifacts = await readJsonArtifacts(
+    new URL('overlays/', artifactRoot),
+    '.overlay.json',
+  );
+  const renderInputs = { analysisArtifact, traceArtifacts, overlayArtifacts };
+  const firstRender = createDocumentationSetFromArtifacts(renderInputs).value;
+  const secondRender = createDocumentationSetFromArtifacts(renderInputs).value;
 
   if (stableStringify(firstRender) !== stableStringify(secondRender)) {
-    throw new Error('Documentation render output changed between identical runs.');
+    throw new Error(`Documentation render output for ${fixture} changed between identical runs.`);
   }
 
   for (const documentationFile of firstRender) {
@@ -46,7 +81,17 @@ async function verifyDocumentationSnapshots(): Promise<void> {
     }
   }
 
-  console.log(`Verified ${firstRender.length} documentation snapshot(s).`);
+  return firstRender.length;
 }
 
-await verifyDocumentationSnapshots();
+let verified = 0;
+
+for (const fixture of await listDirectories(fixturesRoot)) {
+  verified += await verifyFixtureDocumentationSnapshots(fixture);
+}
+
+if (verified === 0) {
+  throw new Error('No documentation snapshots were verified.');
+}
+
+console.log(`Verified ${verified} documentation snapshot(s).`);

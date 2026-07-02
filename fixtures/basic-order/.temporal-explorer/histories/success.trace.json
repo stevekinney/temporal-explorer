@@ -5,7 +5,7 @@
     "temporalExplorerVersion": "0.0.0-mvp",
     "schemaVersion": "temporal-trace/v1",
     "inputs": {
-      "projectRoot": "../../fixtures/basic-order",
+      "projectRoot": "basic-order",
       "configHash": "b6763d8a6a0b3df0d4a23ff34ea7090e788b342f9a64270cd6008c2c08221c37",
       "sourceFileHashes": {},
       "temporalSdkVersions": {

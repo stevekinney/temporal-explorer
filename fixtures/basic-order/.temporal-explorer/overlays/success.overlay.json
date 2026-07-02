@@ -1,7 +1,7 @@
 {
   "schemaVersion": "temporal-overlay/v1",
   "artifactId": "overlay:basicOrderWorkflow:trace:success:success-run-id",
-  "staticAnalysisId": "analysis:../../fixtures/basic-order",
+  "staticAnalysisId": "analysis:basic-order",
   "runtimeTraceId": "trace:success:success-run-id",
   "workflow": "basicOrderWorkflow",
   "staticNodes": [

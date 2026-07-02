@@ -1,4 +1,4 @@
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 import { Project } from 'ts-morph';
 
@@ -99,14 +99,18 @@ export async function analyzeWorkflowFiles(
   const temporalTypeScriptVersion = packageJson.dependencies?.['@temporalio/workflow'];
   const packageManager = getPackageManager(packageJson);
 
+  // The project identifier must not depend on process.cwd(); artifacts are
+  // committed and regenerated from different working directories.
+  const projectName = basename(root);
+
   return {
     schemaVersion: 'temporal-analysis/v1',
-    artifactId: `analysis:${toProjectPath(process.cwd(), root)}`,
+    artifactId: `analysis:${projectName}`,
     metadata: {
       temporalExplorerVersion: '0.0.0-mvp',
       schemaVersion: 'temporal-analysis/v1',
       inputs: {
-        projectRoot: toProjectPath(process.cwd(), root),
+        projectRoot: projectName,
         configHash,
         tsconfigHash: configHash,
         sourceFileHashes,
@@ -118,7 +122,7 @@ export async function analyzeWorkflowFiles(
       },
     },
     project: {
-      root: toProjectPath(process.cwd(), root),
+      root: projectName,
       tsconfig: toProjectPath(root, tsconfig),
       ...(packageManager ? { packageManager } : {}),
     },

@@ -459,3 +459,13 @@ Result: Failed during final cleanup, then passed.
 Output summary: The first `bun run validate` after Stage 7 exposed real lint failures in the new graph code: page and projection max-lines limits, projection helper complexity, and a promise `always-return` warning. The graph UI was split into smaller Svelte components, ELK layout was moved to a helper, runtime display/state helpers were extracted, and graph projection builders were split until `svelte-check`, oxlint, UI gates, graph gates, and screenshots passed. A later final `format:check` exposed that `fixtures/basic-order/histories/success.json` was Prettier-incompatible; formatting the file directly caused fixture drift, so the fixture generator now writes Prettier-formatted history and provenance JSON before hashing. The final explicit MVP gate list passed. `package:check` completed as an npm dry run with 128 files, 135.5 kB package size, and no tarball left behind. The Temporal SDK under Bun emitted the known `v8.promiseHooks.createHook is not available; stack trace collection will be disabled.` notice during fixture generation and drift checks, but those gates passed.
 
 Follow-up: None.
+
+## 2026-07-01: Post-MVP Foundation (event table + manifest-driven fixtures)
+
+- `bun run fixtures:verify-no-drift` — pass (basic-order byte-identical under refactored generator).
+- `bun run fixtures:validate` — pass (1 history, 3 artifacts).
+- `bun run fixtures:regenerate-artifacts` — pass, idempotent across two runs from the repository root.
+- `bun run snapshots:verify` — pass (3 documentation snapshots).
+- `bun run validate` — pass (typecheck, lint, test, build, format across all workspaces).
+- Note: `packages/history/src/event-types.ts` previously mismapped event types 17/18 (Temporal proto defines 17=TimerStarted, 18=TimerFired; the file claimed WorkflowExecutionCanceled/Terminated). Fixed against `@temporalio/proto` 1.18.1 before any timer fixtures exist.
+- Note: analysis/trace artifacts previously embedded `process.cwd()`-relative project paths, so CLI tests (cwd=packages/cli) and root scripts fought over committed artifact content. Artifacts now record the project directory basename.

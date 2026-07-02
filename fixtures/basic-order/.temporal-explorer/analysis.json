@@ -1,11 +1,11 @@
 {
   "schemaVersion": "temporal-analysis/v1",
-  "artifactId": "analysis:../../fixtures/basic-order",
+  "artifactId": "analysis:basic-order",
   "metadata": {
     "temporalExplorerVersion": "0.0.0-mvp",
     "schemaVersion": "temporal-analysis/v1",
     "inputs": {
-      "projectRoot": "../../fixtures/basic-order",
+      "projectRoot": "basic-order",
       "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
       "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
       "sourceFileHashes": {
@@ -17,7 +17,7 @@
     }
   },
   "project": {
-    "root": "../../fixtures/basic-order",
+    "root": "basic-order",
     "tsconfig": "tsconfig.json"
   },
   "sdk": {

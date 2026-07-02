@@ -86,7 +86,9 @@ export async function importEventHistoryFile(
   }
 
   if (projectRoot) {
-    parseOptions.projectRoot = toProjectPath(process.cwd(), projectRoot);
+    // The recorded project identifier must not depend on process.cwd();
+    // artifacts are committed and regenerated from different directories.
+    parseOptions.projectRoot = basename(projectRoot);
   }
 
   if (provenance) {

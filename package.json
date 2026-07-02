@@ -25,6 +25,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,svelte,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,svelte,json,md}\"",
     "fixtures:generate-histories": "bun run scripts/fixtures/generate-histories.ts",
+    "fixtures:regenerate-artifacts": "bun run scripts/fixtures/regenerate-artifacts.ts",
     "fixtures:validate": "bun run scripts/fixtures/validate-fixtures.ts",
     "fixtures:verify-no-drift": "bun run scripts/fixtures/generate-histories.ts --check",
     "lint": "turbo run lint",
