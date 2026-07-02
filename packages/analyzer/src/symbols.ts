@@ -1,4 +1,11 @@
-import { Node, SyntaxKind, type CallExpression, type Identifier, type SourceFile } from 'ts-morph';
+import {
+  Node,
+  SyntaxKind,
+  type CallExpression,
+  type Identifier,
+  type ObjectBindingPattern,
+  type SourceFile,
+} from 'ts-morph';
 
 export const temporalWorkflowModule = '@temporalio/workflow';
 export const temporalWorkerModule = '@temporalio/worker';
@@ -83,4 +90,55 @@ export function findActivityProxyVariables(sourceFile: SourceFile): Set<string> 
   }
 
   return proxyVariables;
+}
+
+/**
+ * Maps destructured Activity proxy bindings to their Activity types, e.g.
+ * `const { reserveInventory: reserve } = proxyActivities<...>(...)` yields
+ * `reserve -> reserveInventory`. Destructuring the proxy is the dominant
+ * convention in real Temporal TypeScript projects.
+ */
+function isProxySourceExpression(node: Node, proxyVariables: Set<string>): boolean {
+  const unwrapped = unwrapCasts(node);
+
+  return (
+    (Node.isCallExpression(unwrapped) && isProxyActivitiesCall(unwrapped)) ||
+    (Node.isIdentifier(unwrapped) && proxyVariables.has(unwrapped.getText()))
+  );
+}
+
+function collectBindingElements(
+  pattern: ObjectBindingPattern,
+  bindings: Map<string, string>,
+): void {
+  for (const element of pattern.getElements()) {
+    const localNameNode = element.getNameNode();
+
+    if (Node.isIdentifier(localNameNode)) {
+      const activityName = element.getPropertyNameNode()?.getText() ?? localNameNode.getText();
+      bindings.set(localNameNode.getText(), activityName);
+    }
+  }
+}
+
+export function findDestructuredActivityBindings(
+  sourceFile: SourceFile,
+  proxyVariables: Set<string>,
+): Map<string, string> {
+  const bindings = new Map<string, string>();
+
+  for (const declaration of sourceFile.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
+    const nameNode = declaration.getNameNode();
+    const initializer = declaration.getInitializer();
+
+    if (
+      initializer &&
+      Node.isObjectBindingPattern(nameNode) &&
+      isProxySourceExpression(initializer, proxyVariables)
+    ) {
+      collectBindingElements(nameNode, bindings);
+    }
+  }
+
+  return bindings;
 }

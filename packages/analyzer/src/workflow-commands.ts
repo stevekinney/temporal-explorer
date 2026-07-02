@@ -21,7 +21,12 @@ import {
   createSleepCommand,
 } from './command-factories';
 import { createSourceLocation } from './paths';
-import { isNamedImportFrom, isWorkflowModuleCall, temporalWorkflowModule } from './symbols';
+import {
+  findDestructuredActivityBindings,
+  isNamedImportFrom,
+  isWorkflowModuleCall,
+  temporalWorkflowModule,
+} from './symbols';
 import { findSignalDeclarations } from './workflow-signals';
 
 export type CollectedCommands = {
@@ -164,11 +169,22 @@ type WalkContext = {
   root: string;
   workflowName: string;
   proxyVariables: Set<string>;
+  destructuredActivities: Map<string, string>;
   externalHandles: Set<string>;
   signalNamesByVariable: Map<string, string>;
   commands: TemporalCommand[];
   diagnostics: Diagnostic[];
 };
+
+function getDestructuredActivityName(
+  call: CallExpression,
+  destructuredActivities: Map<string, string>,
+): string | undefined {
+  const expression = call.getExpression();
+  return Node.isIdentifier(expression)
+    ? destructuredActivities.get(expression.getText())
+    : undefined;
+}
 
 function collectCall(call: CallExpression, context: WalkContext): void {
   const { root, workflowName, commands } = context;
@@ -177,6 +193,15 @@ function collectCall(call: CallExpression, context: WalkContext): void {
   if (proxyAccess) {
     commands.push(
       createActivityCommand(root, workflowName, proxyAccess.getName(), call, commands.length),
+    );
+    return;
+  }
+
+  const destructuredActivity = getDestructuredActivityName(call, context.destructuredActivities);
+
+  if (destructuredActivity) {
+    commands.push(
+      createActivityCommand(root, workflowName, destructuredActivity, call, commands.length),
     );
     return;
   }
@@ -269,6 +294,10 @@ export function collectTemporalCommands(
     root,
     workflowName,
     proxyVariables,
+    destructuredActivities: findDestructuredActivityBindings(
+      functionDeclaration.getSourceFile(),
+      proxyVariables,
+    ),
     externalHandles: findExternalHandleVariables(functionDeclaration),
     signalNamesByVariable,
     commands: [],

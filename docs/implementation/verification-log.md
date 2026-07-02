@@ -556,3 +556,9 @@ Consolidated battery, all passing on `main`:
 - `bun run release:dry-run` — dist bundles verified and tarball packed.
 
 Recorded remainders (also in the progress table and the vault note): the Explorer UI connection selector/run browser and large-graph thresholds, and bundled `.d.ts` files for the dist entrypoints.
+
+## 2026-07-01: Post-Closeout "Verify That It Works" Pass
+
+Re-ran the full acceptance battery fresh (all green), then exercised the packed tarball as a real user would: `npm pack` (prepack builds dist), installed into a brand-new flat-convention project outside the repository, and ran list/show/check/docs/types plus library imports (`analyzeProject`, `renderWorkflowMermaidFromArtifacts`) from the installed package.
+
+That end-to-end pass caught a real extraction gap: destructured `proxyActivities` bindings (`const { reserveInventory } = proxyActivities<...>()`) — the dominant real-world pattern — produced no Activity commands. Fixed in the analyzer (`findDestructuredActivityBindings`, including renamed bindings and destructuring from existing proxy variables), with a regression test in `packages/analyzer/src/destructured-activities.test.ts`. Committed fixture artifacts were unaffected; the compatibility corpus re-run stayed 51/51 and its results now reflect far richer command extraction plus real diagnostics surfaced across the samples. The reinstalled tarball shows correct Activities, docs, and typed declarations on the consumer project.
