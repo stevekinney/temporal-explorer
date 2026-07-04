@@ -134,6 +134,61 @@ export function findSignalDeclarations(
   return declarations;
 }
 
+/**
+ * Resolves a `setHandler` first argument to its `defineSignal` declaration,
+ * whether inline (`setHandler(defineSignal('x'), ...)`), declared in the same file,
+ * or imported from another module. Returns undefined for non-signal handles.
+ */
+function resolveDeclaredSignal(
+  root: string,
+  handleArgument: Node,
+  declaredSignals: Map<string, DeclaredSignal>,
+): DeclaredSignal | undefined {
+  // Inline definition: `setHandler(defineSignal('ready'), handler)`.
+  if (Node.isCallExpression(handleArgument)) {
+    return isWorkflowModuleCall(handleArgument, 'defineSignal')
+      ? readSignalDeclarationFromCall(root, handleArgument)
+      : undefined;
+  }
+
+  if (!Node.isIdentifier(handleArgument)) {
+    return undefined;
+  }
+
+  // Same-file declaration (fast path).
+  const local = declaredSignals.get(handleArgument.getText());
+
+  if (local) {
+    return local;
+  }
+
+  // Cross-file: follow the import to the exported `defineSignal` declaration.
+  for (const definition of handleArgument.getDefinitionNodes()) {
+    if (Node.isVariableDeclaration(definition)) {
+      const declared = readSignalDeclaration(root, definition.getSourceFile(), definition);
+
+      if (declared) {
+        return declared;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/** Builds a DeclaredSignal from an inline `defineSignal(...)` call (no variable name). */
+function readSignalDeclarationFromCall(root: string, call: CallExpression): DeclaredSignal {
+  const { name, literal } = readSignalName(call);
+
+  return {
+    variableName: name,
+    name,
+    source: createSourceLocation(root, call.getSourceFile(), call, name),
+    args: extractSignalPayloadShapes(name, call.getTypeArguments()[0]?.getText()),
+    confidence: literal ? 'exact' : 'dynamic',
+  };
+}
+
 /** Finds `setHandler` registrations for declared signals inside one Workflow function. */
 export function findSignalRegistrations(
   root: string,
@@ -151,11 +206,11 @@ export function findSignalRegistrations(
 
     const [handleArgument] = call.getArguments();
 
-    if (!handleArgument || !Node.isIdentifier(handleArgument)) {
+    if (!handleArgument) {
       continue;
     }
 
-    const declared = declaredSignals.get(handleArgument.getText());
+    const declared = resolveDeclaredSignal(root, handleArgument, declaredSignals);
 
     if (!declared) {
       continue;

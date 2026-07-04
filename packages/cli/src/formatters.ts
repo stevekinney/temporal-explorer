@@ -17,6 +17,10 @@ function getCommandNames(workflow: WorkflowDefinition, kind: string): string[] {
     .map((command) => command.name);
 }
 
+function messageNames(definitions: { name: string }[]): string {
+  return definitions.map((definition) => definition.name).join(', ') || 'none';
+}
+
 export function formatList(analysis: TemporalAnalysisDocument): string {
   const lines = ['Workflows', ''];
 
@@ -25,11 +29,9 @@ export function formatList(analysis: TemporalAnalysisDocument): string {
     lines.push(`    ${workflow.source.path}`);
     lines.push(`    signature: ${formatWorkflowSignature(workflow)}`);
     lines.push(`    activities: ${getCommandNames(workflow, 'activity').join(', ') || 'none'}`);
-    lines.push(
-      `    signals: ${
-        workflow.messageSurface.signals.map((signal) => signal.name).join(', ') || 'none'
-      }`,
-    );
+    lines.push(`    signals: ${messageNames(workflow.messageSurface.signals)}`);
+    lines.push(`    queries: ${messageNames(workflow.messageSurface.queries)}`);
+    lines.push(`    updates: ${messageNames(workflow.messageSurface.updates)}`);
     lines.push('');
   }
 

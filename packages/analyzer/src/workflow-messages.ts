@@ -109,6 +109,54 @@ export function findMessageDeclarations(
   return declarations;
 }
 
+/**
+ * Resolves a `setHandler` first argument to its `defineQuery`/`defineUpdate` declaration,
+ * whether inline (`setHandler(defineQuery('x'), ...)`), declared in the same file, or
+ * imported from another module. Returns undefined for signals and unresolvable handles.
+ */
+function resolveDeclaredMessage(
+  root: string,
+  handleArgument: Node,
+  declaredMessages: Map<string, DeclaredMessage>,
+): DeclaredMessage | undefined {
+  // Inline definition: `setHandler(defineQuery('getValue'), handler)`.
+  if (Node.isCallExpression(handleArgument)) {
+    const kind = getMessageKind(handleArgument);
+
+    if (!kind) {
+      return undefined;
+    }
+
+    const { name } = readMessageName(handleArgument);
+
+    return createDeclaredMessage(root, handleArgument.getSourceFile(), name, kind, handleArgument);
+  }
+
+  if (!Node.isIdentifier(handleArgument)) {
+    return undefined;
+  }
+
+  // Same-file declaration (fast path).
+  const local = declaredMessages.get(handleArgument.getText());
+
+  if (local) {
+    return local;
+  }
+
+  // Cross-file: follow the import to the exported `defineQuery`/`defineUpdate` declaration.
+  for (const definition of handleArgument.getDefinitionNodes()) {
+    if (Node.isVariableDeclaration(definition)) {
+      const declared = readMessageDeclaration(root, definition.getSourceFile(), definition);
+
+      if (declared) {
+        return declared;
+      }
+    }
+  }
+
+  return undefined;
+}
+
 export type MessageRegistration = {
   declared: DeclaredMessage;
   registration: CallExpression;
@@ -134,6 +182,7 @@ function readValidatorNode(call: CallExpression): Node | undefined {
 
 /** Finds `setHandler` registrations for declared queries and updates in one Workflow. */
 export function findMessageRegistrations(
+  root: string,
   functionDeclaration: FunctionDeclaration,
   declaredMessages: Map<string, DeclaredMessage>,
 ): MessageRegistration[] {
@@ -146,11 +195,11 @@ export function findMessageRegistrations(
 
     const [handleArgument, handlerArgument] = call.getArguments();
 
-    if (!handleArgument || !Node.isIdentifier(handleArgument)) {
+    if (!handleArgument) {
       continue;
     }
 
-    const declared = declaredMessages.get(handleArgument.getText());
+    const declared = resolveDeclaredMessage(root, handleArgument, declaredMessages);
 
     if (!declared) {
       continue;

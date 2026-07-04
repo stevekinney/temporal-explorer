@@ -13,6 +13,7 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import { buildControlFlow } from './control-flow';
 import {
   findDuplicateMessageDiagnostics,
   findNondeterministicApiDiagnostics,
@@ -73,13 +74,18 @@ function createWorkflowSignature(root: string, functionDeclaration: FunctionDecl
   const args = functionDeclaration.getParameters().map((parameter, index) => {
     const name = parameter.getName();
     const display = parameter.getTypeNode()?.getText() ?? parameter.getType().getText(parameter);
-
-    return createTypeShape(
+    const shape = createTypeShape(
       `${functionDeclaration.getName() ?? 'anonymous'}:arg:${index}:${name}`,
       display,
       createSourceLocation(root, sourceFile, parameter, name),
       name,
     );
+
+    return {
+      ...shape,
+      ...(parameter.hasQuestionToken() ? { optional: true } : {}),
+      ...(parameter.isRestParameter() ? { isRest: true } : {}),
+    };
   });
 
   return {
@@ -122,6 +128,7 @@ function analyzeWorkflowFunction(
     findSignalDeclarations(root, functionDeclaration.getSourceFile()),
   );
   const registrations = findMessageRegistrations(
+    root,
     functionDeclaration,
     findMessageDeclarations(root, functionDeclaration.getSourceFile()),
   );
@@ -160,7 +167,7 @@ function analyzeWorkflowFunction(
       variables: [],
     },
     body: {
-      nodes: [],
+      nodes: buildControlFlow(root, workflowName, functionDeclaration, collected.commands),
     },
     temporalCommands: collected.commands,
     dependencies: collectTypeImportDependencies(

@@ -68,9 +68,11 @@ const structuralTypeNames = new Set([
 
 function renderSignatureLines(workflow: WorkflowDefinition, known: Set<string>): string[] {
   const parameters = workflow.signature.args
-    .map(
-      (arg, index) => `${arg.displayName ?? `arg${index}`}: ${renderTypeText(arg.display, known)}`,
-    )
+    .map((arg, index) => {
+      const rest = arg.isRest ? '...' : '';
+      const optional = arg.optional ? '?' : '';
+      return `${rest}${arg.displayName ?? `arg${index}`}${optional}: ${renderTypeText(arg.display, known)}`;
+    })
     .join(', ');
   const result = renderTypeText(workflow.signature.result.display, known);
   const resultType = result.startsWith('Promise<') ? result : `Promise<${result}>`;

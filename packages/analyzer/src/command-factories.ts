@@ -153,12 +153,13 @@ export function createContinueAsNewCommand(
   };
 }
 
-/** Creates a patch command for patched or deprecatePatch. */
+/** Creates a patch command for patched or deprecatePatch (`deprecated` marks the latter). */
 export function createPatchCommand(
   root: string,
   workflowName: string,
   call: CallExpression,
   order: number,
+  deprecated: boolean,
 ): TemporalCommand {
   const [patchArgument] = call.getArguments();
   const literalId =
@@ -173,6 +174,7 @@ export function createPatchCommand(
     source: commandSource(root, call),
     confidence: literalId ? 'exact' : 'dynamic',
     staticOrder: order,
+    ...(deprecated ? { deprecated: true } : {}),
   };
 }
 
@@ -188,6 +190,43 @@ export function createCancellationScopeCommand(
     id: `cancellation-scope:${workflowName}:${order}`,
     kind: 'cancellation-scope',
     name: scopeKind,
+    source: commandSource(root, call),
+    confidence: 'exact',
+    staticOrder: order,
+  };
+}
+
+/** Creates a Nexus operation command for client.executeOperation / startOperation. */
+export function createNexusOperationCommand(
+  root: string,
+  workflowName: string,
+  operationName: string,
+  confidence: TemporalCommand['confidence'],
+  call: CallExpression,
+  order: number,
+): TemporalCommand {
+  return {
+    id: `nexus-operation:${workflowName}:${operationName}:${order}`,
+    kind: 'nexus-operation',
+    name: operationName,
+    source: commandSource(root, call, operationName),
+    confidence,
+    staticOrder: order,
+  };
+}
+
+/** Creates a search-attribute command for upsertSearchAttributes / upsertMemo. */
+export function createSearchAttributeCommand(
+  root: string,
+  workflowName: string,
+  methodName: string,
+  call: CallExpression,
+  order: number,
+): TemporalCommand {
+  return {
+    id: `search-attribute:${workflowName}:${order}`,
+    kind: 'search-attribute',
+    name: methodName,
     source: commandSource(root, call),
     confidence: 'exact',
     staticOrder: order,

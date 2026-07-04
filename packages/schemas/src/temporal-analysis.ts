@@ -8,6 +8,7 @@ import {
   type Confidence,
   type SourceLocation,
 } from './common';
+import { flowNodeSchema } from './flow-node';
 
 export type TypeShape = {
   id: string;
@@ -29,6 +30,8 @@ export type TypeShape = {
     | 'unknown';
   nullable?: boolean | undefined;
   optional?: boolean | undefined;
+  /** True when this shape describes a `...rest` parameter. */
+  isRest?: boolean | undefined;
   properties?: Record<string, TypeShape> | undefined;
   items?: TypeShape | undefined;
   tupleItems?: TypeShape[] | undefined;
@@ -66,6 +69,7 @@ const typeShapeSchema: z.ZodType<TypeShape> = z.lazy(() =>
       ]),
       nullable: z.boolean().optional(),
       optional: z.boolean().optional(),
+      isRest: z.boolean().optional(),
       properties: z.record(z.string(), typeShapeSchema).optional(),
       items: typeShapeSchema.optional(),
       tupleItems: z.array(typeShapeSchema).optional(),
@@ -105,12 +109,21 @@ export const temporalCommandSchema = z
       z.literal('continue-as-new'),
       z.literal('patch'),
       z.literal('cancellation-scope'),
+      z.literal('nexus-operation'),
+      z.literal('search-attribute'),
       z.literal('dynamic'),
     ]),
     name: z.string().min(1),
     source: sourceLocationSchema,
     confidence: confidenceSchema,
     staticOrder: z.number().int().nonnegative(),
+    // 'fan-out' marks a command invoked over a dynamic collection (e.g.
+    // `Promise.all(items.map(() => executeChild(...)))`): one static command
+    // that maps to many runtime occurrences.
+    cardinality: z.union([z.literal('single'), z.literal('fan-out')]).optional(),
+    // Set on `patch` commands created by `deprecatePatch()` (as opposed to
+    // `patched()`): the old branch is assumed gone, so the check is one-sided.
+    deprecated: z.boolean().optional(),
   })
   .strict();
 
@@ -180,7 +193,7 @@ export const workflowDefinitionSchema = z
       .strict(),
     body: z
       .object({
-        nodes: z.array(z.unknown()),
+        nodes: z.array(flowNodeSchema),
       })
       .strict(),
     temporalCommands: z.array(temporalCommandSchema),

@@ -63,13 +63,22 @@ export function getMappingConfidence(
   );
 }
 
-/** Formats a workflow signature as `name(args): result`. */
+/** Formats a workflow signature as `name(args): result`, honoring `...rest` and `?optional`. */
 export function formatWorkflowSignature(workflow: WorkflowDefinition): string {
   const args = workflow.signature.args
-    .map((arg) => `${arg.displayName ?? 'arg'}: ${arg.display}`)
+    .map((arg) => {
+      const rest = arg.isRest ? '...' : '';
+      const optional = arg.optional ? '?' : '';
+      return `${rest}${arg.displayName ?? 'arg'}${optional}: ${arg.display}`;
+    })
     .join(', ');
 
   return `${workflow.name}(${args}): ${workflow.signature.result.display}`;
+}
+
+/** Command display name with a `(deprecated)` marker for `deprecatePatch()` patches. */
+export function commandDisplayName(command: TemporalCommand): string {
+  return command.deprecated ? `${command.name} (deprecated)` : command.name;
 }
 
 /** Creates a Prettier-compatible aligned Markdown table. */

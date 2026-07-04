@@ -10,13 +10,47 @@ import {
 export const temporalWorkflowModule = '@temporalio/workflow';
 export const temporalWorkerModule = '@temporalio/worker';
 
-/** Reports whether a call invokes a named export of `@temporalio/workflow`, following import aliases. */
-export function isWorkflowModuleCall(call: CallExpression, importedName: string): boolean {
-  const expression = call.getExpression();
-  return (
-    Node.isIdentifier(expression) &&
-    isNamedImportFrom(expression, temporalWorkflowModule, importedName)
-  );
+/**
+ * True when a source file has a value (non-type) import of `@temporalio/workflow`.
+ * This is the same signal content-based Workflow discovery uses, so it marks a
+ * file as a Workflow module (and excludes Activity implementation files, which
+ * never import the Workflow SDK) when deciding whether to walk into a callee.
+ */
+export function importsWorkflowModule(sourceFile: SourceFile): boolean {
+  return sourceFile.getImportDeclarations().some((declaration) => {
+    if (
+      declaration.getModuleSpecifierValue() !== temporalWorkflowModule ||
+      declaration.isTypeOnly()
+    ) {
+      return false;
+    }
+
+    return (
+      Boolean(declaration.getDefaultImport()) ||
+      Boolean(declaration.getNamespaceImport()) ||
+      declaration.getNamedImports().some((named) => !named.isTypeOnly())
+    );
+  });
+}
+
+/** Follows import aliases to the export name a named-import identifier resolves to, if any. */
+export function namedImportExportName(
+  identifier: Identifier,
+  moduleSpecifier: string,
+): string | undefined {
+  for (const declaration of identifier.getSymbol()?.getDeclarations() ?? []) {
+    if (!Node.isImportSpecifier(declaration)) {
+      continue;
+    }
+
+    if (declaration.getImportDeclaration().getModuleSpecifierValue() !== moduleSpecifier) {
+      continue;
+    }
+
+    return declaration.compilerNode.propertyName?.getText() ?? declaration.getNameNode().getText();
+  }
+
+  return undefined;
 }
 
 export function isNamedImportFrom(
@@ -24,32 +58,61 @@ export function isNamedImportFrom(
   moduleSpecifier: string,
   importedName: string,
 ): boolean {
-  const symbol = identifier.getSymbol();
+  return namedImportExportName(identifier, moduleSpecifier) === importedName;
+}
 
+/** Reports whether an identifier is an `import * as ns` namespace binding of a module. */
+export function isNamespaceImportOf(identifier: Identifier, moduleSpecifier: string): boolean {
   return (
-    symbol?.getDeclarations().some((declaration) => {
-      if (!Node.isImportSpecifier(declaration)) {
-        return false;
-      }
+    identifier
+      .getSymbol()
+      ?.getDeclarations()
+      .some((declaration) => {
+        if (!Node.isNamespaceImport(declaration)) {
+          return false;
+        }
 
-      const importDeclaration = declaration.getImportDeclaration();
-      const exportedName =
-        declaration.compilerNode.propertyName?.getText() ?? declaration.getNameNode().getText();
+        const importDeclaration = declaration.getFirstAncestorByKind(SyntaxKind.ImportDeclaration);
 
-      return (
-        importDeclaration.getModuleSpecifierValue() === moduleSpecifier &&
-        exportedName === importedName
-      );
-    }) ?? false
+        return importDeclaration?.getModuleSpecifierValue() === moduleSpecifier;
+      }) ?? false
   );
 }
 
-function isProxyActivitiesCall(call: CallExpression): boolean {
+/**
+ * Resolves the `@temporalio/workflow` export a call targets, following import
+ * aliases and namespace imports. Handles both `sleep(...)` (named import) and
+ * `wf.sleep(...)` (`import * as wf from '@temporalio/workflow'`).
+ */
+export function workflowModuleCallName(call: CallExpression): string | undefined {
   const expression = call.getExpression();
-  return (
-    Node.isIdentifier(expression) &&
-    isNamedImportFrom(expression, temporalWorkflowModule, 'proxyActivities')
-  );
+
+  if (Node.isIdentifier(expression)) {
+    return namedImportExportName(expression, temporalWorkflowModule);
+  }
+
+  if (Node.isPropertyAccessExpression(expression)) {
+    const receiver = expression.getExpression();
+
+    if (Node.isIdentifier(receiver) && isNamespaceImportOf(receiver, temporalWorkflowModule)) {
+      return expression.getName();
+    }
+  }
+
+  return undefined;
+}
+
+/** Reports whether a call invokes a named export of `@temporalio/workflow`, following import aliases and namespace imports. */
+export function isWorkflowModuleCall(call: CallExpression, importedName: string): boolean {
+  return workflowModuleCallName(call) === importedName;
+}
+
+/** Activity proxy factories whose returned object exposes callable Activity methods. */
+const activityProxyFactories = new Set(['proxyActivities', 'proxyLocalActivities']);
+
+function isProxyActivitiesCall(call: CallExpression): boolean {
+  const name = workflowModuleCallName(call);
+  return name !== undefined && activityProxyFactories.has(name);
 }
 
 function unwrapCasts(node: Node): Node {

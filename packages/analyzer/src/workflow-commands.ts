@@ -9,6 +9,7 @@ import {
 
 import type { Diagnostic, TemporalCommand } from '@temporal-explorer/schemas';
 
+import { findVariablesInitializedBy, getNexusOperationName } from './command-detection';
 import {
   createActivityCommand,
   createCancellationScopeCommand,
@@ -17,15 +18,20 @@ import {
   createContinueAsNewCommand,
   createDynamicCommand,
   createExternalSignalCommand,
+  createNexusOperationCommand,
   createPatchCommand,
+  createSearchAttributeCommand,
   createSleepCommand,
 } from './command-factories';
+import { collectLocalCalleeCommands } from './interprocedural';
 import { createSourceLocation } from './paths';
 import {
   findDestructuredActivityBindings,
   isNamedImportFrom,
+  isNamespaceImportOf,
   isWorkflowModuleCall,
   temporalWorkflowModule,
+  workflowModuleCallName,
 } from './symbols';
 import { findSignalDeclarations } from './workflow-signals';
 
@@ -81,27 +87,24 @@ function createDynamicActivityDiagnostic(
   };
 }
 
-/** Finds variables holding external Workflow handles from getExternalWorkflowHandle. */
-function findExternalHandleVariables(functionDeclaration: FunctionDeclaration): Set<string> {
-  const handles = new Set<string>();
-
-  for (const declaration of functionDeclaration.getDescendantsOfKind(
-    SyntaxKind.VariableDeclaration,
-  )) {
-    const initializer = declaration.getInitializer();
-    const nameNode = declaration.getNameNode();
-
-    if (
-      initializer &&
-      Node.isCallExpression(initializer) &&
-      isWorkflowModuleCall(initializer, 'getExternalWorkflowHandle') &&
-      Node.isIdentifier(nameNode)
-    ) {
-      handles.add(nameNode.getText());
-    }
+/** Reports whether a receiver refers to `@temporalio/workflow`'s `CancellationScope`, via a named or namespace import. */
+function isCancellationScopeReceiver(receiver: Node): boolean {
+  // Named import: `CancellationScope.cancellable(...)`.
+  if (Node.isIdentifier(receiver)) {
+    return isNamedImportFrom(receiver, temporalWorkflowModule, 'CancellationScope');
   }
 
-  return handles;
+  // Namespace import: `wf.CancellationScope.cancellable(...)`.
+  if (Node.isPropertyAccessExpression(receiver) && receiver.getName() === 'CancellationScope') {
+    const namespaceReceiver = receiver.getExpression();
+
+    return (
+      Node.isIdentifier(namespaceReceiver) &&
+      isNamespaceImportOf(namespaceReceiver, temporalWorkflowModule)
+    );
+  }
+
+  return false;
 }
 
 function getCancellationScopeKind(call: CallExpression): string | undefined {
@@ -111,16 +114,7 @@ function getCancellationScopeKind(call: CallExpression): string | undefined {
     return undefined;
   }
 
-  const receiver = expression.getExpression();
-
-  if (
-    !Node.isIdentifier(receiver) ||
-    !isNamedImportFrom(receiver, temporalWorkflowModule, 'CancellationScope')
-  ) {
-    return undefined;
-  }
-
-  return expression.getName();
+  return isCancellationScopeReceiver(expression.getExpression()) ? expression.getName() : undefined;
 }
 
 function isExternalHandleSignalCall(call: CallExpression, externalHandles: Set<string>): boolean {
@@ -165,15 +159,20 @@ function getExternalSignalName(
   return resolveSignalArgumentName(call.getArguments()[0], signalNamesByVariable);
 }
 
-type WalkContext = {
+export type WalkContext = {
   root: string;
   workflowName: string;
   proxyVariables: Set<string>;
   destructuredActivities: Map<string, string>;
   externalHandles: Set<string>;
+  nexusClients: Set<string>;
   signalNamesByVariable: Map<string, string>;
   commands: TemporalCommand[];
   diagnostics: Diagnostic[];
+  /** Interprocedural descent depth; 0 in the Workflow body, 1 inside a walked-into helper. */
+  depth: number;
+  /** The Workflow function being analyzed, used to skip callees it already walks. */
+  workflowFunction: FunctionDeclaration;
 };
 
 function getDestructuredActivityName(
@@ -245,7 +244,24 @@ function collectCall(call: CallExpression, context: WalkContext): void {
     return;
   }
 
+  const nexusOperation = getNexusOperationName(call, context.nexusClients);
+
+  if (nexusOperation) {
+    commands.push(
+      createNexusOperationCommand(
+        root,
+        workflowName,
+        nexusOperation.name,
+        nexusOperation.confidence,
+        call,
+        commands.length,
+      ),
+    );
+    return;
+  }
+
   collectWorkflowModuleCall(call, context);
+  collectLocalCalleeCommands(call, context, collectCall);
 }
 
 function collectWorkflowModuleCall(call: CallExpression, context: WalkContext): void {
@@ -262,11 +278,29 @@ function collectWorkflowModuleCall(call: CallExpression, context: WalkContext): 
     commands.push(createChildWorkflowCommand(root, workflowName, call, commands.length));
   } else if (isWorkflowModuleCall(call, 'continueAsNew')) {
     commands.push(createContinueAsNewCommand(root, workflowName, call, commands.length));
-  } else if (
-    isWorkflowModuleCall(call, 'patched') ||
-    isWorkflowModuleCall(call, 'deprecatePatch')
-  ) {
-    commands.push(createPatchCommand(root, workflowName, call, commands.length));
+  } else if (isWorkflowModuleCall(call, 'patched')) {
+    commands.push(createPatchCommand(root, workflowName, call, commands.length, false));
+  } else if (isWorkflowModuleCall(call, 'deprecatePatch')) {
+    commands.push(createPatchCommand(root, workflowName, call, commands.length, true));
+  } else {
+    collectSearchAttributeCall(call, context);
+  }
+}
+
+const searchAttributeMethods = new Set([
+  'upsertSearchAttributes',
+  'upsertTypedSearchAttributes',
+  'upsertMemo',
+]);
+
+function collectSearchAttributeCall(call: CallExpression, context: WalkContext): void {
+  const { root, workflowName, commands } = context;
+  const methodName = workflowModuleCallName(call);
+
+  if (methodName && searchAttributeMethods.has(methodName)) {
+    commands.push(
+      createSearchAttributeCommand(root, workflowName, methodName, call, commands.length),
+    );
   }
 }
 
@@ -298,10 +332,13 @@ export function collectTemporalCommands(
       functionDeclaration.getSourceFile(),
       proxyVariables,
     ),
-    externalHandles: findExternalHandleVariables(functionDeclaration),
+    externalHandles: findVariablesInitializedBy(functionDeclaration, 'getExternalWorkflowHandle'),
+    nexusClients: findVariablesInitializedBy(functionDeclaration, 'createNexusServiceClient'),
     signalNamesByVariable,
     commands: [],
     diagnostics: [],
+    depth: 0,
+    workflowFunction: functionDeclaration,
   };
 
   for (const call of functionDeclaration.getDescendantsOfKind(SyntaxKind.CallExpression)) {

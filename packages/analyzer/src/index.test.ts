@@ -114,6 +114,42 @@ describe('basic static analyzer slice', () => {
     expect(analysis.diagnostics).toEqual([]);
   });
 
+  it('captures ...rest and ?optional parameters in the workflow signature', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'temporal-explorer-signature-'));
+    await mkdir(join(root, 'src'), { recursive: true });
+    await Bun.write(
+      join(root, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          target: 'ES2022',
+          module: 'ESNext',
+          moduleResolution: 'Bundler',
+          strict: true,
+        },
+        include: ['src/**/*.ts'],
+      }),
+    );
+    await Bun.write(
+      join(root, 'src', 'workflows.ts'),
+      'export async function restWorkflow(first: string, count?: number, ...rest: string[]): Promise<void> {}\n',
+    );
+
+    const analysis = await analyzeWorkflowFiles({
+      projectRoot: root,
+      tsconfig: 'tsconfig.json',
+      workflowFiles: ['src/workflows.ts'],
+    });
+    const args = analysis.workflows[0]?.signature.args ?? [];
+
+    expect(
+      args.map((arg) => [arg.displayName, arg.optional ?? false, arg.isRest ?? false]),
+    ).toEqual([
+      ['first', false, false],
+      ['count', true, false],
+      ['rest', false, true],
+    ]);
+  });
+
   it('handles dynamic Activity calls and inferred Activity implementations', async () => {
     const projectRoot = await createTemporaryAnalyzerProject();
     const analysis = await analyzeWorkflowFiles({

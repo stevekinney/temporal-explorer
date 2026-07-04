@@ -350,7 +350,7 @@ export default configuration;
 
     expect(run.exitCode).toBe(0);
     expect(run.stdout).toContain('flowchart TD');
-    expect(run.stdout).toContain('start --> activity_call_basicOrderWorkflow_validateOrder_0');
+    expect(run.stdout).toContain('["validateOrder"]');
   });
 
   it('opens the explorer in non-interactive verification mode', async () => {

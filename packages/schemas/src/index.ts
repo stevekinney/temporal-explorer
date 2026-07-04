@@ -112,6 +112,7 @@ export function validateArtifact(value: unknown): ArtifactValidationResult {
 }
 
 export * from './common';
+export * from './flow-node';
 export * from './temporal-analysis';
 export * from './temporal-overlay';
 export * from './temporal-trace';

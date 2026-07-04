@@ -185,7 +185,7 @@ function appendOperationsSection(
       operations.map((command) => [
         String(command.staticOrder + 1),
         command.kind,
-        `\`${command.name}\``,
+        command.deprecated ? `\`${command.name}\` (deprecated)` : `\`${command.name}\``,
         `\`${formatSource(command)}\``,
         isObserved(command.id, overlay) ? 'yes' : 'no',
         getMappingConfidence(command.id, overlay),

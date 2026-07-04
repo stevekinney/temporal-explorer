@@ -140,8 +140,12 @@ export function createTimeline(
   }
 
   if (closed) {
+    // The close event can coincide with an operation span's event (e.g. a
+    // continue-as-new is both the terminal operation and the close), so the
+    // close entry is namespaced to stay distinct from `timeline:${eventId}`
+    // span entries. Timeline ids back a keyed render, so they must be unique.
     entries.push({
-      id: `timeline:${closed.eventId}`,
+      id: `timeline:closed:${closed.eventId}`,
       operationId: `workflow:${getWorkflowClosedStatus(closed.eventType)}`,
       at: closed.eventTime,
       label: 'Workflow closed',

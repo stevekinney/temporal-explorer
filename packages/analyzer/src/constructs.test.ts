@@ -89,27 +89,53 @@ describe('construct discovery and configuration', () => {
     expect(externalCommands).toContainEqual(['external-workflow', 'release']);
   });
 
-  it('discovers patches, rollover, and cancellation scopes', async () => {
+  // Each `readCommands` call spins up a cold ts-morph Project with full type
+  // resolution (~1.8s). These construct-discovery assertions are kept in
+  // separate tests — one Project load apiece — so no single test batches
+  // multiple loads past bun's 5000ms default timeout.
+  it('discovers patch commands', async () => {
     expect(await readCommands('patched', 'src/workflows/patched-workflow.ts')).toEqual([
       ['patch', 'legacy-tax-rounding'],
       ['patch', 'use-modern-charge'],
       ['activity', 'newCharge'],
       ['activity', 'oldCharge'],
     ]);
+  });
 
+  it('discovers continue-as-new commands', async () => {
     expect(
       await readCommands('continue-as-new', 'src/workflows/continue-as-new-workflow.ts'),
     ).toEqual([
       ['activity', 'recordIteration'],
       ['continue-as-new', 'continueAsNewWorkflow'],
     ]);
+  });
 
+  it('discovers cancellation scopes', async () => {
     const cancellationCommands = await readCommands(
       'cancellation',
       'src/workflows/cancellation-workflow.ts',
     );
     expect(cancellationCommands).toContainEqual(['cancellation-scope', 'cancellable']);
     expect(cancellationCommands).toContainEqual(['cancellation-scope', 'nonCancellable']);
+  });
+
+  it('marks deprecatePatch commands as deprecated and patched commands as not', async () => {
+    const root = new URL('../../../fixtures/patched', import.meta.url).pathname;
+    const analysis = await analyzeProject(
+      await loadTemporalExplorerProject({
+        root,
+        workflowFiles: ['src/workflows/patched-workflow.ts'],
+      }),
+    );
+    const patches = analysis.workflows
+      .flatMap((workflow) => workflow.temporalCommands)
+      .filter((command) => command.kind === 'patch');
+
+    expect(patches.map((command) => [command.name, command.deprecated ?? false])).toEqual([
+      ['legacy-tax-rounding', true],
+      ['use-modern-charge', false],
+    ]);
   });
 
   it('validates configuration shapes and applies severity overrides', async () => {

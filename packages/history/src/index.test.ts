@@ -237,6 +237,32 @@ describe('event history parser', () => {
     ).toEqual(['release', 'signaled', 'external-target-1']);
   });
 
+  it('assigns every fixture trace a unique set of timeline ids', async () => {
+    // Regression: a close event that coincides with an operation span (e.g. a
+    // continue-as-new is both the terminal operation and the workflow close)
+    // once produced two `timeline:${eventId}` entries with the same id, which
+    // crashed the keyed timeline render. Timeline ids must be unique for every
+    // fixture history, not just the one that happened to collide.
+    const fixturesRoot = new URL('../../../fixtures/', import.meta.url).pathname;
+    const glob = new Bun.Glob('*/histories/*.json');
+    const scannedPaths = await Array.fromAsync(glob.scan({ cwd: fixturesRoot, absolute: true }));
+    const historyPaths = scannedPaths
+      .filter((path) => !path.endsWith('.provenance.json'))
+      .toSorted();
+
+    expect(historyPaths.length).toBeGreaterThan(0);
+
+    const offenders: string[] = [];
+    for (const path of historyPaths) {
+      const history = await Bun.file(path).json();
+      const trace = parseEventHistory({ history, traceId: path, historyHash: `${path}-hash` });
+      const ids = trace.timeline.map((entry) => entry.id);
+      if (new Set(ids).size !== ids.length) offenders.push(path);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
   it('keeps unclosed timers pending', () => {
     const trace = parseEventHistory({
       history: {
