@@ -76,6 +76,7 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "name": { "type": "string", "minLength": 1 },
+          "implementationName": { "type": "string", "minLength": 1 },
           "source": { "$ref": "#/$defs/__schema0" },
           "exported": { "type": "boolean" },
           "signature": {

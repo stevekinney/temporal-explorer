@@ -175,7 +175,18 @@ export const workflowDependencySchema = z
 export const workflowDefinitionSchema = z
   .object({
     id: z.string().min(1),
+    /**
+     * The name the Workflow is registered under. This is the exported/aliased
+     * name a Worker sees (e.g. `AutoUpgrading`), which can differ from the
+     * implementation function's name when registered via a re-export barrel.
+     */
     name: z.string().min(1),
+    /**
+     * The implementation function's own name, present only when it differs
+     * from the registered {@link name} (i.e. the Workflow is exported under an
+     * alias). The Workflow `id` and command IDs stay derived from this name.
+     */
+    implementationName: z.string().min(1).optional(),
     source: sourceLocationSchema,
     exported: z.boolean(),
     signature: workflowSignatureSchema,

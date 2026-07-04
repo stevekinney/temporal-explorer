@@ -162,6 +162,48 @@ function resolveDeclaringSourceFiles(sourceFile: SourceFile): SourceFile[] {
   return [...files.values()];
 }
 
+/**
+ * Maps each declaring file to its `{ implementationName -> registeredName }`
+ * aliases from re-export barrels (`export { impl as Registered } from './base'`).
+ *
+ * A Temporal Worker registers a Workflow under the name it is *exported* as, so
+ * an aliased re-export changes the runtime Workflow name while the underlying
+ * implementation function keeps its own name (used for the Workflow `id`,
+ * command IDs, and source location). Keying by the resolved target file — rather
+ * than threading aliases through re-export resolution — keeps the mapping
+ * order-independent and scoped to the file that declares each implementation.
+ */
+function collectRegisteredNamesByFile(project: Project): Map<string, Map<string, string>> {
+  const byFile = new Map<string, Map<string, string>>();
+
+  for (const sourceFile of project.getSourceFiles()) {
+    for (const exportDeclaration of sourceFile.getExportDeclarations()) {
+      const target = exportDeclaration.getModuleSpecifierSourceFile() ?? sourceFile;
+      const targetPath = target.getFilePath();
+
+      for (const specifier of exportDeclaration.getNamedExports()) {
+        const alias = specifier.getAliasNode()?.getText();
+
+        if (!alias) {
+          continue;
+        }
+
+        const names = byFile.get(targetPath) ?? new Map<string, string>();
+
+        // First registration wins so the mapping stays stable regardless of the
+        // order source files are visited.
+        if (!names.has(specifier.getName())) {
+          names.set(specifier.getName(), alias);
+        }
+
+        byFile.set(targetPath, names);
+      }
+    }
+  }
+
+  return byFile;
+}
+
 function collectWorkflowAnalysis(
   project: Project,
   root: string,
@@ -175,6 +217,7 @@ function collectWorkflowAnalysis(
   const activities: ActivityDefinition[] = [];
   const diagnostics: Diagnostic[] = [];
   const analyzedPaths = new Set<string>();
+  const registeredNamesByFile = collectRegisteredNamesByFile(project);
 
   for (const workflowFile of workflowFiles) {
     for (const sourceFile of resolveDeclaringSourceFiles(
@@ -185,7 +228,11 @@ function collectWorkflowAnalysis(
       }
 
       analyzedPaths.add(sourceFile.getFilePath());
-      const analysis = analyzeWorkflowSourceFile(root, sourceFile);
+      const analysis = analyzeWorkflowSourceFile(
+        root,
+        sourceFile,
+        registeredNamesByFile.get(sourceFile.getFilePath()) ?? new Map(),
+      );
       workflows.push(...analysis.workflows);
       activities.push(...analysis.activities);
       diagnostics.push(...analysis.diagnostics);

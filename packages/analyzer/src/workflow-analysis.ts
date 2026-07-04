@@ -113,8 +113,10 @@ function analyzeWorkflowFunction(
   root: string,
   functionDeclaration: FunctionDeclaration,
   proxyVariables: Set<string>,
+  registeredNames: Map<string, string>,
 ): WorkflowDefinition {
   const workflowName = functionDeclaration.getName() ?? 'anonymousWorkflow';
+  const registeredName = registeredNames.get(workflowName);
   const collected = collectTemporalCommands(
     root,
     workflowName,
@@ -149,7 +151,8 @@ function analyzeWorkflowFunction(
 
   return {
     id: `workflow:${workflowName}`,
-    name: workflowName,
+    name: registeredName ?? workflowName,
+    ...(registeredName ? { implementationName: workflowName } : {}),
     source: createSourceLocation(
       root,
       functionDeclaration.getSourceFile(),
@@ -255,6 +258,7 @@ export function analyzeWorkerFiles(project: Project, root: string): unknown[] {
 export function analyzeWorkflowSourceFile(
   root: string,
   sourceFile: SourceFile,
+  registeredNames: Map<string, string> = new Map(),
 ): {
   workflows: WorkflowDefinition[];
   activities: ActivityDefinition[];
@@ -274,7 +278,12 @@ export function analyzeWorkflowSourceFile(
       continue;
     }
 
-    const workflow = analyzeWorkflowFunction(root, functionDeclaration, proxyVariables);
+    const workflow = analyzeWorkflowFunction(
+      root,
+      functionDeclaration,
+      proxyVariables,
+      registeredNames,
+    );
     workflows.push(workflow);
     activities.push(...analyzeActivities(root, workflow, activitySourceFile, diagnostics));
     diagnostics.push(...workflow.diagnostics);
