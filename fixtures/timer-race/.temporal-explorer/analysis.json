@@ -150,7 +150,131 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:timerRaceWorkflow:1",
+            "commandId": "condition:timerRaceWorkflow:0",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 26,
+                "offset": 629
+              },
+              "end": {
+                "line": 19,
+                "column": 78,
+                "offset": 681
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:timerRaceWorkflow:2",
+            "commandId": "timer:timerRaceWorkflow:1",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 26,
+                "offset": 629
+              },
+              "end": {
+                "line": 19,
+                "column": 78,
+                "offset": 681
+              }
+            }
+          },
+          {
+            "type": "branch",
+            "id": "flow:timerRaceWorkflow:5",
+            "branchKind": "if",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 21,
+                "column": 3,
+                "offset": 686
+              },
+              "end": {
+                "line": 29,
+                "column": 4,
+                "offset": 914
+              }
+            },
+            "clauses": [
+              {
+                "label": "approved",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:timerRaceWorkflow:3",
+                    "commandId": "activity-call:timerRaceWorkflow:notifyApproved:2",
+                    "source": {
+                      "path": "src/workflows/timer-race-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 22,
+                        "column": 26,
+                        "offset": 727
+                      },
+                      "end": {
+                        "line": 22,
+                        "column": 93,
+                        "offset": 794
+                      },
+                      "symbolName": "notifyApproved"
+                    }
+                  },
+                  {
+                    "type": "terminal",
+                    "id": "flow:timerRaceWorkflow:4",
+                    "terminalKind": "return",
+                    "source": {
+                      "path": "src/workflows/timer-race-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 24,
+                        "column": 5,
+                        "offset": 801
+                      },
+                      "end": {
+                        "line": 28,
+                        "column": 7,
+                        "offset": 910
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "command",
+            "id": "flow:timerRaceWorkflow:6",
+            "commandId": "activity-call:timerRaceWorkflow:notifyExpired:3",
+            "source": {
+              "path": "src/workflows/timer-race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 31,
+                "column": 24,
+                "offset": 939
+              },
+              "end": {
+                "line": 31,
+                "column": 65,
+                "offset": 980
+              },
+              "symbolName": "notifyExpired"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

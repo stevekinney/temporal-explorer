@@ -260,7 +260,48 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:childWorkflowParent:1",
+            "commandId": "child-workflow:childWorkflowParent:reserveInventoryChild:0",
+            "source": {
+              "path": "src/workflows/child-workflow-parent.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 38,
+                "column": 25,
+                "offset": 793
+              },
+              "end": {
+                "line": 40,
+                "column": 5,
+                "offset": 875
+              },
+              "symbolName": "reserveInventoryChild"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:childWorkflowParent:2",
+            "commandId": "child-workflow:childWorkflowParent:releaseNotificationChild:1",
+            "source": {
+              "path": "src/workflows/child-workflow-parent.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 42,
+                "column": 24,
+                "offset": 901
+              },
+              "end": {
+                "line": 44,
+                "column": 5,
+                "offset": 984
+              },
+              "symbolName": "releaseNotificationChild"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

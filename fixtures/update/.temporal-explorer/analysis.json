@@ -219,7 +219,47 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:updateWorkflow:1",
+            "commandId": "condition:updateWorkflow:0",
+            "source": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 49,
+                "column": 9,
+                "offset": 1246
+              },
+              "end": {
+                "line": 49,
+                "column": 67,
+                "offset": 1304
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:updateWorkflow:2",
+            "commandId": "activity-call:updateWorkflow:recordAddress:1",
+            "source": {
+              "path": "src/workflows/update-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 51,
+                "column": 24,
+                "offset": 1330
+              },
+              "end": {
+                "line": 51,
+                "column": 57,
+                "offset": 1363
+              },
+              "symbolName": "recordAddress"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

@@ -1,8 +1,13 @@
 flowchart TD
   start(["continueAsNewWorkflow"])
-  activity_call_continueAsNewWorkflow_recordIteration_0["recordIteration"]
-  continue_as_new_continueAsNewWorkflow_1["continueAsNewWorkflow"]
+  flow_continueAsNewWorkflow_1["recordIteration"]
+  flow_continueAsNewWorkflow_3{"if"}
+  n1(( ))
+  flow_continueAsNewWorkflow_2[/"continue as new: continueAsNewWorkflow"/]
   complete(["complete"])
-  start --> activity_call_continueAsNewWorkflow_recordIteration_0
-  activity_call_continueAsNewWorkflow_recordIteration_0 --> continue_as_new_continueAsNewWorkflow_1
-  continue_as_new_continueAsNewWorkflow_1 --> complete
+  start --> flow_continueAsNewWorkflow_1
+  flow_continueAsNewWorkflow_1 --> flow_continueAsNewWorkflow_3
+  flow_continueAsNewWorkflow_3 -->|"input.iteration + 1 < input.maxIterations"| flow_continueAsNewWorkflow_2
+  flow_continueAsNewWorkflow_2 -->|"loop"| start
+  flow_continueAsNewWorkflow_3 -->|"else"| n1
+  n1 --> complete

@@ -150,7 +150,1246 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:1",
+            "commandId": "condition:largeWorkflow:0",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 8,
+                "offset": 595
+              },
+              "end": {
+                "line": 18,
+                "column": 47,
+                "offset": 634
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:2",
+            "commandId": "activity-call:largeWorkflow:step00:1",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 21,
+                "column": 30,
+                "offset": 702
+              },
+              "end": {
+                "line": 21,
+                "column": 62,
+                "offset": 734
+              },
+              "symbolName": "step00"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:3",
+            "commandId": "activity-call:largeWorkflow:step01:2",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 23,
+                "column": 30,
+                "offset": 806
+              },
+              "end": {
+                "line": 23,
+                "column": 62,
+                "offset": 838
+              },
+              "symbolName": "step01"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:4",
+            "commandId": "activity-call:largeWorkflow:step02:3",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 25,
+                "column": 30,
+                "offset": 910
+              },
+              "end": {
+                "line": 25,
+                "column": 62,
+                "offset": 942
+              },
+              "symbolName": "step02"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:5",
+            "commandId": "activity-call:largeWorkflow:step03:4",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 27,
+                "column": 30,
+                "offset": 1014
+              },
+              "end": {
+                "line": 27,
+                "column": 62,
+                "offset": 1046
+              },
+              "symbolName": "step03"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:6",
+            "commandId": "activity-call:largeWorkflow:step04:5",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 29,
+                "column": 30,
+                "offset": 1118
+              },
+              "end": {
+                "line": 29,
+                "column": 62,
+                "offset": 1150
+              },
+              "symbolName": "step04"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:7",
+            "commandId": "activity-call:largeWorkflow:step05:6",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 31,
+                "column": 30,
+                "offset": 1222
+              },
+              "end": {
+                "line": 31,
+                "column": 62,
+                "offset": 1254
+              },
+              "symbolName": "step05"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:8",
+            "commandId": "activity-call:largeWorkflow:step06:7",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 33,
+                "column": 30,
+                "offset": 1326
+              },
+              "end": {
+                "line": 33,
+                "column": 62,
+                "offset": 1358
+              },
+              "symbolName": "step06"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:9",
+            "commandId": "activity-call:largeWorkflow:step07:8",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 35,
+                "column": 30,
+                "offset": 1430
+              },
+              "end": {
+                "line": 35,
+                "column": 62,
+                "offset": 1462
+              },
+              "symbolName": "step07"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:10",
+            "commandId": "activity-call:largeWorkflow:step08:9",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 37,
+                "column": 30,
+                "offset": 1534
+              },
+              "end": {
+                "line": 37,
+                "column": 62,
+                "offset": 1566
+              },
+              "symbolName": "step08"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:11",
+            "commandId": "activity-call:largeWorkflow:step09:10",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 39,
+                "column": 30,
+                "offset": 1638
+              },
+              "end": {
+                "line": 39,
+                "column": 62,
+                "offset": 1670
+              },
+              "symbolName": "step09"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:12",
+            "commandId": "activity-call:largeWorkflow:step10:11",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 41,
+                "column": 30,
+                "offset": 1742
+              },
+              "end": {
+                "line": 41,
+                "column": 62,
+                "offset": 1774
+              },
+              "symbolName": "step10"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:13",
+            "commandId": "activity-call:largeWorkflow:step11:12",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 43,
+                "column": 30,
+                "offset": 1846
+              },
+              "end": {
+                "line": 43,
+                "column": 62,
+                "offset": 1878
+              },
+              "symbolName": "step11"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:14",
+            "commandId": "activity-call:largeWorkflow:step12:13",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 45,
+                "column": 30,
+                "offset": 1950
+              },
+              "end": {
+                "line": 45,
+                "column": 62,
+                "offset": 1982
+              },
+              "symbolName": "step12"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:15",
+            "commandId": "activity-call:largeWorkflow:step13:14",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 47,
+                "column": 30,
+                "offset": 2054
+              },
+              "end": {
+                "line": 47,
+                "column": 62,
+                "offset": 2086
+              },
+              "symbolName": "step13"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:16",
+            "commandId": "activity-call:largeWorkflow:step14:15",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 49,
+                "column": 30,
+                "offset": 2158
+              },
+              "end": {
+                "line": 49,
+                "column": 62,
+                "offset": 2190
+              },
+              "symbolName": "step14"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:17",
+            "commandId": "activity-call:largeWorkflow:step15:16",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 51,
+                "column": 30,
+                "offset": 2262
+              },
+              "end": {
+                "line": 51,
+                "column": 62,
+                "offset": 2294
+              },
+              "symbolName": "step15"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:18",
+            "commandId": "activity-call:largeWorkflow:step16:17",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 53,
+                "column": 30,
+                "offset": 2366
+              },
+              "end": {
+                "line": 53,
+                "column": 62,
+                "offset": 2398
+              },
+              "symbolName": "step16"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:19",
+            "commandId": "activity-call:largeWorkflow:step17:18",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 55,
+                "column": 30,
+                "offset": 2470
+              },
+              "end": {
+                "line": 55,
+                "column": 62,
+                "offset": 2502
+              },
+              "symbolName": "step17"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:20",
+            "commandId": "activity-call:largeWorkflow:step18:19",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 57,
+                "column": 30,
+                "offset": 2574
+              },
+              "end": {
+                "line": 57,
+                "column": 62,
+                "offset": 2606
+              },
+              "symbolName": "step18"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:21",
+            "commandId": "activity-call:largeWorkflow:step19:20",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 59,
+                "column": 30,
+                "offset": 2678
+              },
+              "end": {
+                "line": 59,
+                "column": 62,
+                "offset": 2710
+              },
+              "symbolName": "step19"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:22",
+            "commandId": "activity-call:largeWorkflow:step20:21",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 61,
+                "column": 30,
+                "offset": 2782
+              },
+              "end": {
+                "line": 61,
+                "column": 62,
+                "offset": 2814
+              },
+              "symbolName": "step20"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:23",
+            "commandId": "activity-call:largeWorkflow:step21:22",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 63,
+                "column": 30,
+                "offset": 2886
+              },
+              "end": {
+                "line": 63,
+                "column": 62,
+                "offset": 2918
+              },
+              "symbolName": "step21"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:24",
+            "commandId": "activity-call:largeWorkflow:step22:23",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 65,
+                "column": 30,
+                "offset": 2990
+              },
+              "end": {
+                "line": 65,
+                "column": 62,
+                "offset": 3022
+              },
+              "symbolName": "step22"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:25",
+            "commandId": "activity-call:largeWorkflow:step23:24",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 67,
+                "column": 30,
+                "offset": 3094
+              },
+              "end": {
+                "line": 67,
+                "column": 62,
+                "offset": 3126
+              },
+              "symbolName": "step23"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:26",
+            "commandId": "activity-call:largeWorkflow:step24:25",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 69,
+                "column": 30,
+                "offset": 3198
+              },
+              "end": {
+                "line": 69,
+                "column": 62,
+                "offset": 3230
+              },
+              "symbolName": "step24"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:27",
+            "commandId": "activity-call:largeWorkflow:step25:26",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 71,
+                "column": 30,
+                "offset": 3302
+              },
+              "end": {
+                "line": 71,
+                "column": 62,
+                "offset": 3334
+              },
+              "symbolName": "step25"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:28",
+            "commandId": "activity-call:largeWorkflow:step26:27",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 73,
+                "column": 30,
+                "offset": 3406
+              },
+              "end": {
+                "line": 73,
+                "column": 62,
+                "offset": 3438
+              },
+              "symbolName": "step26"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:29",
+            "commandId": "activity-call:largeWorkflow:step27:28",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 75,
+                "column": 30,
+                "offset": 3510
+              },
+              "end": {
+                "line": 75,
+                "column": 62,
+                "offset": 3542
+              },
+              "symbolName": "step27"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:30",
+            "commandId": "activity-call:largeWorkflow:step28:29",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 77,
+                "column": 30,
+                "offset": 3614
+              },
+              "end": {
+                "line": 77,
+                "column": 62,
+                "offset": 3646
+              },
+              "symbolName": "step28"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:31",
+            "commandId": "activity-call:largeWorkflow:step29:30",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 79,
+                "column": 30,
+                "offset": 3718
+              },
+              "end": {
+                "line": 79,
+                "column": 62,
+                "offset": 3750
+              },
+              "symbolName": "step29"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:32",
+            "commandId": "timer:largeWorkflow:31",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 81,
+                "column": 9,
+                "offset": 3801
+              },
+              "end": {
+                "line": 81,
+                "column": 26,
+                "offset": 3818
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:33",
+            "commandId": "activity-call:largeWorkflow:step30:32",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 82,
+                "column": 30,
+                "offset": 3849
+              },
+              "end": {
+                "line": 82,
+                "column": 62,
+                "offset": 3881
+              },
+              "symbolName": "step30"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:34",
+            "commandId": "activity-call:largeWorkflow:step31:33",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 84,
+                "column": 30,
+                "offset": 3953
+              },
+              "end": {
+                "line": 84,
+                "column": 62,
+                "offset": 3985
+              },
+              "symbolName": "step31"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:35",
+            "commandId": "activity-call:largeWorkflow:step32:34",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 86,
+                "column": 30,
+                "offset": 4057
+              },
+              "end": {
+                "line": 86,
+                "column": 62,
+                "offset": 4089
+              },
+              "symbolName": "step32"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:36",
+            "commandId": "activity-call:largeWorkflow:step33:35",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 88,
+                "column": 30,
+                "offset": 4161
+              },
+              "end": {
+                "line": 88,
+                "column": 62,
+                "offset": 4193
+              },
+              "symbolName": "step33"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:37",
+            "commandId": "activity-call:largeWorkflow:step34:36",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 90,
+                "column": 30,
+                "offset": 4265
+              },
+              "end": {
+                "line": 90,
+                "column": 62,
+                "offset": 4297
+              },
+              "symbolName": "step34"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:38",
+            "commandId": "activity-call:largeWorkflow:step35:37",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 92,
+                "column": 30,
+                "offset": 4369
+              },
+              "end": {
+                "line": 92,
+                "column": 62,
+                "offset": 4401
+              },
+              "symbolName": "step35"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:39",
+            "commandId": "activity-call:largeWorkflow:step36:38",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 94,
+                "column": 30,
+                "offset": 4473
+              },
+              "end": {
+                "line": 94,
+                "column": 62,
+                "offset": 4505
+              },
+              "symbolName": "step36"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:40",
+            "commandId": "activity-call:largeWorkflow:step37:39",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 96,
+                "column": 30,
+                "offset": 4577
+              },
+              "end": {
+                "line": 96,
+                "column": 62,
+                "offset": 4609
+              },
+              "symbolName": "step37"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:41",
+            "commandId": "activity-call:largeWorkflow:step38:40",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 98,
+                "column": 30,
+                "offset": 4681
+              },
+              "end": {
+                "line": 98,
+                "column": 62,
+                "offset": 4713
+              },
+              "symbolName": "step38"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:42",
+            "commandId": "activity-call:largeWorkflow:step39:41",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 100,
+                "column": 30,
+                "offset": 4785
+              },
+              "end": {
+                "line": 100,
+                "column": 62,
+                "offset": 4817
+              },
+              "symbolName": "step39"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:43",
+            "commandId": "activity-call:largeWorkflow:step40:42",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 102,
+                "column": 30,
+                "offset": 4889
+              },
+              "end": {
+                "line": 102,
+                "column": 62,
+                "offset": 4921
+              },
+              "symbolName": "step40"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:44",
+            "commandId": "activity-call:largeWorkflow:step41:43",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 104,
+                "column": 30,
+                "offset": 4993
+              },
+              "end": {
+                "line": 104,
+                "column": 62,
+                "offset": 5025
+              },
+              "symbolName": "step41"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:45",
+            "commandId": "activity-call:largeWorkflow:step42:44",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 106,
+                "column": 30,
+                "offset": 5097
+              },
+              "end": {
+                "line": 106,
+                "column": 62,
+                "offset": 5129
+              },
+              "symbolName": "step42"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:46",
+            "commandId": "activity-call:largeWorkflow:step43:45",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 108,
+                "column": 30,
+                "offset": 5201
+              },
+              "end": {
+                "line": 108,
+                "column": 62,
+                "offset": 5233
+              },
+              "symbolName": "step43"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:47",
+            "commandId": "activity-call:largeWorkflow:step44:46",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 110,
+                "column": 30,
+                "offset": 5305
+              },
+              "end": {
+                "line": 110,
+                "column": 62,
+                "offset": 5337
+              },
+              "symbolName": "step44"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:48",
+            "commandId": "activity-call:largeWorkflow:step45:47",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 112,
+                "column": 30,
+                "offset": 5409
+              },
+              "end": {
+                "line": 112,
+                "column": 62,
+                "offset": 5441
+              },
+              "symbolName": "step45"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:49",
+            "commandId": "activity-call:largeWorkflow:step46:48",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 114,
+                "column": 30,
+                "offset": 5513
+              },
+              "end": {
+                "line": 114,
+                "column": 62,
+                "offset": 5545
+              },
+              "symbolName": "step46"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:50",
+            "commandId": "activity-call:largeWorkflow:step47:49",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 116,
+                "column": 30,
+                "offset": 5617
+              },
+              "end": {
+                "line": 116,
+                "column": 62,
+                "offset": 5649
+              },
+              "symbolName": "step47"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:51",
+            "commandId": "activity-call:largeWorkflow:step48:50",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 118,
+                "column": 30,
+                "offset": 5721
+              },
+              "end": {
+                "line": 118,
+                "column": 62,
+                "offset": 5753
+              },
+              "symbolName": "step48"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:52",
+            "commandId": "activity-call:largeWorkflow:step49:51",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 120,
+                "column": 30,
+                "offset": 5825
+              },
+              "end": {
+                "line": 120,
+                "column": 62,
+                "offset": 5857
+              },
+              "symbolName": "step49"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:53",
+            "commandId": "activity-call:largeWorkflow:step50:52",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 122,
+                "column": 30,
+                "offset": 5929
+              },
+              "end": {
+                "line": 122,
+                "column": 62,
+                "offset": 5961
+              },
+              "symbolName": "step50"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:54",
+            "commandId": "activity-call:largeWorkflow:step51:53",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 124,
+                "column": 30,
+                "offset": 6033
+              },
+              "end": {
+                "line": 124,
+                "column": 62,
+                "offset": 6065
+              },
+              "symbolName": "step51"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:55",
+            "commandId": "activity-call:largeWorkflow:step52:54",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 126,
+                "column": 30,
+                "offset": 6137
+              },
+              "end": {
+                "line": 126,
+                "column": 62,
+                "offset": 6169
+              },
+              "symbolName": "step52"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:56",
+            "commandId": "activity-call:largeWorkflow:step53:55",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 128,
+                "column": 30,
+                "offset": 6241
+              },
+              "end": {
+                "line": 128,
+                "column": 62,
+                "offset": 6273
+              },
+              "symbolName": "step53"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:57",
+            "commandId": "activity-call:largeWorkflow:step54:56",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 130,
+                "column": 30,
+                "offset": 6345
+              },
+              "end": {
+                "line": 130,
+                "column": 62,
+                "offset": 6377
+              },
+              "symbolName": "step54"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:58",
+            "commandId": "activity-call:largeWorkflow:step55:57",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 132,
+                "column": 30,
+                "offset": 6449
+              },
+              "end": {
+                "line": 132,
+                "column": 62,
+                "offset": 6481
+              },
+              "symbolName": "step55"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:59",
+            "commandId": "activity-call:largeWorkflow:step56:58",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 134,
+                "column": 30,
+                "offset": 6553
+              },
+              "end": {
+                "line": 134,
+                "column": 62,
+                "offset": 6585
+              },
+              "symbolName": "step56"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:60",
+            "commandId": "activity-call:largeWorkflow:step57:59",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 136,
+                "column": 30,
+                "offset": 6657
+              },
+              "end": {
+                "line": 136,
+                "column": 62,
+                "offset": 6689
+              },
+              "symbolName": "step57"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:61",
+            "commandId": "activity-call:largeWorkflow:step58:60",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 138,
+                "column": 30,
+                "offset": 6761
+              },
+              "end": {
+                "line": 138,
+                "column": 62,
+                "offset": 6793
+              },
+              "symbolName": "step58"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:largeWorkflow:62",
+            "commandId": "activity-call:largeWorkflow:step59:61",
+            "source": {
+              "path": "src/workflows/large-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 140,
+                "column": 30,
+                "offset": 6865
+              },
+              "end": {
+                "line": 140,
+                "column": 62,
+                "offset": 6897
+              },
+              "symbolName": "step59"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

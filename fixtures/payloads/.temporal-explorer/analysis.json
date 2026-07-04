@@ -106,7 +106,28 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:payloadWorkflow:1",
+            "commandId": "activity-call:payloadWorkflow:storeProfile:0",
+            "source": {
+              "path": "src/workflows/payload-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 11,
+                "column": 16,
+                "offset": 430
+              },
+              "end": {
+                "line": 11,
+                "column": 48,
+                "offset": 462
+              },
+              "symbolName": "storeProfile"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

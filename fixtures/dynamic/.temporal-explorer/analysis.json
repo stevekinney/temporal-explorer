@@ -106,7 +106,68 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:dynamicWorkflow:1",
+            "commandId": "activity-call:dynamicWorkflow:archiveRequest:0",
+            "source": {
+              "path": "src/workflows/dynamic-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 14,
+                "column": 25,
+                "offset": 516
+              },
+              "end": {
+                "line": 14,
+                "column": 67,
+                "offset": 558
+              },
+              "symbolName": "archiveRequest"
+            }
+          },
+          {
+            "type": "loop",
+            "id": "flow:dynamicWorkflow:3",
+            "loopKind": "for-of",
+            "source": {
+              "path": "src/workflows/dynamic-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 3,
+                "offset": 563
+              },
+              "end": {
+                "line": 19,
+                "column": 4,
+                "offset": 754
+              }
+            },
+            "body": [
+              {
+                "type": "command",
+                "id": "flow:dynamicWorkflow:2",
+                "commandId": "dynamic:dynamicWorkflow:1",
+                "source": {
+                  "path": "src/workflows/dynamic-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 18,
+                    "column": 28,
+                    "offset": 708
+                  },
+                  "end": {
+                    "line": 18,
+                    "column": 68,
+                    "offset": 748
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       "temporalCommands": [
         {

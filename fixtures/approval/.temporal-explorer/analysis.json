@@ -150,7 +150,47 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:approvalWorkflow:1",
+            "commandId": "condition:approvalWorkflow:0",
+            "source": {
+              "path": "src/workflows/approval-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 23,
+                "column": 9,
+                "offset": 674
+              },
+              "end": {
+                "line": 23,
+                "column": 48,
+                "offset": 713
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:approvalWorkflow:2",
+            "commandId": "activity-call:approvalWorkflow:recordApproval:1",
+            "source": {
+              "path": "src/workflows/approval-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 26,
+                "column": 25,
+                "offset": 796
+              },
+              "end": {
+                "line": 29,
+                "column": 5,
+                "offset": 876
+              },
+              "symbolName": "recordApproval"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

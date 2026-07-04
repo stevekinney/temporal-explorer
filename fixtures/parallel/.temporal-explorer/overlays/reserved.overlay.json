@@ -1,0 +1,283 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:parallelWorkflow:trace:reserved:reserved-run-id",
+  "staticAnalysisId": "analysis:parallel",
+  "runtimeTraceId": "trace:reserved:reserved-run-id",
+  "workflow": "parallelWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:parallelWorkflow",
+      "kind": "workflow",
+      "name": "parallelWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 1,
+          "offset": 767
+        },
+        "end": {
+          "line": 35,
+          "column": 2,
+          "offset": 1266
+        },
+        "symbolName": "parallelWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:parallelWorkflow:validateRequest:0",
+      "kind": "activity",
+      "name": "validateRequest",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 43,
+          "offset": 900
+        },
+        "end": {
+          "line": 25,
+          "column": 65,
+          "offset": 922
+        },
+        "symbolName": "validateRequest"
+      }
+    },
+    {
+      "id": "activity-call:parallelWorkflow:reserveInventory:1",
+      "kind": "activity",
+      "name": "reserveInventory",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 5,
+          "offset": 1026
+        },
+        "end": {
+          "line": 28,
+          "column": 30,
+          "offset": 1051
+        },
+        "symbolName": "reserveInventory"
+      }
+    },
+    {
+      "id": "activity-call:parallelWorkflow:reserveShipping:2",
+      "kind": "activity",
+      "name": "reserveShipping",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 29,
+          "column": 5,
+          "offset": 1057
+        },
+        "end": {
+          "line": 29,
+          "column": 29,
+          "offset": 1081
+        },
+        "symbolName": "reserveShipping"
+      }
+    },
+    {
+      "id": "activity-call:parallelWorkflow:confirmReservation:3",
+      "kind": "activity",
+      "name": "confirmReservation",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 50,
+          "offset": 1139
+        },
+        "end": {
+          "line": 32,
+          "column": 89,
+          "offset": 1178
+        },
+        "symbolName": "confirmReservation"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:parallelWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to parallelWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type parallelWorkflow matched static Workflow parallelWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:parallelWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/parallel-workflow.ts:24.",
+          "staticNodeId": "workflow:parallelWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:parallelWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to parallelWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type parallelWorkflow matched static Workflow parallelWorkflow.",
+          "eventIds": [29],
+          "staticNodeId": "workflow:parallelWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/parallel-workflow.ts:24.",
+          "staticNodeId": "workflow:parallelWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:validateRequest:5",
+      "staticNodeId": "activity-call:parallelWorkflow:validateRequest:0",
+      "confidence": "exact",
+      "reason": "Activity validateRequest matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type validateRequest matched static Activity command validateRequest.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:parallelWorkflow:validateRequest:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:parallelWorkflow:validateRequest:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/parallel-workflow.ts:25.",
+          "staticNodeId": "activity-call:parallelWorkflow:validateRequest:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveInventory:11",
+      "staticNodeId": "activity-call:parallelWorkflow:reserveInventory:1",
+      "confidence": "exact",
+      "reason": "Activity reserveInventory matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveInventory matched static Activity command reserveInventory.",
+          "eventIds": [11, 13, 14],
+          "staticNodeId": "activity-call:parallelWorkflow:reserveInventory:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 13, 14],
+          "staticNodeId": "activity-call:parallelWorkflow:reserveInventory:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/parallel-workflow.ts:28.",
+          "staticNodeId": "activity-call:parallelWorkflow:reserveInventory:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveShipping:12",
+      "staticNodeId": "activity-call:parallelWorkflow:reserveShipping:2",
+      "confidence": "exact",
+      "reason": "Activity reserveShipping matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveShipping matched static Activity command reserveShipping.",
+          "eventIds": [12, 18, 19],
+          "staticNodeId": "activity-call:parallelWorkflow:reserveShipping:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [12, 18, 19],
+          "staticNodeId": "activity-call:parallelWorkflow:reserveShipping:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/parallel-workflow.ts:29.",
+          "staticNodeId": "activity-call:parallelWorkflow:reserveShipping:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:confirmReservation:23",
+      "staticNodeId": "activity-call:parallelWorkflow:confirmReservation:3",
+      "confidence": "exact",
+      "reason": "Activity confirmReservation matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type confirmReservation matched static Activity command confirmReservation.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:parallelWorkflow:confirmReservation:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:parallelWorkflow:confirmReservation:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/parallel-workflow.ts:32.",
+          "staticNodeId": "activity-call:parallelWorkflow:confirmReservation:3"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 5,
+      "observed": 5,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 4,
+      "observed": 4,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

@@ -21,10 +21,10 @@ Signature: `patchedWorkflow(input: PatchedInput): Promise<PatchedResult>`
 
 ## Temporal Operations
 
-| Order | Kind  | Target                | Source                                 | Observed | Confidence |
-| ----: | ----- | --------------------- | -------------------------------------- | -------- | ---------- |
-|     1 | patch | `legacy-tax-rounding` | `src/workflows/patched-workflow.ts:11` | yes      | exact      |
-|     2 | patch | `use-modern-charge`   | `src/workflows/patched-workflow.ts:13` | yes      | exact      |
+| Order | Kind  | Target                             | Source                                 | Observed | Confidence |
+| ----: | ----- | ---------------------------------- | -------------------------------------- | -------- | ---------- |
+|     1 | patch | `legacy-tax-rounding` (deprecated) | `src/workflows/patched-workflow.ts:11` | yes      | exact      |
+|     2 | patch | `use-modern-charge`                | `src/workflows/patched-workflow.ts:13` | yes      | exact      |
 
 ## Runtime Summary
 

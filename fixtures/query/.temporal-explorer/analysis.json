@@ -277,7 +277,47 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:queryWorkflow:1",
+            "commandId": "activity-call:queryWorkflow:recordAudit:0",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 45,
+                "column": 23,
+                "offset": 1239
+              },
+              "end": {
+                "line": 45,
+                "column": 62,
+                "offset": 1278
+              },
+              "symbolName": "recordAudit"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:queryWorkflow:2",
+            "commandId": "condition:queryWorkflow:1",
+            "source": {
+              "path": "src/workflows/query-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 48,
+                "column": 9,
+                "offset": 1329
+              },
+              "end": {
+                "line": 48,
+                "column": 30,
+                "offset": 1350
+              }
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

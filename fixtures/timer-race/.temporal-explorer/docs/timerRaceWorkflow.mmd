@@ -1,12 +1,18 @@
 flowchart TD
   start(["timerRaceWorkflow"])
-  condition_timerRaceWorkflow_0{"() => approvedBy !== undefined"}
-  timer_timerRaceWorkflow_1(("'30 days'"))
-  activity_call_timerRaceWorkflow_notifyApproved_2["notifyApproved"]
-  activity_call_timerRaceWorkflow_notifyExpired_3["notifyExpired"]
+  flow_timerRaceWorkflow_1{"() => approvedBy !== undefined"}
+  flow_timerRaceWorkflow_2(("'30 days'"))
+  flow_timerRaceWorkflow_5{"if"}
+  n1(( ))
+  flow_timerRaceWorkflow_3["notifyApproved"]
+  flow_timerRaceWorkflow_4(["return"])
+  flow_timerRaceWorkflow_6["notifyExpired"]
   complete(["complete"])
-  start --> condition_timerRaceWorkflow_0
-  condition_timerRaceWorkflow_0 --> timer_timerRaceWorkflow_1
-  timer_timerRaceWorkflow_1 --> activity_call_timerRaceWorkflow_notifyApproved_2
-  activity_call_timerRaceWorkflow_notifyApproved_2 --> activity_call_timerRaceWorkflow_notifyExpired_3
-  activity_call_timerRaceWorkflow_notifyExpired_3 --> complete
+  start --> flow_timerRaceWorkflow_1
+  flow_timerRaceWorkflow_1 --> flow_timerRaceWorkflow_2
+  flow_timerRaceWorkflow_2 --> flow_timerRaceWorkflow_5
+  flow_timerRaceWorkflow_5 -->|"approved"| flow_timerRaceWorkflow_3
+  flow_timerRaceWorkflow_3 --> flow_timerRaceWorkflow_4
+  flow_timerRaceWorkflow_5 -->|"else"| n1
+  n1 --> flow_timerRaceWorkflow_6
+  flow_timerRaceWorkflow_6 --> complete

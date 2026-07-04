@@ -1,0 +1,467 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:parallel",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "parallel",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/parallel-workflow.ts": "b6a1a839cadfe2e26188dfc473fb8294013c937e7d85e372258e70ec657fd4cb"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "parallel",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 204
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 345
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:parallelWorkflow",
+      "name": "parallelWorkflow",
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 1,
+          "offset": 767
+        },
+        "end": {
+          "line": 35,
+          "column": 2,
+          "offset": 1266
+        },
+        "symbolName": "parallelWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "parallelWorkflow:arg:0:input",
+            "display": "ReservationInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/parallel-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 24,
+                "column": 40,
+                "offset": 806
+              },
+              "end": {
+                "line": 24,
+                "column": 63,
+                "offset": 829
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "parallelWorkflow:result",
+          "display": "Promise<ParallelResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:parallelWorkflow:1",
+            "commandId": "activity-call:parallelWorkflow:validateRequest:0",
+            "source": {
+              "path": "src/workflows/parallel-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 25,
+                "column": 43,
+                "offset": 900
+              },
+              "end": {
+                "line": 25,
+                "column": 65,
+                "offset": 922
+              },
+              "symbolName": "validateRequest"
+            }
+          },
+          {
+            "type": "parallel",
+            "id": "flow:parallelWorkflow:2",
+            "parallelKind": "all",
+            "source": {
+              "path": "src/workflows/parallel-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 27,
+                "column": 84,
+                "offset": 1008
+              },
+              "end": {
+                "line": 30,
+                "column": 5,
+                "offset": 1087
+              }
+            },
+            "cardinality": "fixed",
+            "branches": [
+              [
+                {
+                  "type": "command",
+                  "id": "flow:parallelWorkflow:3",
+                  "commandId": "activity-call:parallelWorkflow:reserveInventory:1",
+                  "source": {
+                    "path": "src/workflows/parallel-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 28,
+                      "column": 5,
+                      "offset": 1026
+                    },
+                    "end": {
+                      "line": 28,
+                      "column": 30,
+                      "offset": 1051
+                    },
+                    "symbolName": "reserveInventory"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "command",
+                  "id": "flow:parallelWorkflow:4",
+                  "commandId": "activity-call:parallelWorkflow:reserveShipping:2",
+                  "source": {
+                    "path": "src/workflows/parallel-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 29,
+                      "column": 5,
+                      "offset": 1057
+                    },
+                    "end": {
+                      "line": 29,
+                      "column": 29,
+                      "offset": 1081
+                    },
+                    "symbolName": "reserveShipping"
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "type": "command",
+            "id": "flow:parallelWorkflow:5",
+            "commandId": "activity-call:parallelWorkflow:confirmReservation:3",
+            "source": {
+              "path": "src/workflows/parallel-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 32,
+                "column": 50,
+                "offset": 1139
+              },
+              "end": {
+                "line": 32,
+                "column": 89,
+                "offset": 1178
+              },
+              "symbolName": "confirmReservation"
+            }
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:parallelWorkflow:validateRequest:0",
+          "kind": "activity",
+          "name": "validateRequest",
+          "source": {
+            "path": "src/workflows/parallel-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 25,
+              "column": 43,
+              "offset": 900
+            },
+            "end": {
+              "line": 25,
+              "column": 65,
+              "offset": 922
+            },
+            "symbolName": "validateRequest"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:parallelWorkflow:reserveInventory:1",
+          "kind": "activity",
+          "name": "reserveInventory",
+          "source": {
+            "path": "src/workflows/parallel-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 28,
+              "column": 5,
+              "offset": 1026
+            },
+            "end": {
+              "line": 28,
+              "column": 30,
+              "offset": 1051
+            },
+            "symbolName": "reserveInventory"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:parallelWorkflow:reserveShipping:2",
+          "kind": "activity",
+          "name": "reserveShipping",
+          "source": {
+            "path": "src/workflows/parallel-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 29,
+              "column": 5,
+              "offset": 1057
+            },
+            "end": {
+              "line": 29,
+              "column": 29,
+              "offset": 1081
+            },
+            "symbolName": "reserveShipping"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:parallelWorkflow:confirmReservation:3",
+          "kind": "activity",
+          "name": "confirmReservation",
+          "source": {
+            "path": "src/workflows/parallel-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 32,
+              "column": 50,
+              "offset": 1139
+            },
+            "end": {
+              "line": 32,
+              "column": 89,
+              "offset": 1178
+            },
+            "symbolName": "confirmReservation"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ParallelResult",
+          "module": "src/activities/reservation-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ReservationInput",
+          "module": "src/activities/reservation-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:validateRequest",
+      "name": "validateRequest",
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 43,
+          "offset": 900
+        },
+        "end": {
+          "line": 25,
+          "column": 65,
+          "offset": 922
+        },
+        "symbolName": "validateRequest"
+      },
+      "implementationSource": {
+        "path": "src/activities/reservation-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 1,
+          "offset": 496
+        },
+        "end": {
+          "line": 34,
+          "column": 2,
+          "offset": 674
+        },
+        "symbolName": "validateRequest"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:reserveInventory",
+      "name": "reserveInventory",
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 5,
+          "offset": 1026
+        },
+        "end": {
+          "line": 28,
+          "column": 30,
+          "offset": 1051
+        },
+        "symbolName": "reserveInventory"
+      },
+      "implementationSource": {
+        "path": "src/activities/reservation-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 36,
+          "column": 1,
+          "offset": 676
+        },
+        "end": {
+          "line": 38,
+          "column": 2,
+          "offset": 854
+        },
+        "symbolName": "reserveInventory"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:reserveShipping",
+      "name": "reserveShipping",
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 29,
+          "column": 5,
+          "offset": 1057
+        },
+        "end": {
+          "line": 29,
+          "column": 29,
+          "offset": 1081
+        },
+        "symbolName": "reserveShipping"
+      },
+      "implementationSource": {
+        "path": "src/activities/reservation-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 40,
+          "column": 1,
+          "offset": 856
+        },
+        "end": {
+          "line": 42,
+          "column": 2,
+          "offset": 1041
+        },
+        "symbolName": "reserveShipping"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:confirmReservation",
+      "name": "confirmReservation",
+      "source": {
+        "path": "src/workflows/parallel-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 50,
+          "offset": 1139
+        },
+        "end": {
+          "line": 32,
+          "column": 89,
+          "offset": 1178
+        },
+        "symbolName": "confirmReservation"
+      },
+      "implementationSource": {
+        "path": "src/activities/reservation-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 44,
+          "column": 1,
+          "offset": 1043
+        },
+        "end": {
+          "line": 49,
+          "column": 2,
+          "offset": 1279
+        },
+        "symbolName": "confirmReservation"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

@@ -1,8 +1,8 @@
 flowchart TD
   start(["queryWorkflow"])
-  activity_call_queryWorkflow_recordAudit_0["recordAudit"]
-  condition_queryWorkflow_1{"() => done"}
+  flow_queryWorkflow_1["recordAudit"]
+  flow_queryWorkflow_2{"() => done"}
   complete(["complete"])
-  start --> activity_call_queryWorkflow_recordAudit_0
-  activity_call_queryWorkflow_recordAudit_0 --> condition_queryWorkflow_1
-  condition_queryWorkflow_1 --> complete
+  start --> flow_queryWorkflow_1
+  flow_queryWorkflow_1 --> flow_queryWorkflow_2
+  flow_queryWorkflow_2 --> complete

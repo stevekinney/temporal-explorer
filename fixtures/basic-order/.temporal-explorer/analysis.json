@@ -106,7 +106,68 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:basicOrderWorkflow:1",
+            "commandId": "activity-call:basicOrderWorkflow:validateOrder:0",
+            "source": {
+              "path": "src/workflows/basic-order-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 39,
+                "offset": 490
+              },
+              "end": {
+                "line": 17,
+                "column": 70,
+                "offset": 521
+              },
+              "symbolName": "validateOrder"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:basicOrderWorkflow:2",
+            "commandId": "activity-call:basicOrderWorkflow:chargeCard:1",
+            "source": {
+              "path": "src/workflows/basic-order-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 40,
+                "offset": 562
+              },
+              "end": {
+                "line": 18,
+                "column": 68,
+                "offset": 590
+              },
+              "symbolName": "chargeCard"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:basicOrderWorkflow:3",
+            "commandId": "activity-call:basicOrderWorkflow:shipOrder:2",
+            "source": {
+              "path": "src/workflows/basic-order-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 42,
+                "offset": 633
+              },
+              "end": {
+                "line": 19,
+                "column": 69,
+                "offset": 660
+              },
+              "symbolName": "shipOrder"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

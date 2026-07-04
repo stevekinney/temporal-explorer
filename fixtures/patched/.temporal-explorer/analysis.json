@@ -106,7 +106,96 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:patchedWorkflow:1",
+            "commandId": "patch:patchedWorkflow:0",
+            "source": {
+              "path": "src/workflows/patched-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 11,
+                "column": 3,
+                "offset": 430
+              },
+              "end": {
+                "line": 11,
+                "column": 40,
+                "offset": 467
+              }
+            }
+          },
+          {
+            "type": "branch",
+            "id": "flow:patchedWorkflow:4",
+            "branchKind": "ternary",
+            "source": {
+              "path": "src/workflows/patched-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 13,
+                "column": 19,
+                "offset": 488
+              },
+              "end": {
+                "line": 15,
+                "column": 48,
+                "offset": 612
+              }
+            },
+            "testCommandId": "patch:patchedWorkflow:1",
+            "clauses": [
+              {
+                "label": "patched('use-modern-charge')",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:patchedWorkflow:2",
+                    "commandId": "activity-call:patchedWorkflow:newCharge:2",
+                    "source": {
+                      "path": "src/workflows/patched-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 14,
+                        "column": 13,
+                        "offset": 529
+                      },
+                      "end": {
+                        "line": 14,
+                        "column": 48,
+                        "offset": 564
+                      },
+                      "symbolName": "newCharge"
+                    }
+                  }
+                ]
+              }
+            ],
+            "otherwise": [
+              {
+                "type": "command",
+                "id": "flow:patchedWorkflow:3",
+                "commandId": "activity-call:patchedWorkflow:oldCharge:3",
+                "source": {
+                  "path": "src/workflows/patched-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 15,
+                    "column": 13,
+                    "offset": 577
+                  },
+                  "end": {
+                    "line": 15,
+                    "column": 48,
+                    "offset": 612
+                  },
+                  "symbolName": "oldCharge"
+                }
+              }
+            ]
+          }
+        ]
       },
       "temporalCommands": [
         {
@@ -128,7 +217,8 @@
             }
           },
           "confidence": "exact",
-          "staticOrder": 0
+          "staticOrder": 0,
+          "deprecated": true
         },
         {
           "id": "patch:patchedWorkflow:1",

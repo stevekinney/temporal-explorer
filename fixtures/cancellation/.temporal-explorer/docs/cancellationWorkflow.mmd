@@ -1,12 +1,23 @@
 flowchart TD
   start(["cancellationWorkflow"])
-  activity_call_cancellationWorkflow_reserveResources_1["reserveResources"]
-  timer_cancellationWorkflow_2(("'30 days'"))
-  activity_call_cancellationWorkflow_useResources_3["useResources"]
-  activity_call_cancellationWorkflow_releaseResources_5["releaseResources"]
+  flow_cancellationWorkflow_2(["return"])
+  n1(( ))
+  flow_cancellationWorkflow_4{"if"}
+  n2(( ))
+  flow_cancellationWorkflow_3(["throw"])
+  flow_cancellationWorkflow_5(["throw"])
+  flow_cancellationWorkflow_6["reserveResources"]
+  flow_cancellationWorkflow_7(("'30 days'"))
+  flow_cancellationWorkflow_8["useResources"]
+  flow_cancellationWorkflow_9["releaseResources"]
   complete(["complete"])
-  start --> activity_call_cancellationWorkflow_reserveResources_1
-  activity_call_cancellationWorkflow_reserveResources_1 --> timer_cancellationWorkflow_2
-  timer_cancellationWorkflow_2 --> activity_call_cancellationWorkflow_useResources_3
-  activity_call_cancellationWorkflow_useResources_3 --> activity_call_cancellationWorkflow_releaseResources_5
-  activity_call_cancellationWorkflow_releaseResources_5 --> complete
+  start --> flow_cancellationWorkflow_2
+  start -->|"catch"| flow_cancellationWorkflow_4
+  flow_cancellationWorkflow_4 -->|"!isCancellation(error)"| flow_cancellationWorkflow_3
+  flow_cancellationWorkflow_4 -->|"else"| n2
+  n2 --> flow_cancellationWorkflow_5
+  n1 --> flow_cancellationWorkflow_6
+  flow_cancellationWorkflow_6 --> flow_cancellationWorkflow_7
+  flow_cancellationWorkflow_7 --> flow_cancellationWorkflow_8
+  flow_cancellationWorkflow_8 --> flow_cancellationWorkflow_9
+  flow_cancellationWorkflow_9 --> complete

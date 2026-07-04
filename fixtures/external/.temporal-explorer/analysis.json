@@ -120,7 +120,27 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:externalSignalTarget:1",
+            "commandId": "condition:externalSignalTarget:0",
+            "source": {
+              "path": "src/workflows/external-interaction-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 27,
+                "column": 9,
+                "offset": 564
+              },
+              "end": {
+                "line": 27,
+                "column": 34,
+                "offset": 589
+              }
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {
@@ -252,7 +272,47 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:externalWorkflowInteraction:1",
+            "commandId": "condition:externalWorkflowInteraction:0",
+            "source": {
+              "path": "src/workflows/external-interaction-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 40,
+                "column": 9,
+                "offset": 886
+              },
+              "end": {
+                "line": 40,
+                "column": 56,
+                "offset": 933
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:externalWorkflowInteraction:2",
+            "commandId": "external-workflow:externalWorkflowInteraction:release:1",
+            "source": {
+              "path": "src/workflows/external-interaction-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 43,
+                "column": 9,
+                "offset": 1019
+              },
+              "end": {
+                "line": 43,
+                "column": 37,
+                "offset": 1047
+              },
+              "symbolName": "release"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

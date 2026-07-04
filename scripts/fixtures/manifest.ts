@@ -29,6 +29,13 @@ export type FixtureHistoryDefinition = {
   workflowsPath: string;
   /** Loads Activity implementations registered on the fixture worker. */
   loadActivities?: () => Promise<object>;
+  /**
+   * Caps concurrent Activity Task execution on the fixture worker. Parallel
+   * fixtures (`Promise.all`/`race`) set this to `1` so the branch activities
+   * complete in a fixed, scheduled order and the generated history is
+   * deterministic rather than racing on whichever activity finishes first.
+   */
+  maxConcurrentActivityTaskExecutions?: number;
   /** Workflow arguments. */
   args: unknown[];
   /** Optional interaction with the running Workflow before awaiting its result. */
@@ -303,6 +310,18 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
     loadActivities: async () =>
       await import('../../fixtures/large/src/activities/large-activities'),
     args: [{ batchId: 'batch-010' }],
+    expectedOutcome: 'completed',
+  },
+  {
+    fixture: 'parallel',
+    history: 'reserved',
+    workflowType: 'parallelWorkflow',
+    taskQueue: 'parallel-task-queue',
+    workflowsPath: 'src/workflows/parallel-workflow.ts',
+    loadActivities: async () =>
+      await import('../../fixtures/parallel/src/activities/reservation-activities'),
+    maxConcurrentActivityTaskExecutions: 1,
+    args: [{ orderId: 'order-011', sku: 'sku-parallel', destination: '456 Concurrent Ave' }],
     expectedOutcome: 'completed',
   },
 ];

@@ -1,0 +1,17 @@
+flowchart TD
+  start(["parallelWorkflow"])
+  flow_parallelWorkflow_1["validateRequest"]
+  flow_parallelWorkflow_2{{"Promise.all"}}
+  n1(( ))
+  flow_parallelWorkflow_3["reserveInventory"]
+  flow_parallelWorkflow_4["reserveShipping"]
+  flow_parallelWorkflow_5["confirmReservation"]
+  complete(["complete"])
+  start --> flow_parallelWorkflow_1
+  flow_parallelWorkflow_1 --> flow_parallelWorkflow_2
+  flow_parallelWorkflow_2 --> flow_parallelWorkflow_3
+  flow_parallelWorkflow_3 --> n1
+  flow_parallelWorkflow_2 --> flow_parallelWorkflow_4
+  flow_parallelWorkflow_4 --> n1
+  n1 --> flow_parallelWorkflow_5
+  flow_parallelWorkflow_5 --> complete

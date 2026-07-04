@@ -67,6 +67,11 @@ async function executeFixtureWorkflow(
     workflowsPath: workflowUrl.pathname,
     activities,
     ...(dataConverter ? { dataConverter } : {}),
+    // Parallel fixtures serialize activity execution so the branch activities
+    // report in a fixed order, keeping the generated history deterministic.
+    ...(definition.maxConcurrentActivityTaskExecutions !== undefined
+      ? { maxConcurrentActivityTaskExecutions: definition.maxConcurrentActivityTaskExecutions }
+      : {}),
   });
 
   // Fixtures with a custom data converter need a dedicated client carrying the

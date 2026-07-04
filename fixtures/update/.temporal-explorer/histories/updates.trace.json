@@ -178,7 +178,7 @@
       "eventIds": [20]
     },
     {
-      "id": "timeline:24",
+      "id": "timeline:closed:24",
       "operationId": "workflow:completed",
       "at": "2026-01-01T00:00:00.024Z",
       "label": "Workflow closed",

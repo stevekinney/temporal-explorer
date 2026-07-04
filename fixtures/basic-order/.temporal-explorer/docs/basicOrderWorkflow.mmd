@@ -1,10 +1,10 @@
 flowchart TD
   start(["basicOrderWorkflow"])
-  activity_call_basicOrderWorkflow_validateOrder_0["validateOrder"]
-  activity_call_basicOrderWorkflow_chargeCard_1["chargeCard"]
-  activity_call_basicOrderWorkflow_shipOrder_2["shipOrder"]
+  flow_basicOrderWorkflow_1["validateOrder"]
+  flow_basicOrderWorkflow_2["chargeCard"]
+  flow_basicOrderWorkflow_3["shipOrder"]
   complete(["complete"])
-  start --> activity_call_basicOrderWorkflow_validateOrder_0
-  activity_call_basicOrderWorkflow_validateOrder_0 --> activity_call_basicOrderWorkflow_chargeCard_1
-  activity_call_basicOrderWorkflow_chargeCard_1 --> activity_call_basicOrderWorkflow_shipOrder_2
-  activity_call_basicOrderWorkflow_shipOrder_2 --> complete
+  start --> flow_basicOrderWorkflow_1
+  flow_basicOrderWorkflow_1 --> flow_basicOrderWorkflow_2
+  flow_basicOrderWorkflow_2 --> flow_basicOrderWorkflow_3
+  flow_basicOrderWorkflow_3 --> complete

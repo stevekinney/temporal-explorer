@@ -106,7 +106,28 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:retryWorkflow:1",
+            "commandId": "activity-call:retryWorkflow:flakyCharge:0",
+            "source": {
+              "path": "src/workflows/retry-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 24,
+                "offset": 516
+              },
+              "end": {
+                "line": 16,
+                "column": 90,
+                "offset": 582
+              },
+              "symbolName": "flakyCharge"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

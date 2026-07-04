@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "parallel",
+  "history": "reserved",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "parallelWorkflow",
+  "workflowId": "parallel-reserved",
+  "runIdNormalization": { "replacement": "reserved-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 29,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 5,
+    "6": 5,
+    "7": 5,
+    "10": 4,
+    "11": 4,
+    "12": 4
+  },
+  "contentSha256": "05dfd212cc3e4eb7fb625f207248ad896e33fdf9b05ac89920a1b15e28edce91"
+}

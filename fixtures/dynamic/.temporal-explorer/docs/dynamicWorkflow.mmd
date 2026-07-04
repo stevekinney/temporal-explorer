@@ -1,8 +1,11 @@
 flowchart TD
   start(["dynamicWorkflow"])
-  activity_call_dynamicWorkflow_archiveRequest_0["archiveRequest"]
-  dynamic_dynamicWorkflow_1[/"dynamicActivities[step]"/]
+  flow_dynamicWorkflow_1["archiveRequest"]
+  flow_dynamicWorkflow_3{"loop (for-of)"}
+  flow_dynamicWorkflow_2[/"dynamicActivities[step]"/]
   complete(["complete"])
-  start --> activity_call_dynamicWorkflow_archiveRequest_0
-  activity_call_dynamicWorkflow_archiveRequest_0 --> dynamic_dynamicWorkflow_1
-  dynamic_dynamicWorkflow_1 --> complete
+  start --> flow_dynamicWorkflow_1
+  flow_dynamicWorkflow_1 --> flow_dynamicWorkflow_3
+  flow_dynamicWorkflow_3 -->|"each"| flow_dynamicWorkflow_2
+  flow_dynamicWorkflow_2 -->|"repeat"| flow_dynamicWorkflow_3
+  flow_dynamicWorkflow_3 --> complete

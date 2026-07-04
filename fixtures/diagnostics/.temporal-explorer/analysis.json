@@ -173,7 +173,28 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:unsafeWorkflow:1",
+            "commandId": "activity-call:unsafeWorkflow:unresolvedActivity:0",
+            "source": {
+              "path": "src/workflows/unsafe-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 37,
+                "column": 24,
+                "offset": 1115
+              },
+              "end": {
+                "line": 37,
+                "column": 60,
+                "offset": 1151
+              },
+              "symbolName": "unresolvedActivity"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {

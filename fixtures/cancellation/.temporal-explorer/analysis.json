@@ -106,7 +106,195 @@
         "variables": []
       },
       "body": {
-        "nodes": []
+        "nodes": [
+          {
+            "type": "try",
+            "id": "flow:cancellationWorkflow:1",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 11,
+                "column": 3,
+                "offset": 480
+              },
+              "end": {
+                "line": 32,
+                "column": 4,
+                "offset": 1002
+              }
+            },
+            "body": [
+              {
+                "type": "terminal",
+                "id": "flow:cancellationWorkflow:2",
+                "terminalKind": "return",
+                "source": {
+                  "path": "src/workflows/cancellation-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 18,
+                    "column": 5,
+                    "offset": 697
+                  },
+                  "end": {
+                    "line": 21,
+                    "column": 7,
+                    "offset": 776
+                  }
+                }
+              }
+            ],
+            "handler": {
+              "label": "error",
+              "body": [
+                {
+                  "type": "branch",
+                  "id": "flow:cancellationWorkflow:4",
+                  "branchKind": "if",
+                  "source": {
+                    "path": "src/workflows/cancellation-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 23,
+                      "column": 5,
+                      "offset": 801
+                    },
+                    "end": {
+                      "line": 25,
+                      "column": 6,
+                      "offset": 855
+                    }
+                  },
+                  "clauses": [
+                    {
+                      "label": "!isCancellation(error)",
+                      "body": [
+                        {
+                          "type": "terminal",
+                          "id": "flow:cancellationWorkflow:3",
+                          "terminalKind": "throw",
+                          "source": {
+                            "path": "src/workflows/cancellation-workflow.ts",
+                            "pathKind": "project-relative",
+                            "start": {
+                              "line": 24,
+                              "column": 7,
+                              "offset": 837
+                            },
+                            "end": {
+                              "line": 24,
+                              "column": 19,
+                              "offset": 849
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "terminal",
+                  "id": "flow:cancellationWorkflow:5",
+                  "terminalKind": "throw",
+                  "source": {
+                    "path": "src/workflows/cancellation-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 31,
+                      "column": 5,
+                      "offset": 986
+                    },
+                    "end": {
+                      "line": 31,
+                      "column": 17,
+                      "offset": 998
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:cancellationWorkflow:6",
+            "commandId": "activity-call:cancellationWorkflow:reserveResources:1",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 13,
+                "column": 13,
+                "offset": 552
+              },
+              "end": {
+                "line": 13,
+                "column": 58,
+                "offset": 597
+              },
+              "symbolName": "reserveResources"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:cancellationWorkflow:7",
+            "commandId": "timer:cancellationWorkflow:2",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 14,
+                "column": 13,
+                "offset": 611
+              },
+              "end": {
+                "line": 14,
+                "column": 29,
+                "offset": 627
+              }
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:cancellationWorkflow:8",
+            "commandId": "activity-call:cancellationWorkflow:useResources:3",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 15,
+                "column": 13,
+                "offset": 641
+              },
+              "end": {
+                "line": 15,
+                "column": 54,
+                "offset": 682
+              },
+              "symbolName": "useResources"
+            }
+          },
+          {
+            "type": "command",
+            "id": "flow:cancellationWorkflow:9",
+            "commandId": "activity-call:cancellationWorkflow:releaseResources:5",
+            "source": {
+              "path": "src/workflows/cancellation-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 28,
+                "column": 13,
+                "offset": 926
+              },
+              "end": {
+                "line": 28,
+                "column": 58,
+                "offset": 971
+              },
+              "symbolName": "releaseResources"
+            }
+          }
+        ]
       },
       "temporalCommands": [
         {
