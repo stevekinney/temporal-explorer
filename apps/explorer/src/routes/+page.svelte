@@ -199,12 +199,6 @@
       </section>
 
       <section class="signal-strip" aria-label="Artifact summary">
-        <div class="event-spine" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
         <div>
           <span>Activities</span>
           <strong>{activityCommands.length}</strong>
@@ -608,7 +602,7 @@
 
   .signal-strip {
     position: relative;
-    grid-template-columns: 0.875rem repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: stretch;
     padding: 0.875rem 1rem;
     margin-bottom: 1rem;
@@ -618,32 +612,7 @@
     box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
   }
 
-  .event-spine {
-    display: grid;
-    gap: 0.35rem;
-    align-content: center;
-  }
-
-  .event-spine span {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 999px;
-    background: #2f6fed;
-  }
-
-  .event-spine span:nth-child(2) {
-    background: #18845b;
-  }
-
-  .event-spine span:nth-child(3) {
-    background: #b76b00;
-  }
-
-  .event-spine span:nth-child(4) {
-    background: #7a4cc2;
-  }
-
-  .signal-strip div:not(.event-spine) {
+  .signal-strip div {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;

@@ -3,8 +3,27 @@ import { describe, expect, it } from 'bun:test';
 import type { ExecutionOverlayDocument, RuntimeOperation } from '@temporal-explorer/schemas';
 
 import { loadExplorerArtifacts } from '../server/artifacts';
-import { buildGraphProjection } from './projection';
+import { buildGraphProjection, type GraphProjection } from './projection';
 import { commandState, operationState } from './runtime-state';
+
+/** Structural control-flow nodes carry no runtime state; drop them to assert the command/message leaves. */
+const STRUCTURAL_KINDS = new Set([
+  'branch-region',
+  'loop-region',
+  'parallel-region',
+  'try-region',
+  'decision',
+  'join',
+  'terminal',
+]);
+
+function commandShape(
+  projection: GraphProjection,
+): Array<{ kind: string; label: string; state: string }> {
+  return projection.nodes
+    .filter((node) => !STRUCTURAL_KINDS.has(node.kind))
+    .map((node) => ({ kind: node.kind, label: node.label, state: node.state }));
+}
 
 const approvalFixtureRoot = new URL('../../../../../fixtures/approval/', import.meta.url).pathname;
 const timerRaceFixtureRoot = new URL('../../../../../fixtures/timer-race/', import.meta.url)
@@ -21,38 +40,19 @@ describe('signal, timer, and condition projection', () => {
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'approvalWorkflow', state: 'completed' },
       { kind: 'condition', label: '() => approval !== undefined', state: 'not taken' },
       { kind: 'activity', label: 'recordApproval', state: 'completed' },
       { kind: 'signal', label: 'approve', state: 'observed' },
     ]);
 
+    // The signal remains a satellite edged into the workflow node.
     expect(
-      projection.edges.map((edge) => ({
-        label: edge.label,
-        source: edge.source,
-        target: edge.target,
-      })),
-    ).toEqual([
-      {
-        label: 'Condition 1',
-        source: 'workflow:approvalWorkflow',
-        target: 'condition:approvalWorkflow:0',
-      },
-      {
-        label: 'Activity 1',
-        source: 'condition:approvalWorkflow:0',
-        target: 'activity-call:approvalWorkflow:recordApproval:1',
-      },
-      {
-        label: 'signal',
-        source: 'signal:approvalWorkflow:approve',
-        target: 'workflow:approvalWorkflow',
-      },
-    ]);
+      projection.edges
+        .filter((edge) => edge.target === 'workflow:approvalWorkflow')
+        .map((edge) => ({ label: edge.label, source: edge.source })),
+    ).toEqual([{ label: 'signal', source: 'signal:approvalWorkflow:approve' }]);
 
     const signalTimelineRow = projection.timelineRows.find(
       (row) => row.entry.label === 'Signal approve received',
@@ -74,23 +74,13 @@ describe('signal, timer, and condition projection', () => {
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'timerRaceWorkflow', state: 'completed' },
       { kind: 'condition', label: '() => approvedBy !== undefined', state: 'not taken' },
       { kind: 'timer', label: "'30 days'", state: 'fired' },
       { kind: 'activity', label: 'notifyApproved', state: 'not taken' },
       { kind: 'activity', label: 'notifyExpired', state: 'completed' },
       { kind: 'signal', label: 'approve', state: 'not taken' },
-    ]);
-
-    expect(projection.edges.map((edge) => edge.label)).toEqual([
-      'Condition 1',
-      'Timer 1',
-      'Activity 1',
-      'Activity 2',
-      'signal',
     ]);
 
     const timerStartedRow = projection.timelineRows.find(

@@ -18,13 +18,15 @@ import {
 import { commandState, workflowState, type RuntimeOverlayState } from './runtime-state';
 
 /** A static command that joins the sequential command chain, ordered by staticOrder. */
-type GraphCommand = TemporalCommand & {
+export type GraphCommand = TemporalCommand & {
   kind:
     | 'activity'
     | 'timer'
     | 'condition'
     | 'child-workflow'
     | 'external-workflow'
+    | 'nexus-operation'
+    | 'search-attribute'
     | 'continue-as-new'
     | 'patch'
     | 'dynamic';
@@ -74,7 +76,9 @@ export function createCommandGraphNodes(
   return workflow.temporalCommands
     .filter(isGraphCommand)
     .toSorted((left, right) => left.staticOrder - right.staticOrder)
-    .map((command, index) => createCommandGraphNode(command, index, trace, overlay, context));
+    .map((command, index) =>
+      createCommandGraphNode(command, { x: 320 + index * 280, y: 120 }, trace, overlay, context),
+    );
 }
 
 /**
@@ -156,9 +160,10 @@ export function createUnmappedRuntimeNodes(
   );
 }
 
-function createCommandGraphNode(
+/** Builds one graph node for a flow-relevant command, keyed by command id and carrying runtime state. */
+export function createCommandGraphNode(
   command: GraphCommand,
-  index: number,
+  fallbackPosition: { x: number; y: number },
   trace: RuntimeTraceDocument | undefined,
   overlay: ExecutionOverlayDocument | undefined,
   context: ProjectionBuildContext,
@@ -170,7 +175,7 @@ function createCommandGraphNode(
 
   return {
     id: command.id,
-    label: command.name,
+    label: command.deprecated ? `${command.name} (deprecated)` : command.name,
     kind: command.kind,
     state: commandState(
       command,
@@ -187,7 +192,7 @@ function createCommandGraphNode(
       runtimeOperationIds,
       context.mappingsByRuntimeOperationId,
     ),
-    fallbackPosition: { x: 320 + index * 280, y: 120 },
+    fallbackPosition,
   };
 }
 
@@ -265,18 +270,20 @@ function createMessageSurfaceGraphNode(
 
 function fallbackObservedState(kind: GraphCommand['kind']): RuntimeOverlayState {
   if (kind === 'timer') return 'fired';
-  if (kind === 'condition' || kind === 'patch') return 'observed';
+  if (kind === 'condition' || kind === 'patch' || kind === 'search-attribute') return 'observed';
 
-  return 'completed'; // activity, child-workflow, external-workflow, continue-as-new, dynamic
+  return 'completed'; // activity, child-workflow, external-workflow, nexus-operation, continue-as-new, dynamic
 }
 
-function isGraphCommand(command: TemporalCommand): command is GraphCommand {
+export function isGraphCommand(command: TemporalCommand): command is GraphCommand {
   return (
     command.kind === 'activity' ||
     command.kind === 'timer' ||
     command.kind === 'condition' ||
     command.kind === 'child-workflow' ||
     command.kind === 'external-workflow' ||
+    command.kind === 'nexus-operation' ||
+    command.kind === 'search-attribute' ||
     command.kind === 'continue-as-new' ||
     command.kind === 'patch' ||
     command.kind === 'dynamic'

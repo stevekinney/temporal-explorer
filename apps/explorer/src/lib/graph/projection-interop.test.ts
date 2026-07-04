@@ -1,7 +1,26 @@
 import { describe, expect, it } from 'bun:test';
 
 import { loadExplorerArtifacts } from '../server/artifacts';
-import { buildGraphProjection } from './projection';
+import { buildGraphProjection, type GraphProjection } from './projection';
+
+/** Structural control-flow nodes carry no runtime state; drop them to assert the command/message leaves. */
+const STRUCTURAL_KINDS = new Set([
+  'branch-region',
+  'loop-region',
+  'parallel-region',
+  'try-region',
+  'decision',
+  'join',
+  'terminal',
+]);
+
+function commandShape(
+  projection: GraphProjection,
+): Array<{ kind: string; label: string; state: string }> {
+  return projection.nodes
+    .filter((node) => !STRUCTURAL_KINDS.has(node.kind))
+    .map((node) => ({ kind: node.kind, label: node.label, state: node.state }));
+}
 
 const childWorkflowFixtureRoot = new URL('../../../../../fixtures/child-workflow/', import.meta.url)
   .pathname;
@@ -24,17 +43,10 @@ describe('child workflow, external workflow, and continue-as-new projection', ()
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'childWorkflowParent', state: 'completed' },
       { kind: 'child-workflow', label: 'reserveInventoryChild', state: 'completed' },
       { kind: 'child-workflow', label: 'releaseNotificationChild', state: 'completed' },
-    ]);
-
-    expect(projection.edges.map((edge) => edge.label)).toEqual([
-      'Child workflow 1',
-      'Child workflow 2',
     ]);
   });
 
@@ -50,9 +62,7 @@ describe('child workflow, external workflow, and continue-as-new projection', ()
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'externalWorkflowInteraction', state: 'completed' },
       { kind: 'condition', label: '() => targetWorkflowId !== undefined', state: 'not taken' },
       { kind: 'external-workflow', label: 'release', state: 'completed' },
@@ -76,15 +86,22 @@ describe('child workflow, external workflow, and continue-as-new projection', ()
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'continueAsNewWorkflow', state: 'observed' },
       { kind: 'activity', label: 'recordIteration', state: 'completed' },
       { kind: 'continue-as-new', label: 'continueAsNewWorkflow', state: 'observed' },
     ]);
 
-    expect(projection.edges.map((edge) => edge.label)).toEqual(['Activity 1', 'Continue as new']);
+    // continue-as-new keeps its command id and loops back to the workflow entry.
+    const continueAsNewNode = projection.nodes.find((node) => node.kind === 'continue-as-new');
+    expect(
+      projection.edges.some(
+        (edge) =>
+          edge.source === continueAsNewNode?.id &&
+          edge.target === 'workflow:continueAsNewWorkflow' &&
+          edge.label === 'loop',
+      ),
+    ).toBe(true);
     expect(
       projection.timelineRows.find((row) => row.entry.label === 'Continued as new')?.state,
     ).toBe('observed');

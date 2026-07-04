@@ -1,7 +1,26 @@
 import { describe, expect, it } from 'bun:test';
 
 import { loadExplorerArtifacts } from '../server/artifacts';
-import { buildGraphProjection } from './projection';
+import { buildGraphProjection, type GraphProjection } from './projection';
+
+/** Structural control-flow nodes carry no runtime state; drop them to assert the command/message leaves. */
+const STRUCTURAL_KINDS = new Set([
+  'branch-region',
+  'loop-region',
+  'parallel-region',
+  'try-region',
+  'decision',
+  'join',
+  'terminal',
+]);
+
+function commandShape(
+  projection: GraphProjection,
+): Array<{ kind: string; label: string; state: string }> {
+  return projection.nodes
+    .filter((node) => !STRUCTURAL_KINDS.has(node.kind))
+    .map((node) => ({ kind: node.kind, label: node.label, state: node.state }));
+}
 
 const queryFixtureRoot = new URL('../../../../../fixtures/query/', import.meta.url).pathname;
 const updateFixtureRoot = new URL('../../../../../fixtures/update/', import.meta.url).pathname;
@@ -19,9 +38,7 @@ describe('query and update message-surface projection', () => {
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'queryWorkflow', state: 'completed' },
       { kind: 'activity', label: 'recordAudit', state: 'completed' },
       { kind: 'condition', label: '() => done', state: 'not taken' },
@@ -54,9 +71,7 @@ describe('query and update message-surface projection', () => {
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(
-      projection.nodes.map((node) => ({ kind: node.kind, label: node.label, state: node.state })),
-    ).toEqual([
+    expect(commandShape(projection)).toEqual([
       { kind: 'workflow', label: 'updateWorkflow', state: 'completed' },
       {
         kind: 'condition',

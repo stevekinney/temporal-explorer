@@ -73,13 +73,21 @@
     gap: 0.15rem 0.55rem;
     align-items: center;
     width: 100%;
-    padding: 0.65rem 0.7rem;
-    border: 1px solid #d7e0e6;
+    padding: 0.55rem 0.65rem;
+    /* Borderless rows (see timeline panel): quieter than nested white cards. */
+    border: 1px solid transparent;
     border-radius: 0.5rem;
-    background: #ffffff;
+    background: transparent;
     color: #172026;
     text-align: left;
     cursor: pointer;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+
+  .edge-item:hover {
+    background: #f4f8fb;
   }
 
   .edge-item[data-active='true'] {

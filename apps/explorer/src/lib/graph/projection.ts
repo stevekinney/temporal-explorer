@@ -19,13 +19,15 @@ import {
   createUpdateGraphNodes,
   createWorkflowGraphNode,
 } from './projection-builders';
-import { createGraphEdges } from './projection-edges';
-import { createStatusCounts } from './projection-helpers';
+import { createGraphEdges, createSequentialGraphEdges } from './projection-edges';
+import { buildControlFlowGraph } from './projection-flow';
+import { createStatusCounts, isStructuralNode } from './projection-helpers';
 import { createRuntimeOperationRows, createTimelineRows } from './projection-rows';
 import { runtimeOverlayStates, runtimeStateToken, type RuntimeOverlayState } from './runtime-state';
 
 export {
   formatEventReferences,
+  isStructuralNode,
   runtimeOverlayStates,
   runtimeStateToken,
   sourceText,
@@ -51,11 +53,22 @@ export type TemporalGraphNode = {
     | 'update'
     | 'child-workflow'
     | 'external-workflow'
+    | 'nexus-operation'
+    | 'search-attribute'
     | 'continue-as-new'
     | 'patch'
     | 'cancellation-scope'
     | 'dynamic'
-    | 'runtime';
+    | 'runtime'
+    // Structured control-flow nodes (from workflow.body.nodes):
+    | 'branch-region'
+    | 'loop-region'
+    | 'parallel-region'
+    | 'try-region'
+    | 'decision'
+    | 'parallel-fork'
+    | 'join'
+    | 'terminal';
   state: RuntimeOverlayState;
   source: SourceLocation | undefined;
   sourceText: string;
@@ -63,6 +76,10 @@ export type TemporalGraphNode = {
   eventReferences: EventReference[];
   confidence: RuntimeNodeMapping['confidence'] | 'unknown';
   fallbackPosition: { x: number; y: number };
+  /** For nested control-flow rendering: the enclosing region container node id, if any. */
+  parentId?: string | undefined;
+  /** True for region container nodes, which visually group their children but bear no runtime state. */
+  isContainer?: boolean | undefined;
 };
 
 export type TemporalGraphEdge = {
@@ -122,7 +139,16 @@ export function buildGraphProjection({
   );
   const context = { mappingsByRuntimeOperationId, operationsById };
   const workflowNode = createWorkflowGraphNode(workflow, trace, context);
-  const commandNodes = createCommandGraphNodes(workflow, trace, overlay, context);
+  // Prefer the structured control-flow tree (nested region containers) when present;
+  // fall back to the flat command chain for artifacts without `body.nodes`.
+  const flow =
+    workflow.body.nodes.length > 0
+      ? buildControlFlowGraph(workflow, trace, overlay, context, workflowNode.id)
+      : undefined;
+  const commandNodes = flow
+    ? flow.nodes
+    : createCommandGraphNodes(workflow, trace, overlay, context);
+  const commandEdges = flow ? flow.edges : createSequentialGraphEdges(workflowNode, commandNodes);
   const signalNodes = createSignalGraphNodes(workflow, trace, overlay, context);
   const queryNodes = createQueryGraphNodes(workflow, trace, overlay, context);
   const updateNodes = createUpdateGraphNodes(workflow, trace, overlay, context);
@@ -141,7 +167,7 @@ export function buildGraphProjection({
     ...scopeNodes,
     ...unmappedRuntimeNodes,
   ];
-  const edges = createGraphEdges(workflowNode, commandNodes, messageSurfaceNodes, scopeNodes);
+  const edges = createGraphEdges(workflowNode, commandEdges, messageSurfaceNodes, scopeNodes);
   const timelineRows = createTimelineRows(trace, workflow.id, nodes, context);
   const runtimeOperationRows = createRuntimeOperationRows(trace, workflow.id, nodes, context);
   const edgesById = new Map(edges.map((edge) => [edge.id, edge]));

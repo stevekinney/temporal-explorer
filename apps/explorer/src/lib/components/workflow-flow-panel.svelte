@@ -12,6 +12,7 @@
     type LayoutStatus,
   } from '$lib/graph/layout';
   import {
+    isStructuralNode,
     runtimeOverlayStates,
     runtimeStateToken,
     sourceText,
@@ -89,6 +90,12 @@
   );
   const flowNodes = $derived(graphProjection?.nodes.map<TemporalFlowNode>(createFlowNode) ?? []);
   const flowEdges = $derived(graphProjection?.edges.map<TemporalFlowEdge>(createFlowEdge) ?? []);
+  // Structural nodes are excluded from status counts, so the "All" total sums the per-state counts.
+  const filterableNodeCount = $derived(
+    graphProjection
+      ? [...graphProjection.statusCounts.values()].reduce((sum, count) => sum + count, 0)
+      : 0,
+  );
   const activeInspectorTitle = $derived(
     selectedEdge?.label ??
       (selectedRuntimeOperation ? operationDisplayName(selectedRuntimeOperation) : undefined) ??
@@ -156,18 +163,33 @@
     );
   }
 
+  // A join marker is tinted to the region it closes (e.g. the parallel join
+  // matches its fork), so surface the enclosing region container's kind.
+  function joinRegionKind(
+    node: GraphProjection['nodes'][number],
+  ): GraphProjection['nodes'][number]['kind'] | undefined {
+    if (node.kind !== 'join' || !node.parentId) return undefined;
+    return graphProjection?.nodesById.get(node.parentId)?.kind;
+  }
+
   function createFlowNode(node: GraphProjection['nodes'][number]): TemporalFlowNode {
+    const structural = isStructuralNode(node);
     const active =
       node.id === selectedGraphNodeId ||
       Boolean(
         selectedRuntimeOperationId && node.runtimeOperationIds.includes(selectedRuntimeOperationId),
       );
-    const muted = statusFilter !== 'all' && node.state !== statusFilter;
+    // Structural nodes (containers/markers) carry no runtime state, so the status filter never hides them.
+    const muted = !structural && statusFilter !== 'all' && node.state !== statusFilter;
+    const layout = layoutPositions[node.id];
+    const regionKind = joinRegionKind(node);
 
     return {
       id: node.id,
       type: 'temporal',
-      position: layoutPositions[node.id] ?? node.fallbackPosition,
+      position: layout ? { x: layout.x, y: layout.y } : node.fallbackPosition,
+      ...(node.parentId ? { parentId: node.parentId } : {}),
+      ...(layout ? { width: layout.width, height: layout.height } : {}),
       data: {
         label: node.label,
         kind: node.kind,
@@ -176,6 +198,8 @@
         eventSummary: compactEventSummary(node.eventReferences),
         active,
         muted,
+        isContainer: Boolean(node.isContainer),
+        regionKind,
       },
       draggable: false,
       focusable: true,
@@ -295,7 +319,7 @@
           onclick={() => (statusFilter = 'all')}
         >
           All
-          <span>{graphProjection.nodes.length}</span>
+          <span>{filterableNodeCount}</span>
         </button>
         {#each runtimeOverlayStates as state (state)}
           <button
@@ -316,35 +340,49 @@
       {/if}
 
       <div class="flow-stage" data-layout-status={layoutStatus}>
-        <SvelteFlow
-          id="temporal-flow"
-          class="temporal-flow"
-          nodes={flowNodes}
-          edges={flowEdges}
-          {nodeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.22, maxZoom: 1.1 }}
-          nodesDraggable={false}
-          nodesConnectable={false}
-          elementsSelectable
-          minZoom={0.35}
-          maxZoom={1.45}
-          colorMode="light"
-          colorModeSSR="light"
-          onnodeclick={handleNodeClick}
-          onedgeclick={handleEdgeClick}
-          aria-label="Workflow execution graph"
-        >
-          <Background variant={BackgroundVariant.Dots} gap={22} size={1} />
-          <MiniMap
-            ariaLabel="Workflow graph minimap"
-            nodeColor="#2f6fed"
-            nodeBorderRadius={6}
-            pannable
-            zoomable
-          />
-          <Controls showLock={false} />
-        </SvelteFlow>
+        {#if layoutStatus !== 'ready'}
+          <!-- Mounting SvelteFlow only once ELK positions exist lets `fitView` fit
+               the real layout on mount; fitting against fallback positions leaves
+               the graph parked off-viewport when the async layout lands. -->
+          <div class="flow-placeholder" role="status">
+            {layoutStatus === 'failed' ? 'Graph layout failed.' : 'Laying out graph…'}
+          </div>
+        {:else}
+          <SvelteFlow
+            id="temporal-flow"
+            class="temporal-flow"
+            nodes={flowNodes}
+            edges={flowEdges}
+            {nodeTypes}
+            fitView
+            fitViewOptions={{ padding: 0.22, maxZoom: 1.1 }}
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable
+            minZoom={0.35}
+            maxZoom={1.45}
+            colorMode="light"
+            colorModeSSR="light"
+            onnodeclick={handleNodeClick}
+            onedgeclick={handleEdgeClick}
+            aria-label="Workflow execution graph"
+          >
+            <Background variant={BackgroundVariant.Dots} gap={22} size={1} />
+            <MiniMap
+              ariaLabel="Workflow graph minimap"
+              width={220}
+              height={150}
+              bgColor="#f7f9fb"
+              maskColor="rgba(23, 32, 38, 0.06)"
+              nodeColor="#b7c6d1"
+              nodeStrokeColor="#ffffff"
+              nodeBorderRadius={6}
+              pannable
+              zoomable
+            />
+            <Controls showLock={false} />
+          </SvelteFlow>
+        {/if}
       </div>
     </div>
 
@@ -446,6 +484,39 @@
     color: #17479b;
   }
 
+  /* Surface the per-state color mapping (already defined for the legend) on the
+     always-visible filter chips so a failed chip reads differently from a
+     completed one at rest, not only when active. */
+  .state-filters button[data-state]::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: #8a98a3;
+  }
+
+  .state-filters button[data-state='completed']::before,
+  .state-filters button[data-state='observed']::before,
+  .state-filters button[data-state='fired']::before {
+    background: #18845b;
+  }
+
+  .state-filters button[data-state='failed']::before,
+  .state-filters button[data-state='timed-out']::before,
+  .state-filters button[data-state='canceled']::before {
+    background: #c94444;
+  }
+
+  .state-filters button[data-state='retried']::before,
+  .state-filters button[data-state='pending']::before,
+  .state-filters button[data-state='ambiguous']::before {
+    background: #b76b00;
+  }
+
+  .state-filters button[data-state='unmapped']::before {
+    background: #7a4cc2;
+  }
+
   .state-filters span {
     display: inline-grid;
     place-items: center;
@@ -520,6 +591,15 @@
     border-radius: 0 0 0.5rem 0.5rem;
   }
 
+  .flow-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #5d6b75;
+    font-size: 0.9rem;
+  }
+
   :global(.temporal-flow) {
     --xy-background-pattern-dots-color-default: #b7c6d1;
     --xy-edge-stroke-default: #73838f;
@@ -534,10 +614,21 @@
     stroke-width: 2.4;
   }
 
-  :global(.temporal-flow .svelte-flow__edge-text) {
-    fill: #34434f;
+  :global(.temporal-flow .svelte-flow__edge-label) {
+    padding: 0.1rem 0.4rem;
+    border: 1px solid #d7e0e6;
+    border-radius: 0.35rem;
+    background: rgba(255, 255, 255, 0.92);
+    color: #34434f;
     font-size: 0.75rem;
     font-weight: 650;
+  }
+
+  :global(.temporal-flow .svelte-flow__minimap) {
+    border: 1px solid #d3dde5;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
+    overflow: hidden;
   }
 
   :global(.temporal-flow .svelte-flow__attribution) {

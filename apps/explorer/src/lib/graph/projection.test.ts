@@ -42,16 +42,24 @@ describe('explorer graph projection', () => {
 
     const projection = buildGraphProjection({ workflow, trace, overlay });
 
-    expect(projection.nodes.map((node) => node.label)).toEqual([
-      'basicOrderWorkflow',
-      'validateOrder',
-      'chargeCard',
-      'shipOrder',
-    ]);
-    expect(projection.edges.map((edge) => edge.label)).toEqual([
-      'Activity 1',
-      'Activity 2',
-      'Activity 3',
+    // The trailing structural `complete` terminal is excluded from the command leaves.
+    expect(
+      projection.nodes.filter((node) => node.kind !== 'terminal').map((node) => node.label),
+    ).toEqual(['basicOrderWorkflow', 'validateOrder', 'chargeCard', 'shipOrder']);
+    const activityIds = [
+      'activity-call:basicOrderWorkflow:validateOrder:0',
+      'activity-call:basicOrderWorkflow:chargeCard:1',
+      'activity-call:basicOrderWorkflow:shipOrder:2',
+    ];
+    // The activities form a sequential chain rooted at the workflow node.
+    expect(
+      projection.edges
+        .filter((edge) => activityIds.includes(edge.target))
+        .map((edge) => ({ source: edge.source, target: edge.target })),
+    ).toEqual([
+      { source: 'workflow:basicOrderWorkflow', target: activityIds[0] },
+      { source: activityIds[0], target: activityIds[1] },
+      { source: activityIds[1], target: activityIds[2] },
     ]);
     expect(projection.timelineRows.map((row) => row.entry.label)).toContain(
       'validateOrder scheduled',
@@ -209,5 +217,42 @@ describe('explorer graph projection', () => {
     if (!failureActivity) throw new Error('Expected the retry failure activity fixture.');
 
     expect(operationState(failureActivity)).toBe('failed');
+  });
+
+  it('assigns unique node and edge ids for every fixture projection', async () => {
+    // Regression: Svelte keyed `{#each}` renders throw on duplicate keys (this is
+    // what crashed continue-as-new via the timeline). The control-flow graph adds
+    // many structural nodes/edges, so every fixture projection must keep node and
+    // edge ids unique — a collision would crash the whole flow panel.
+    const fixturesRoot = new URL('../../../../../fixtures/', import.meta.url).pathname;
+    const glob = new Bun.Glob('*/');
+    const scanned = await Array.fromAsync(glob.scan({ cwd: fixturesRoot, onlyFiles: false }));
+    const fixtureDirs = scanned.map((dir) => dir.replace(/\/$/, '')).toSorted();
+
+    const offenders: string[] = [];
+    for (const dir of fixtureDirs) {
+      let artifacts;
+      try {
+        artifacts = await loadExplorerArtifacts(`${fixturesRoot}${dir}`);
+      } catch {
+        continue; // Not every top-level fixtures/ entry is an artifact project.
+      }
+      for (const workflow of artifacts.analysis.workflows) {
+        const projection = buildGraphProjection({
+          workflow,
+          trace: artifacts.traces[0],
+          overlay: artifacts.overlays[0],
+        });
+        const nodeIds = projection.nodes.map((node) => node.id);
+        const edgeIds = projection.edges.map((edge) => edge.id);
+        if (new Set(nodeIds).size !== nodeIds.length)
+          offenders.push(`${dir}/${workflow.name} nodes`);
+        if (new Set(edgeIds).size !== edgeIds.length)
+          offenders.push(`${dir}/${workflow.name} edges`);
+      }
+    }
+
+    expect(fixtureDirs.length).toBeGreaterThan(0);
+    expect(offenders).toEqual([]);
   });
 });

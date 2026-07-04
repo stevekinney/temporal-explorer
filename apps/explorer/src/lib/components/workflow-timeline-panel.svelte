@@ -78,13 +78,23 @@
     grid-template-columns: 4.25rem minmax(0, 1fr);
     gap: 0.15rem 0.75rem;
     width: 100%;
-    padding: 0.7rem;
-    border: 1px solid #d7e0e6;
+    padding: 0.6rem 0.65rem;
+    /* Borderless rows: on a white panel the per-item border + fill read as
+       nested boxes; spacing and a hover tint separate them more quietly. The
+       transparent border reserves the box so the active state adds no shift. */
+    border: 1px solid transparent;
     border-radius: 0.5rem;
-    background: #ffffff;
+    background: transparent;
     color: #172026;
     text-align: left;
     cursor: pointer;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease;
+  }
+
+  .timeline-item:hover {
+    background: #f4f8fb;
   }
 
   .timeline-item[data-active='true'] {

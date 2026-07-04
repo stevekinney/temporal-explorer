@@ -1,25 +1,26 @@
 import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 
 /**
- * Builds the graph edges: a sequential chain across the command nodes (in
- * staticOrder) so the flow view shows waits between them, plus a `signal`/`query`/
- * `update` edge from each message-surface node into the workflow node, and a `scope`
- * edge from each cancellation scope node into the workflow node.
+ * Assembles the full graph edge set: the flow edges across the command nodes
+ * (either the nested control-flow walk or the flat sequential chain), plus a
+ * `signal`/`query`/`update` edge from each message-surface node into the workflow
+ * node, and a `scope` edge from each cancellation scope node into the workflow node.
  */
 export function createGraphEdges(
   workflowNode: TemporalGraphNode,
-  commandNodes: TemporalGraphNode[],
+  commandEdges: TemporalGraphEdge[],
   messageSurfaceNodes: TemporalGraphNode[],
   scopeNodes: TemporalGraphNode[],
 ): TemporalGraphEdge[] {
   return [
-    ...createSequentialGraphEdges(workflowNode, commandNodes),
+    ...commandEdges,
     ...createNodeToWorkflowEdges(workflowNode, messageSurfaceNodes, (node) => node.kind),
     ...createNodeToWorkflowEdges(workflowNode, scopeNodes, () => 'scope'),
   ];
 }
 
-function createSequentialGraphEdges(
+/** Builds a flat sequential chain across command nodes (in staticOrder), used when a Workflow has no structured `body.nodes`. */
+export function createSequentialGraphEdges(
   workflowNode: TemporalGraphNode,
   commandNodes: TemporalGraphNode[],
 ): TemporalGraphEdge[] {
@@ -65,6 +66,8 @@ const sequentialEdgeLabelPrefixes: Partial<Record<TemporalGraphNode['kind'], str
   condition: 'Condition',
   'child-workflow': 'Child workflow',
   'external-workflow': 'External workflow',
+  'nexus-operation': 'Nexus operation',
+  'search-attribute': 'Search attribute',
   patch: 'Patch',
   dynamic: 'Dynamic',
 };

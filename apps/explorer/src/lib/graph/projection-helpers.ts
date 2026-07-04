@@ -96,11 +96,30 @@ export function confidenceForOperationIds(
   return confidencePriority.find((candidate) => confidences.includes(candidate)) ?? 'unknown';
 }
 
+const STRUCTURAL_KINDS = new Set<TemporalGraphNode['kind']>([
+  'branch-region',
+  'loop-region',
+  'parallel-region',
+  'try-region',
+  'decision',
+  'parallel-fork',
+  'join',
+  'terminal',
+]);
+
+/** True for structural control-flow nodes (region containers and markers), which bear no runtime state. */
+export function isStructuralNode(node: TemporalGraphNode): boolean {
+  return Boolean(node.isContainer) || STRUCTURAL_KINDS.has(node.kind);
+}
+
+/** Counts nodes by runtime state for the status legend, excluding structural control-flow nodes. */
 export function createStatusCounts(nodes: TemporalGraphNode[]): Map<RuntimeOverlayState, number> {
+  const runtimeNodes = nodes.filter((node) => !isStructuralNode(node));
+
   return new Map(
     runtimeOverlayStates.map((state) => [
       state,
-      nodes.filter((node) => node.state === state).length,
+      runtimeNodes.filter((node) => node.state === state).length,
     ]),
   );
 }
