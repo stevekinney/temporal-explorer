@@ -2,16 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Server",
+      "name": "Explore Fixtures (UI)",
       "type": "bun",
       "request": "launch",
-      "program": "run",
-      "args": ["start"],
-      "cwd": "${workspaceFolder}/apps/server",
-      "internalConsoleOptions": "neverOpen",
-      "env": {
-        "NODE_ENV": "development"
-      }
+      "program": "scripts/ui/explore-all-fixtures.ts",
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "openOnSessionStart"
     },
     {
       "name": "Debug Tests",
