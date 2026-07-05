@@ -5,6 +5,7 @@ import {
   renderTypeDeclarations,
   renderWorkflowMermaidFromArtifacts,
   validateArtifact,
+  workflowSlug,
 } from '@temporal-explorer/api';
 import type { TemporalAnalysisDocument, WorkflowDefinition } from '@temporal-explorer/schemas';
 
@@ -23,22 +24,23 @@ function assertWorkflowRendering(
   analysis: TemporalAnalysisDocument,
   workflow: WorkflowDefinition,
 ): void {
+  // Address the workflow by its unique slug: versioned samples (worker-versioning)
+  // register several implementations under one display name, which is ambiguous.
+  const slug = workflowSlug(workflow);
   const mermaid = renderWorkflowMermaidFromArtifacts({
     analysisArtifact: analysis,
-    workflowName: workflow.name,
+    workflowName: slug,
   });
 
   if (mermaid.trim().length === 0) {
-    throw new Error(
-      `renderWorkflowMermaidFromArtifacts returned empty text for "${workflow.name}".`,
-    );
+    throw new Error(`renderWorkflowMermaidFromArtifacts returned empty text for "${slug}".`);
   }
 
-  const first = renderTypeDeclarations({ analysis, workflowName: workflow.name });
-  const second = renderTypeDeclarations({ analysis, workflowName: workflow.name });
+  const first = renderTypeDeclarations({ analysis, workflowName: slug });
+  const second = renderTypeDeclarations({ analysis, workflowName: slug });
 
   if (JSON.stringify(first.value) !== JSON.stringify(second.value)) {
-    throw new Error(`renderTypeDeclarations was not deterministic for "${workflow.name}".`);
+    throw new Error(`renderTypeDeclarations was not deterministic for "${slug}".`);
   }
 }
 

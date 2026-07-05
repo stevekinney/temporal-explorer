@@ -4,9 +4,15 @@ import {
   executionOverlayDocumentSchema,
   runtimeTraceDocumentSchema,
   temporalAnalysisDocumentSchema,
+  type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
 
-import { createDocumentationSet, renderWorkflowDeclaration, renderWorkflowMermaid } from './index';
+import {
+  createDocumentationSet,
+  getWorkflow,
+  renderWorkflowDeclaration,
+  renderWorkflowMermaid,
+} from './index';
 
 const fixtureRoot = new URL('../../../fixtures/basic-order/', import.meta.url);
 
@@ -241,5 +247,61 @@ describe('documentation renderers', () => {
     expect(mermaid).toContain('complete["complete"]'); // The activity keeps the id.
     expect(mermaid).toContain('complete_1(["complete"])'); // The sentinel relocates.
     expect(mermaid).toContain('--> complete_1');
+  });
+});
+
+describe('versioned workflows that share a registered name', () => {
+  // Builds an analysis document shaped like the worker-versioning sample: two
+  // distinct implementations both registered under the display name
+  // "AutoUpgrading", disambiguated only by their implementation name / id.
+  async function aliasedAnalysis(): Promise<TemporalAnalysisDocument> {
+    const base = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(new URL('.temporal-explorer/analysis.json', fixtureRoot)).json(),
+    );
+    const template = base.workflows[0];
+
+    if (!template) {
+      throw new Error('Expected a Workflow fixture.');
+    }
+
+    const version = (
+      implementationName: string,
+    ): TemporalAnalysisDocument['workflows'][number] => ({
+      ...structuredClone(template),
+      id: `workflow:${implementationName}`,
+      name: 'AutoUpgrading',
+      implementationName,
+    });
+
+    return {
+      ...structuredClone(base),
+      workflows: [version('autoUpgradingV1'), version('autoUpgradingV1b')],
+    };
+  }
+
+  it('gives each implementation a distinct doc file instead of overwriting by name', async () => {
+    const files = createDocumentationSet({ analysis: await aliasedAnalysis() });
+    const paths = files.map((file) => file.path);
+
+    // The class bug: two "AutoUpgrading" workflows would both write AutoUpgrading.md.
+    expect(new Set(paths).size).toBe(paths.length);
+    expect(paths).toContain('autoUpgradingV1.md');
+    expect(paths).toContain('autoUpgradingV1b.md');
+    expect(paths).toContain('autoUpgradingV1.mmd');
+    expect(paths).toContain('autoUpgradingV1b.mmd');
+    expect(paths).not.toContain('AutoUpgrading.md');
+
+    // The index links the unique slugs but shows the registered display name.
+    const index = files.find((file) => file.path === 'index.md');
+    expect(index?.contents).toContain('[AutoUpgrading](./autoUpgradingV1.md)');
+    expect(index?.contents).toContain('[AutoUpgrading](./autoUpgradingV1b.md)');
+  });
+
+  it('resolves getWorkflow by unique slug and rejects an ambiguous display name', async () => {
+    const analysis = await aliasedAnalysis();
+
+    expect(getWorkflow(analysis, 'autoUpgradingV1').implementationName).toBe('autoUpgradingV1');
+    expect(getWorkflow(analysis, 'autoUpgradingV1b').implementationName).toBe('autoUpgradingV1b');
+    expect(() => getWorkflow(analysis, 'AutoUpgrading')).toThrow('is ambiguous');
   });
 });

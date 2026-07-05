@@ -1,5 +1,6 @@
 import {
   applySeverityOverrides,
+  findWorkflow,
   getTemporalExplorerVersion,
   renderWorkflowMermaidFromArtifacts,
 } from '@temporal-explorer/api';
@@ -54,7 +55,9 @@ async function runShow(args: string[], environment: CommandEnvironment): Promise
   }
 
   const { analysis } = await loadAnalysis(flags);
-  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
+  // findWorkflow resolves the unique slug/name and throws on an ambiguous shared
+  // name; the --json contract still emits `null` (not an error) when absent.
+  const workflow = findWorkflow(analysis, workflowName);
 
   if (flags.json) {
     await environment.stdout(stableJson(workflow ?? null));

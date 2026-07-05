@@ -66,6 +66,7 @@ export {
   type TemporalExplorerConfiguration,
 } from '@temporal-explorer/analyzer';
 
+export { findWorkflow, getWorkflow, workflowSlug } from '@temporal-explorer/renderers';
 export {
   renderMarkdown,
   renderTypeDeclarations,

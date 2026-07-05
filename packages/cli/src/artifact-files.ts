@@ -6,6 +6,7 @@ import {
   createDocumentationSetFromArtifacts,
   createExecutionOverlayFromArtifacts,
   createOverlayReportFromArtifact,
+  getWorkflow,
   importHistoryFromFile,
   loadTemporalExplorerProject,
   renderTypeDeclarations,
@@ -160,11 +161,7 @@ async function captureReplayForWorkflow(
   flags: ParsedFlags,
 ): Promise<ReplayCapturedCommand[]> {
   const analysis = temporalAnalysisDocumentSchema.parse(analysisArtifact);
-  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
-
-  if (!workflow) {
-    throw new Error(`Workflow "${workflowName}" was not found in the analysis artifact.`);
-  }
+  const workflow = getWorkflow(analysis, workflowName);
 
   const historyFile = flags.file ?? join(projectRoot, 'histories', `${flags.history}.json`);
 

@@ -6,23 +6,81 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
-/** Finds a workflow in an analysis document or throws a clear error. */
+/**
+ * A workflow's stable, unique identity for file names and static lookups. It is
+ * the implementation function's own name (which the Workflow `id` also derives
+ * from), so it stays unique even when several implementations register under the
+ * same display `name` via aliased re-exports (worker versioning). Runtime
+ * matching (traces/overlays) must NOT use this — the runtime only records the
+ * registered name — so those stay keyed on `name`.
+ */
+export function workflowSlug(workflow: WorkflowDefinition): string {
+  return workflow.implementationName ?? workflow.name;
+}
+
+function resolveUnique(
+  matches: WorkflowDefinition[],
+  workflowKey: string,
+): WorkflowDefinition | undefined {
+  if (matches.length > 1) {
+    const slugs = matches.map(workflowSlug).join(', ');
+    throw new Error(
+      `Workflow "${workflowKey}" is ambiguous across implementations (${slugs}); use one of those names.`,
+    );
+  }
+
+  return matches[0];
+}
+
+/**
+ * Finds a workflow by its unique slug (implementation name) or, failing that, by
+ * its registered display name, returning `undefined` when neither matches.
+ * Resolving the slug first keeps versioned workflows — which share a display
+ * name — individually addressable; a key shared by several implementations
+ * throws rather than silently resolving to an arbitrary one.
+ */
+export function findWorkflow(
+  analysis: TemporalAnalysisDocument,
+  workflowKey: string,
+): WorkflowDefinition | undefined {
+  const bySlug = resolveUnique(
+    analysis.workflows.filter((candidate) => workflowSlug(candidate) === workflowKey),
+    workflowKey,
+  );
+
+  if (bySlug) {
+    return bySlug;
+  }
+
+  return resolveUnique(
+    analysis.workflows.filter((candidate) => candidate.name === workflowKey),
+    workflowKey,
+  );
+}
+
+/** Like {@link findWorkflow} but throws a clear error when no workflow matches. */
 export function getWorkflow(
   analysis: TemporalAnalysisDocument,
-  workflowName: string,
+  workflowKey: string,
 ): WorkflowDefinition {
-  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
+  const workflow = findWorkflow(analysis, workflowKey);
 
   if (!workflow) {
-    throw new Error(`Workflow "${workflowName}" was not found.`);
+    throw new Error(`Workflow "${workflowKey}" was not found.`);
   }
 
   return workflow;
 }
 
-/** Sorts workflows by name for deterministic output. */
+/**
+ * Sorts workflows by display name for deterministic output, breaking ties on the
+ * unique slug so versioned workflows sharing a name keep a stable order.
+ */
 export function sortWorkflows(workflows: WorkflowDefinition[]): WorkflowDefinition[] {
-  return workflows.toSorted((left, right) => left.name.localeCompare(right.name));
+  return workflows.toSorted(
+    (left, right) =>
+      left.name.localeCompare(right.name) || workflowSlug(left).localeCompare(workflowSlug(right)),
+  );
 }
 
 /** Returns a workflow's commands of one kind in static order. */

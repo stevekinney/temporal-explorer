@@ -1,4 +1,4 @@
-import type { TemporalAnalysisDocument } from '@temporal-explorer/api';
+import { getWorkflow, type TemporalAnalysisDocument } from '@temporal-explorer/api';
 
 type WorkflowDefinition = TemporalAnalysisDocument['workflows'][number];
 
@@ -56,11 +56,7 @@ function appendSourceLines(
 }
 
 export function formatShow(analysis: TemporalAnalysisDocument, workflowName: string): string {
-  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
-
-  if (!workflow) {
-    throw new Error(`Workflow "${workflowName}" was not found.`);
-  }
+  const workflow = getWorkflow(analysis, workflowName);
 
   const lines = [
     formatWorkflowSignature(workflow),

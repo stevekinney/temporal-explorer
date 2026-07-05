@@ -12,6 +12,7 @@ import {
   loadTemporalExplorerProject,
   parseEventHistory,
   renderMarkdown,
+  renderTypeDeclarations,
   renderWorkflowJson,
   runDiagnostics,
   temporalExplorerArtifactVersions,
@@ -20,6 +21,8 @@ import {
 import {
   executionOverlayDocumentSchema,
   runtimeTraceDocumentSchema,
+  temporalAnalysisDocumentSchema,
+  type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
 
 import temporalExplorerPackageJson from '../../../package.json';
@@ -205,5 +208,35 @@ describe('public API scaffold', () => {
     expect(
       queryDiagnostics.value.filter((diagnostic) => diagnostic.severity === 'error'),
     ).toHaveLength(1);
+  });
+
+  it('gives versioned workflows distinct declaration files', async () => {
+    const base = temporalAnalysisDocumentSchema.parse(await analysisArtifactFile.json());
+    const template = base.workflows[0];
+
+    if (!template) {
+      throw new Error('Expected a Workflow fixture.');
+    }
+
+    const version = (
+      implementationName: string,
+    ): TemporalAnalysisDocument['workflows'][number] => ({
+      ...structuredClone(template),
+      id: `workflow:${implementationName}`,
+      name: 'AutoUpgrading',
+      implementationName,
+    });
+    const analysis: TemporalAnalysisDocument = {
+      ...structuredClone(base),
+      workflows: [version('autoUpgradingV1'), version('autoUpgradingV1b')],
+    };
+
+    const paths = renderTypeDeclarations({ analysis }).value.map((file) => file.path);
+
+    // Two workflows registered as "AutoUpgrading" must not both write AutoUpgrading.d.ts.
+    expect(new Set(paths).size).toBe(paths.length);
+    expect(paths).toContain('autoUpgradingV1.d.ts');
+    expect(paths).toContain('autoUpgradingV1b.d.ts');
+    expect(paths).not.toContain('AutoUpgrading.d.ts');
   });
 });

@@ -15,6 +15,7 @@ import {
   getWorkflow,
   isObserved,
   sortWorkflows,
+  workflowSlug,
 } from './shared';
 
 export type CreateDocumentationSetOptions = {
@@ -28,7 +29,9 @@ export function renderWorkflowIndexMarkdown(options: CreateDocumentationSetOptio
   const lines = ['# Temporal Workflow Explorer', '', '## Workflows', ''];
 
   for (const workflow of sortWorkflows(options.analysis.workflows)) {
-    lines.push(`- [${workflow.name}](./${workflow.name}.md) - \`${formatSource(workflow)}\``);
+    lines.push(
+      `- [${workflow.name}](./${workflowSlug(workflow)}.md) - \`${formatSource(workflow)}\``,
+    );
   }
 
   lines.push('', '## Artifacts', '');
@@ -82,13 +85,14 @@ type MessageRow = {
   received: string;
 };
 
+function formatPayload(args: { display: string }[]): string {
+  return args.map((arg) => `\`${arg.display}\``).join(', ') || 'none';
+}
+
 function collectMessageRows(
   workflow: WorkflowDefinition,
   overlay: ExecutionOverlayDocument | undefined,
 ): MessageRow[] {
-  const formatPayload = (args: { display: string }[]): string =>
-    args.map((arg) => `\`${arg.display}\``).join(', ') || 'none';
-
   return [
     ...workflow.messageSurface.signals.map((signal): MessageRow => ({
       kind: 'Signal',

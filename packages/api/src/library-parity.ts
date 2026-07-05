@@ -6,9 +6,11 @@ import {
   type TemporalExplorerProject,
 } from '@temporal-explorer/analyzer';
 import {
+  getWorkflow,
   renderWorkflowDeclaration,
   renderWorkflowIndexMarkdown,
   renderWorkflowMarkdown,
+  workflowSlug,
   type CreateDocumentationSetOptions,
 } from '@temporal-explorer/renderers';
 import type {
@@ -44,13 +46,7 @@ export type RenderWorkflowJsonOptions = {
 export function renderWorkflowJson(
   options: RenderWorkflowJsonOptions,
 ): TemporalExplorerResult<WorkflowDefinition> {
-  const workflow = options.analysis.workflows.find(
-    (candidate) => candidate.name === options.workflow,
-  );
-
-  if (!workflow) {
-    throw new Error(`Workflow "${options.workflow}" was not found.`);
-  }
+  const workflow = getWorkflow(options.analysis, options.workflow);
 
   return createTemporalExplorerResult(workflow, {
     diagnostics: workflow.diagnostics,
@@ -74,18 +70,20 @@ export function renderTypeDeclarations(
   options: RenderTypeDeclarationsOptions,
 ): TemporalExplorerResult<DeclarationFile[]> {
   const workflows = options.workflowName
-    ? options.analysis.workflows.filter((workflow) => workflow.name === options.workflowName)
+    ? [getWorkflow(options.analysis, options.workflowName)]
     : options.analysis.workflows;
 
-  if (options.workflowName && workflows.length === 0) {
-    throw new Error(`Workflow "${options.workflowName}" was not found.`);
-  }
-
   const files = workflows
-    .toSorted((left, right) => left.name.localeCompare(right.name))
+    .toSorted(
+      (left, right) =>
+        left.name.localeCompare(right.name) ||
+        workflowSlug(left).localeCompare(workflowSlug(right)),
+    )
     .map((workflow) => ({
-      path: `${workflow.name}.d.ts`,
-      contents: renderWorkflowDeclaration(options.analysis, workflow.name),
+      // Key the file on the unique slug so versioned workflows sharing a
+      // registered name do not overwrite each other's declarations.
+      path: `${workflowSlug(workflow)}.d.ts`,
+      contents: renderWorkflowDeclaration(options.analysis, workflowSlug(workflow)),
     }));
 
   return createTemporalExplorerResult(files, {

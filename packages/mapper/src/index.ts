@@ -27,7 +27,24 @@ export type CreateExecutionOverlayOptions = {
 };
 
 function getWorkflow(analysis: TemporalAnalysisDocument, workflowName: string): WorkflowDefinition {
-  const workflow = analysis.workflows.find((candidate) => candidate.name === workflowName);
+  // Match the runtime workflow type (the registered display name). Several
+  // implementations can register under one name (worker versioning); a trace
+  // cannot say which one ran, so bind explicitly by erroring rather than
+  // silently attaching the overlay to an arbitrary implementation.
+  const matches = analysis.workflows.filter(
+    (candidate) => candidate.name === workflowName || candidate.implementationName === workflowName,
+  );
+
+  if (matches.length > 1) {
+    const names = matches
+      .map((candidate) => candidate.implementationName ?? candidate.name)
+      .join(', ');
+    throw new Error(
+      `Workflow "${workflowName}" is ambiguous across implementations (${names}); overlay one at a time.`,
+    );
+  }
+
+  const workflow = matches[0];
 
   if (!workflow) {
     throw new Error(`Workflow "${workflowName}" was not found in static analysis.`);

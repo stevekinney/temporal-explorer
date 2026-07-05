@@ -4,7 +4,7 @@ import {
   type CreateDocumentationSetOptions,
 } from './markdown';
 import { renderWorkflowMermaid } from './mermaid';
-import { sortWorkflows } from './shared';
+import { sortWorkflows, workflowSlug } from './shared';
 
 export type DocumentationFile = {
   path: string;
@@ -23,13 +23,16 @@ export function createDocumentationSet(
   ];
 
   for (const workflow of sortWorkflows(options.analysis.workflows)) {
+    // File names key on the unique slug, not the display name, so versioned
+    // workflows that share a registered name do not overwrite each other.
+    const slug = workflowSlug(workflow);
     files.push({
-      path: `${workflow.name}.md`,
-      contents: renderWorkflowMarkdown({ ...options, workflowName: workflow.name }),
+      path: `${slug}.md`,
+      contents: renderWorkflowMarkdown({ ...options, workflowName: slug }),
     });
     files.push({
-      path: `${workflow.name}.mmd`,
-      contents: renderWorkflowMermaid(options.analysis, workflow.name),
+      path: `${slug}.mmd`,
+      contents: renderWorkflowMermaid(options.analysis, slug),
     });
   }
 
@@ -37,5 +40,6 @@ export function createDocumentationSet(
 }
 
 export { renderWorkflowDeclaration } from './declarations';
+export { findWorkflow, getWorkflow, workflowSlug } from './shared';
 export { renderWorkflowIndexMarkdown, renderWorkflowMarkdown, renderWorkflowMermaid };
 export type { CreateDocumentationSetOptions };

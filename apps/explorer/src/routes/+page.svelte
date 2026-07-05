@@ -51,12 +51,14 @@
   let activeTab = $state('flow');
   let inspectorOpen = $state(false);
 
-  const selectedWorkflowName = $derived(
-    selectedWorkflowOverride ?? data.analysis.workflows[0]?.name ?? '',
+  // Select by the unique workflow id, not the display name: versioned workflows
+  // can share a registered name, so a name would not identify a single one.
+  const selectedWorkflowId = $derived(
+    selectedWorkflowOverride ?? data.analysis.workflows[0]?.id ?? '',
   );
   const selectedWorkflow = $derived.by(() => {
     return (
-      data.analysis.workflows.find((workflow) => workflow.name === selectedWorkflowName) ??
+      data.analysis.workflows.find((workflow) => workflow.id === selectedWorkflowId) ??
       data.analysis.workflows[0]
     );
   });
@@ -139,8 +141,8 @@
     return `${workflow.name}(${args}): ${workflow.signature.result.display}`;
   }
 
-  function selectWorkflow(workflowName: string): void {
-    selectedWorkflowOverride = workflowName;
+  function selectWorkflow(workflowId: string): void {
+    selectedWorkflowOverride = workflowId;
     activeTab = 'flow';
   }
 </script>
@@ -166,9 +168,9 @@
       <SideNavigation ariaLabel="Workflow selection">
         {#each data.analysis.workflows as workflow (workflow.id)}
           <SideNavigationItem
-            active={workflow.name === selectedWorkflow?.name}
+            active={workflow.id === selectedWorkflow?.id}
             current="true"
-            onclick={() => selectWorkflow(workflow.name)}
+            onclick={() => selectWorkflow(workflow.id)}
           >
             <span class="workflow-nav-item">{workflow.name}</span>
           </SideNavigationItem>
