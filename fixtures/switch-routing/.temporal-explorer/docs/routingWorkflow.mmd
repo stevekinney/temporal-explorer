@@ -1,0 +1,18 @@
+flowchart TD
+  start(["routingWorkflow"])
+  flow_routingWorkflow_6{"switch"}
+  n1(( ))
+  flow_routingWorkflow_1["premiumFulfillment"]
+  flow_routingWorkflow_3["standardFulfillment"]
+  flow_routingWorkflow_5["basicFulfillment"]
+  flow_routingWorkflow_7["recordRouting"]
+  complete(["complete"])
+  start --> flow_routingWorkflow_6
+  flow_routingWorkflow_6 -->|"'gold'"| flow_routingWorkflow_1
+  flow_routingWorkflow_1 --> n1
+  flow_routingWorkflow_6 -->|"'silver'"| flow_routingWorkflow_3
+  flow_routingWorkflow_3 --> n1
+  flow_routingWorkflow_6 -->|"else"| flow_routingWorkflow_5
+  flow_routingWorkflow_5 --> n1
+  n1 --> flow_routingWorkflow_7
+  flow_routingWorkflow_7 --> complete

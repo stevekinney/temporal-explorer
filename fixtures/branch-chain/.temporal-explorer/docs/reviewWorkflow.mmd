@@ -1,0 +1,18 @@
+flowchart TD
+  start(["reviewWorkflow"])
+  flow_reviewWorkflow_4{"if"}
+  n1(( ))
+  flow_reviewWorkflow_1["seniorApproval"]
+  flow_reviewWorkflow_2["managerApproval"]
+  flow_reviewWorkflow_3["autoApprove"]
+  flow_reviewWorkflow_5["finalizeReview"]
+  complete(["complete"])
+  start --> flow_reviewWorkflow_4
+  flow_reviewWorkflow_4 -->|"input.amount > 10_000"| flow_reviewWorkflow_1
+  flow_reviewWorkflow_1 --> n1
+  flow_reviewWorkflow_4 -->|"input.amount > 1_000"| flow_reviewWorkflow_2
+  flow_reviewWorkflow_2 --> n1
+  flow_reviewWorkflow_4 -->|"else"| flow_reviewWorkflow_3
+  flow_reviewWorkflow_3 --> n1
+  n1 --> flow_reviewWorkflow_5
+  flow_reviewWorkflow_5 --> complete

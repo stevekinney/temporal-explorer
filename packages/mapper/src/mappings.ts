@@ -17,6 +17,7 @@ import {
   mapMarkerOperation,
   mapUpdateOperation,
 } from './construct-mappings';
+import { collectLoopCommandIds } from './loop-command-ids';
 
 function getEventIds(operation: RuntimeOperation): number[] {
   return operation.eventReferences.map((reference) => reference.eventId);
@@ -149,12 +150,22 @@ function mapActivityOperation(
   activityCommands: TemporalCommand[],
   dynamicCommands: TemporalCommand[],
   occurrences: Map<string, number>,
+  loopCommandIds: Set<string>,
 ): RuntimeNodeMapping {
   const occurrence = occurrences.get(operation.activityType) ?? 0;
   occurrences.set(operation.activityType, occurrence + 1);
-  const command = activityCommands.filter((candidate) => candidate.name === operation.activityType)[
-    occurrence
-  ];
+  const matching = activityCommands.filter(
+    (candidate) => candidate.name === operation.activityType,
+  );
+  // A command that repeats — a fan-out template (`Promise.all(items.map(...))`) or any
+  // command inside a loop body — is a single static node standing in for N runtime
+  // executions, so every occurrence past the last static command maps back to it instead
+  // of falling off the end into an unmapped, disconnected orphan node.
+  const command =
+    matching[occurrence] ??
+    matching.find(
+      (candidate) => candidate.cardinality === 'fan-out' || loopCommandIds.has(candidate.id),
+    );
 
   if (command) {
     return createActivityMapping(operation, command, occurrence);
@@ -217,6 +228,7 @@ type MappingContext = {
   externalOccurrences: Map<string, number>;
   runtimeTimerCount: number;
   timerOccurrence: number;
+  loopCommandIds: Set<string>;
 };
 
 function mapCoreOperation(
@@ -232,6 +244,7 @@ function mapCoreOperation(
         context.activityCommands,
         context.dynamicCommands,
         context.activityOccurrences,
+        context.loopCommandIds,
       );
     case 'signal':
       return mapSignalOperation(operation, context.workflow.messageSurface.signals);
@@ -303,6 +316,7 @@ export function createMappings(
     externalOccurrences: new Map(),
     runtimeTimerCount: trace.operations.filter((operation) => operation.kind === 'timer').length,
     timerOccurrence: 0,
+    loopCommandIds: collectLoopCommandIds(workflow.body.nodes),
   };
 
   return trace.operations.map((operation) => mapOperation(operation, context));

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "try-catch-finally",
+  "history": "compensated",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "bookingWorkflow",
+  "workflowId": "try-catch-finally-compensated",
+  "runIdNormalization": { "replacement": "compensated-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 23,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "10": 3,
+    "11": 3,
+    "12": 2,
+    "13": 1
+  },
+  "contentSha256": "567223ffd56481717129c5bb10a4c80faca0ed0ef3007d0230574bda07b23bb1"
+}

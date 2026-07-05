@@ -1,0 +1,375 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:orchestrationWorkflow:trace:orchestrated:orchestrated-run-id",
+  "staticAnalysisId": "analysis:nested-orchestration",
+  "runtimeTraceId": "trace:orchestrated:orchestrated-run-id",
+  "workflow": "orchestrationWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:orchestrationWorkflow",
+      "kind": "workflow",
+      "name": "orchestrationWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 951
+        },
+        "end": {
+          "line": 47,
+          "column": 2,
+          "offset": 1679
+        },
+        "symbolName": "orchestrationWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:buildPlan:0",
+      "kind": "activity",
+      "name": "buildPlan",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 22,
+          "offset": 1080
+        },
+        "end": {
+          "line": 25,
+          "column": 46,
+          "offset": 1104
+        },
+        "symbolName": "buildPlan"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:reserveInventory:1",
+      "kind": "activity",
+      "name": "reserveInventory",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 9,
+          "offset": 1241
+        },
+        "end": {
+          "line": 31,
+          "column": 47,
+          "offset": 1279
+        },
+        "symbolName": "reserveInventory"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:reserveShipping:2",
+      "kind": "activity",
+      "name": "reserveShipping",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 9,
+          "offset": 1289
+        },
+        "end": {
+          "line": 32,
+          "column": 46,
+          "offset": 1326
+        },
+        "symbolName": "reserveShipping"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:confirmStage:3",
+      "kind": "activity",
+      "name": "confirmStage",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 34,
+          "column": 13,
+          "offset": 1350
+        },
+        "end": {
+          "line": 34,
+          "column": 47,
+          "offset": 1384
+        },
+        "symbolName": "confirmStage"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:auditStage:4",
+      "kind": "activity",
+      "name": "auditStage",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 38,
+          "column": 15,
+          "offset": 1453
+        },
+        "end": {
+          "line": 38,
+          "column": 47,
+          "offset": 1485
+        },
+        "symbolName": "auditStage"
+      }
+    },
+    {
+      "id": "activity-call:orchestrationWorkflow:compensateStage:5",
+      "kind": "activity",
+      "name": "compensateStage",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 40,
+          "column": 15,
+          "offset": 1517
+        },
+        "end": {
+          "line": 40,
+          "column": 52,
+          "offset": 1554
+        },
+        "symbolName": "compensateStage"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:orchestrationWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to orchestrationWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type orchestrationWorkflow matched static Workflow orchestrationWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:orchestrationWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/orchestration-workflow.ts:22.",
+          "staticNodeId": "workflow:orchestrationWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:orchestrationWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to orchestrationWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type orchestrationWorkflow matched static Workflow orchestrationWorkflow.",
+          "eventIds": [41],
+          "staticNodeId": "workflow:orchestrationWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/orchestration-workflow.ts:22.",
+          "staticNodeId": "workflow:orchestrationWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:buildPlan:5",
+      "staticNodeId": "activity-call:orchestrationWorkflow:buildPlan:0",
+      "confidence": "exact",
+      "reason": "Activity buildPlan matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type buildPlan matched static Activity command buildPlan.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:orchestrationWorkflow:buildPlan:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:orchestrationWorkflow:buildPlan:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:25.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:buildPlan:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveInventory:11",
+      "staticNodeId": "activity-call:orchestrationWorkflow:reserveInventory:1",
+      "confidence": "exact",
+      "reason": "Activity reserveInventory matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveInventory matched static Activity command reserveInventory.",
+          "eventIds": [11, 13, 14],
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveInventory:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 13, 14],
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveInventory:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:31.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveInventory:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveShipping:12",
+      "staticNodeId": "activity-call:orchestrationWorkflow:reserveShipping:2",
+      "confidence": "exact",
+      "reason": "Activity reserveShipping matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveShipping matched static Activity command reserveShipping.",
+          "eventIds": [12, 18, 19],
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveShipping:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [12, 18, 19],
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveShipping:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:32.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:reserveShipping:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:confirmStage:23",
+      "staticNodeId": "activity-call:orchestrationWorkflow:confirmStage:3",
+      "confidence": "exact",
+      "reason": "Activity confirmStage matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type confirmStage matched static Activity command confirmStage.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:orchestrationWorkflow:confirmStage:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [23, 24, 25],
+          "staticNodeId": "activity-call:orchestrationWorkflow:confirmStage:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:34.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:confirmStage:3"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:auditStage:29",
+      "staticNodeId": "activity-call:orchestrationWorkflow:auditStage:4",
+      "confidence": "exact",
+      "reason": "Activity auditStage matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type auditStage matched static Activity command auditStage.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:orchestrationWorkflow:auditStage:4"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 4.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:orchestrationWorkflow:auditStage:4"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:38.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:auditStage:4"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:compensateStage:35",
+      "staticNodeId": "activity-call:orchestrationWorkflow:compensateStage:5",
+      "confidence": "exact",
+      "reason": "Activity compensateStage matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type compensateStage matched static Activity command compensateStage.",
+          "eventIds": [35, 36, 37],
+          "staticNodeId": "activity-call:orchestrationWorkflow:compensateStage:5"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 5.",
+          "eventIds": [35, 36, 37],
+          "staticNodeId": "activity-call:orchestrationWorkflow:compensateStage:5"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/orchestration-workflow.ts:40.",
+          "staticNodeId": "activity-call:orchestrationWorkflow:compensateStage:5"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 7,
+      "observed": 7,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 6,
+      "observed": 6,
+      "retried": 0,
+      "failed": 1
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

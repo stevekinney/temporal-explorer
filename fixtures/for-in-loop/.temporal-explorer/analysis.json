@@ -1,0 +1,276 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:for-in-loop",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "for-in-loop",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/flag-workflow.ts": "4f1244692dc555ddcfe7fe3e51bcb28440f504b6de341f21066245927147b1b7"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "for-in-loop",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 198
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 335
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:flagWorkflow",
+      "name": "flagWorkflow",
+      "source": {
+        "path": "src/workflows/flag-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 626
+        },
+        "end": {
+          "line": 29,
+          "column": 2,
+          "offset": 964
+        },
+        "symbolName": "flagWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "flagWorkflow:arg:0:input",
+            "display": "FlagInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/flag-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 36,
+                "offset": 661
+              },
+              "end": {
+                "line": 16,
+                "column": 52,
+                "offset": 677
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "flagWorkflow:result",
+          "display": "Promise<FlagResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "loop",
+            "id": "flow:flagWorkflow:4",
+            "loopKind": "for-in",
+            "source": {
+              "path": "src/workflows/flag-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 3,
+                "offset": 724
+              },
+              "end": {
+                "line": 26,
+                "column": 4,
+                "offset": 913
+              }
+            },
+            "body": [
+              {
+                "type": "branch",
+                "id": "flow:flagWorkflow:2",
+                "branchKind": "if",
+                "source": {
+                  "path": "src/workflows/flag-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 20,
+                    "column": 5,
+                    "offset": 762
+                  },
+                  "end": {
+                    "line": 22,
+                    "column": 6,
+                    "offset": 847
+                  }
+                },
+                "clauses": [
+                  {
+                    "label": "!Object.prototype.hasOwnProperty.call(input.flags, flag)",
+                    "body": [
+                      {
+                        "type": "terminal",
+                        "id": "flow:flagWorkflow:1",
+                        "terminalKind": "continue",
+                        "source": {
+                          "path": "src/workflows/flag-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 21,
+                            "column": 7,
+                            "offset": 832
+                          },
+                          "end": {
+                            "line": 21,
+                            "column": 16,
+                            "offset": 841
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "command",
+                "id": "flow:flagWorkflow:3",
+                "commandId": "activity-call:flagWorkflow:applyFlag:0",
+                "source": {
+                  "path": "src/workflows/flag-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 24,
+                    "column": 11,
+                    "offset": 859
+                  },
+                  "end": {
+                    "line": 24,
+                    "column": 42,
+                    "offset": 890
+                  },
+                  "symbolName": "applyFlag"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:flagWorkflow:applyFlag:0",
+          "kind": "activity",
+          "name": "applyFlag",
+          "source": {
+            "path": "src/workflows/flag-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 24,
+              "column": 11,
+              "offset": 859
+            },
+            "end": {
+              "line": 24,
+              "column": 42,
+              "offset": 890
+            },
+            "symbolName": "applyFlag"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "FlagInput",
+          "module": "src/activities/flag-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "FlagResult",
+          "module": "src/activities/flag-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:applyFlag",
+      "name": "applyFlag",
+      "source": {
+        "path": "src/workflows/flag-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 11,
+          "offset": 859
+        },
+        "end": {
+          "line": 24,
+          "column": 42,
+          "offset": 890
+        },
+        "symbolName": "applyFlag"
+      },
+      "implementationSource": {
+        "path": "src/activities/flag-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 207
+        },
+        "end": {
+          "line": 17,
+          "column": 2,
+          "offset": 343
+        },
+        "symbolName": "applyFlag"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

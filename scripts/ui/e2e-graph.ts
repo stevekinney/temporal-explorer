@@ -39,7 +39,9 @@ async function runGraphInteractionTest(): Promise<void> {
       'Event 5 ActivityTaskScheduled',
     );
 
-    await page.getByRole('button', { name: /Activity 1 edge/ }).click();
+    // Sequential edges in the control-flow graph are unlabeled (only branch/loop arms carry
+    // labels), so select the first edge row directly rather than by a flat-path label.
+    await page.locator('.edge-item').first().click();
     await expect(page.getByRole('complementary', { name: 'Selection inspector' })).toContainText(
       'Directed static execution order.',
     );

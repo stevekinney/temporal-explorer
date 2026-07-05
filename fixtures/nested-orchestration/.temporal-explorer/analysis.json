@@ -1,0 +1,694 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:nested-orchestration",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "nested-orchestration",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/orchestration-workflow.ts": "644e96ae229b5492b305bbac9383bba469aa5e89b869df75ccd0e5b29c23a87f"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "nested-orchestration",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 217
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 363
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:orchestrationWorkflow",
+      "name": "orchestrationWorkflow",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 951
+        },
+        "end": {
+          "line": 47,
+          "column": 2,
+          "offset": 1679
+        },
+        "symbolName": "orchestrationWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "orchestrationWorkflow:arg:0:input",
+            "display": "OrchestrationInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/orchestration-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 23,
+                "column": 3,
+                "offset": 998
+              },
+              "end": {
+                "line": 23,
+                "column": 28,
+                "offset": 1023
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "orchestrationWorkflow:result",
+          "display": "Promise<OrchestrationResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:orchestrationWorkflow:1",
+            "commandId": "activity-call:orchestrationWorkflow:buildPlan:0",
+            "source": {
+              "path": "src/workflows/orchestration-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 25,
+                "column": 22,
+                "offset": 1080
+              },
+              "end": {
+                "line": 25,
+                "column": 46,
+                "offset": 1104
+              },
+              "symbolName": "buildPlan"
+            }
+          },
+          {
+            "type": "loop",
+            "id": "flow:orchestrationWorkflow:10",
+            "loopKind": "for-of",
+            "source": {
+              "path": "src/workflows/orchestration-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 28,
+                "column": 3,
+                "offset": 1136
+              },
+              "end": {
+                "line": 44,
+                "column": 4,
+                "offset": 1601
+              }
+            },
+            "body": [
+              {
+                "type": "branch",
+                "id": "flow:orchestrationWorkflow:9",
+                "branchKind": "if",
+                "source": {
+                  "path": "src/workflows/orchestration-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 29,
+                    "column": 5,
+                    "offset": 1176
+                  },
+                  "end": {
+                    "line": 43,
+                    "column": 6,
+                    "offset": 1597
+                  }
+                },
+                "clauses": [
+                  {
+                    "label": "stage === 'fulfillment'",
+                    "body": [
+                      {
+                        "type": "parallel",
+                        "id": "flow:orchestrationWorkflow:2",
+                        "parallelKind": "all",
+                        "source": {
+                          "path": "src/workflows/orchestration-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 30,
+                            "column": 13,
+                            "offset": 1219
+                          },
+                          "end": {
+                            "line": 33,
+                            "column": 9,
+                            "offset": 1336
+                          }
+                        },
+                        "cardinality": "fixed",
+                        "branches": [
+                          [
+                            {
+                              "type": "command",
+                              "id": "flow:orchestrationWorkflow:3",
+                              "commandId": "activity-call:orchestrationWorkflow:reserveInventory:1",
+                              "source": {
+                                "path": "src/workflows/orchestration-workflow.ts",
+                                "pathKind": "project-relative",
+                                "start": {
+                                  "line": 31,
+                                  "column": 9,
+                                  "offset": 1241
+                                },
+                                "end": {
+                                  "line": 31,
+                                  "column": 47,
+                                  "offset": 1279
+                                },
+                                "symbolName": "reserveInventory"
+                              }
+                            }
+                          ],
+                          [
+                            {
+                              "type": "command",
+                              "id": "flow:orchestrationWorkflow:4",
+                              "commandId": "activity-call:orchestrationWorkflow:reserveShipping:2",
+                              "source": {
+                                "path": "src/workflows/orchestration-workflow.ts",
+                                "pathKind": "project-relative",
+                                "start": {
+                                  "line": 32,
+                                  "column": 9,
+                                  "offset": 1289
+                                },
+                                "end": {
+                                  "line": 32,
+                                  "column": 46,
+                                  "offset": 1326
+                                },
+                                "symbolName": "reserveShipping"
+                              }
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "type": "command",
+                        "id": "flow:orchestrationWorkflow:5",
+                        "commandId": "activity-call:orchestrationWorkflow:confirmStage:3",
+                        "source": {
+                          "path": "src/workflows/orchestration-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 34,
+                            "column": 13,
+                            "offset": 1350
+                          },
+                          "end": {
+                            "line": 34,
+                            "column": 47,
+                            "offset": 1384
+                          },
+                          "symbolName": "confirmStage"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "otherwise": [
+                  {
+                    "type": "try",
+                    "id": "flow:orchestrationWorkflow:6",
+                    "source": {
+                      "path": "src/workflows/orchestration-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 37,
+                        "column": 7,
+                        "offset": 1433
+                      },
+                      "end": {
+                        "line": 41,
+                        "column": 8,
+                        "offset": 1563
+                      }
+                    },
+                    "body": [
+                      {
+                        "type": "command",
+                        "id": "flow:orchestrationWorkflow:7",
+                        "commandId": "activity-call:orchestrationWorkflow:auditStage:4",
+                        "source": {
+                          "path": "src/workflows/orchestration-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 38,
+                            "column": 15,
+                            "offset": 1453
+                          },
+                          "end": {
+                            "line": 38,
+                            "column": 47,
+                            "offset": 1485
+                          },
+                          "symbolName": "auditStage"
+                        }
+                      }
+                    ],
+                    "handler": {
+                      "body": [
+                        {
+                          "type": "command",
+                          "id": "flow:orchestrationWorkflow:8",
+                          "commandId": "activity-call:orchestrationWorkflow:compensateStage:5",
+                          "source": {
+                            "path": "src/workflows/orchestration-workflow.ts",
+                            "pathKind": "project-relative",
+                            "start": {
+                              "line": 40,
+                              "column": 15,
+                              "offset": 1517
+                            },
+                            "end": {
+                              "line": 40,
+                              "column": 52,
+                              "offset": 1554
+                            },
+                            "symbolName": "compensateStage"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:orchestrationWorkflow:buildPlan:0",
+          "kind": "activity",
+          "name": "buildPlan",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 25,
+              "column": 22,
+              "offset": 1080
+            },
+            "end": {
+              "line": 25,
+              "column": 46,
+              "offset": 1104
+            },
+            "symbolName": "buildPlan"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:orchestrationWorkflow:reserveInventory:1",
+          "kind": "activity",
+          "name": "reserveInventory",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 31,
+              "column": 9,
+              "offset": 1241
+            },
+            "end": {
+              "line": 31,
+              "column": 47,
+              "offset": 1279
+            },
+            "symbolName": "reserveInventory"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:orchestrationWorkflow:reserveShipping:2",
+          "kind": "activity",
+          "name": "reserveShipping",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 32,
+              "column": 9,
+              "offset": 1289
+            },
+            "end": {
+              "line": 32,
+              "column": 46,
+              "offset": 1326
+            },
+            "symbolName": "reserveShipping"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:orchestrationWorkflow:confirmStage:3",
+          "kind": "activity",
+          "name": "confirmStage",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 34,
+              "column": 13,
+              "offset": 1350
+            },
+            "end": {
+              "line": 34,
+              "column": 47,
+              "offset": 1384
+            },
+            "symbolName": "confirmStage"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        },
+        {
+          "id": "activity-call:orchestrationWorkflow:auditStage:4",
+          "kind": "activity",
+          "name": "auditStage",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 38,
+              "column": 15,
+              "offset": 1453
+            },
+            "end": {
+              "line": 38,
+              "column": 47,
+              "offset": 1485
+            },
+            "symbolName": "auditStage"
+          },
+          "confidence": "exact",
+          "staticOrder": 4
+        },
+        {
+          "id": "activity-call:orchestrationWorkflow:compensateStage:5",
+          "kind": "activity",
+          "name": "compensateStage",
+          "source": {
+            "path": "src/workflows/orchestration-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 40,
+              "column": 15,
+              "offset": 1517
+            },
+            "end": {
+              "line": 40,
+              "column": 52,
+              "offset": 1554
+            },
+            "symbolName": "compensateStage"
+          },
+          "confidence": "exact",
+          "staticOrder": 5
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "OrchestrationInput",
+          "module": "src/activities/orchestration-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "OrchestrationResult",
+          "module": "src/activities/orchestration-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:buildPlan",
+      "name": "buildPlan",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 22,
+          "offset": 1080
+        },
+        "end": {
+          "line": 25,
+          "column": 46,
+          "offset": 1104
+        },
+        "symbolName": "buildPlan"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 285
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 398
+        },
+        "symbolName": "buildPlan"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:reserveInventory",
+      "name": "reserveInventory",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 9,
+          "offset": 1241
+        },
+        "end": {
+          "line": 31,
+          "column": 47,
+          "offset": 1279
+        },
+        "symbolName": "reserveInventory"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 1,
+          "offset": 400
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 554
+        },
+        "symbolName": "reserveInventory"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:reserveShipping",
+      "name": "reserveShipping",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 9,
+          "offset": 1289
+        },
+        "end": {
+          "line": 32,
+          "column": 46,
+          "offset": 1326
+        },
+        "symbolName": "reserveShipping"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 1,
+          "offset": 556
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 708
+        },
+        "symbolName": "reserveShipping"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:confirmStage",
+      "name": "confirmStage",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 34,
+          "column": 13,
+          "offset": 1350
+        },
+        "end": {
+          "line": 34,
+          "column": 47,
+          "offset": 1384
+        },
+        "symbolName": "confirmStage"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 1,
+          "offset": 710
+        },
+        "end": {
+          "line": 34,
+          "column": 2,
+          "offset": 858
+        },
+        "symbolName": "confirmStage"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:auditStage",
+      "name": "auditStage",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 38,
+          "column": 15,
+          "offset": 1453
+        },
+        "end": {
+          "line": 38,
+          "column": 47,
+          "offset": 1485
+        },
+        "symbolName": "auditStage"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 37,
+          "column": 1,
+          "offset": 945
+        },
+        "end": {
+          "line": 39,
+          "column": 2,
+          "offset": 1095
+        },
+        "symbolName": "auditStage"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:compensateStage",
+      "name": "compensateStage",
+      "source": {
+        "path": "src/workflows/orchestration-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 40,
+          "column": 15,
+          "offset": 1517
+        },
+        "end": {
+          "line": 40,
+          "column": 52,
+          "offset": 1554
+        },
+        "symbolName": "compensateStage"
+      },
+      "implementationSource": {
+        "path": "src/activities/orchestration-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 41,
+          "column": 1,
+          "offset": 1097
+        },
+        "end": {
+          "line": 43,
+          "column": 2,
+          "offset": 1251
+        },
+        "symbolName": "compensateStage"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

@@ -1,8 +1,9 @@
-import type {
-  ExecutionOverlayDocument,
-  FlowNode,
-  RuntimeTraceDocument,
-  WorkflowDefinition,
+import {
+  switchClauseBody,
+  type ExecutionOverlayDocument,
+  type FlowNode,
+  type RuntimeTraceDocument,
+  type WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
 import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } from './projection';
@@ -88,7 +89,13 @@ function addStructural(
   return id;
 }
 
-function pushEdge(context: FlowContext, source: string, target: string, label: string): void {
+function pushEdge(
+  context: FlowContext,
+  source: string,
+  target: string,
+  label: string,
+  variant?: 'loop-back',
+): void {
   context.counter.value += 1;
   const targetNode = context.nodes.find((node) => node.id === target);
   context.edges.push({
@@ -99,6 +106,7 @@ function pushEdge(context: FlowContext, source: string, target: string, label: s
     state: targetNode?.state ?? 'observed',
     runtimeOperationIds: targetNode?.runtimeOperationIds ?? [],
     eventReferences: targetNode?.eventReferences ?? [],
+    ...(variant ? { variant } : {}),
   });
 }
 
@@ -221,13 +229,13 @@ function walkTerminal(
       graphNode.parentId = parentId;
       context.nodes.push(graphNode);
       pushEdge(context, entry, command.id, label);
-      pushEdge(context, command.id, context.startId, 'loop');
+      pushEdge(context, command.id, context.startId, 'loop', 'loop-back');
       return undefined;
     }
 
     const id = addStructural(context, 'terminal', 'continue as new', parentId);
     pushEdge(context, entry, id, label);
-    pushEdge(context, id, context.startId, 'loop');
+    pushEdge(context, id, context.startId, 'loop', 'loop-back');
     return undefined;
   }
 
@@ -251,10 +259,12 @@ function walkBranch(
   const join = addStructural(context, 'join', '', container);
 
   for (const clause of node.clauses) {
-    walkArm(clause.body, decision, join, clause.label, container, context);
+    const body = switchClauseBody(clause.body, node.branchKind);
+    walkArm(body, decision, join, clause.label, container, context);
   }
 
-  walkArm(node.otherwise ?? [], decision, join, 'else', container, context);
+  const otherwise = switchClauseBody(node.otherwise ?? [], node.branchKind);
+  walkArm(otherwise, decision, join, 'else', container, context);
 
   return join;
 }
@@ -283,7 +293,7 @@ function walkLoop(
   const bodyExit = walkSequence(node.body, header, container, context);
 
   if (bodyExit !== undefined) {
-    pushEdge(context, bodyExit, header, 'repeat');
+    pushEdge(context, bodyExit, header, 'repeat', 'loop-back');
   }
 
   return header;

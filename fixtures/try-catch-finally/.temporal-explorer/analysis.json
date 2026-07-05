@@ -1,0 +1,390 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:try-catch-finally",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "try-catch-finally",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/booking-workflow.ts": "d20d48bcfc429118dd4ecfce542ff1d4a6e65f0bdb4aba8a1175b94d25de9487"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "try-catch-finally",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 207
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 347
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:bookingWorkflow",
+      "name": "bookingWorkflow",
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 737
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 1078
+        },
+        "symbolName": "bookingWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "bookingWorkflow:arg:0:input",
+            "display": "BookingInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/booking-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 39,
+                "offset": 775
+              },
+              "end": {
+                "line": 17,
+                "column": 58,
+                "offset": 794
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "bookingWorkflow:result",
+          "display": "Promise<BookingResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "try",
+            "id": "flow:bookingWorkflow:1",
+            "source": {
+              "path": "src/workflows/booking-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 20,
+                "column": 3,
+                "offset": 853
+              },
+              "end": {
+                "line": 27,
+                "column": 4,
+                "offset": 1029
+              }
+            },
+            "body": [
+              {
+                "type": "command",
+                "id": "flow:bookingWorkflow:2",
+                "commandId": "activity-call:bookingWorkflow:reserveSeats:0",
+                "source": {
+                  "path": "src/workflows/booking-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 21,
+                    "column": 11,
+                    "offset": 869
+                  },
+                  "end": {
+                    "line": 21,
+                    "column": 38,
+                    "offset": 896
+                  },
+                  "symbolName": "reserveSeats"
+                }
+              }
+            ],
+            "handler": {
+              "body": [
+                {
+                  "type": "command",
+                  "id": "flow:bookingWorkflow:3",
+                  "commandId": "activity-call:bookingWorkflow:recordFailure:1",
+                  "source": {
+                    "path": "src/workflows/booking-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 23,
+                      "column": 11,
+                      "offset": 920
+                    },
+                    "end": {
+                      "line": 23,
+                      "column": 39,
+                      "offset": 948
+                    },
+                    "symbolName": "recordFailure"
+                  }
+                }
+              ]
+            },
+            "finalizer": [
+              {
+                "type": "command",
+                "id": "flow:bookingWorkflow:4",
+                "commandId": "activity-call:bookingWorkflow:releaseHold:2",
+                "source": {
+                  "path": "src/workflows/booking-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 26,
+                    "column": 11,
+                    "offset": 998
+                  },
+                  "end": {
+                    "line": 26,
+                    "column": 37,
+                    "offset": 1024
+                  },
+                  "symbolName": "releaseHold"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:bookingWorkflow:reserveSeats:0",
+          "kind": "activity",
+          "name": "reserveSeats",
+          "source": {
+            "path": "src/workflows/booking-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 21,
+              "column": 11,
+              "offset": 869
+            },
+            "end": {
+              "line": 21,
+              "column": 38,
+              "offset": 896
+            },
+            "symbolName": "reserveSeats"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:bookingWorkflow:recordFailure:1",
+          "kind": "activity",
+          "name": "recordFailure",
+          "source": {
+            "path": "src/workflows/booking-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 23,
+              "column": 11,
+              "offset": 920
+            },
+            "end": {
+              "line": 23,
+              "column": 39,
+              "offset": 948
+            },
+            "symbolName": "recordFailure"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:bookingWorkflow:releaseHold:2",
+          "kind": "activity",
+          "name": "releaseHold",
+          "source": {
+            "path": "src/workflows/booking-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 26,
+              "column": 11,
+              "offset": 998
+            },
+            "end": {
+              "line": 26,
+              "column": 37,
+              "offset": 1024
+            },
+            "symbolName": "releaseHold"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "BookingInput",
+          "module": "src/activities/booking-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "BookingResult",
+          "module": "src/activities/booking-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:reserveSeats",
+      "name": "reserveSeats",
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 11,
+          "offset": 869
+        },
+        "end": {
+          "line": 21,
+          "column": 38,
+          "offset": 896
+        },
+        "symbolName": "reserveSeats"
+      },
+      "implementationSource": {
+        "path": "src/activities/booking-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 1,
+          "offset": 370
+        },
+        "end": {
+          "line": 25,
+          "column": 2,
+          "offset": 503
+        },
+        "symbolName": "reserveSeats"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:recordFailure",
+      "name": "recordFailure",
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 11,
+          "offset": 920
+        },
+        "end": {
+          "line": 23,
+          "column": 39,
+          "offset": 948
+        },
+        "symbolName": "recordFailure"
+      },
+      "implementationSource": {
+        "path": "src/activities/booking-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 27,
+          "column": 1,
+          "offset": 505
+        },
+        "end": {
+          "line": 29,
+          "column": 2,
+          "offset": 632
+        },
+        "symbolName": "recordFailure"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:releaseHold",
+      "name": "releaseHold",
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 11,
+          "offset": 998
+        },
+        "end": {
+          "line": 26,
+          "column": 37,
+          "offset": 1024
+        },
+        "symbolName": "releaseHold"
+      },
+      "implementationSource": {
+        "path": "src/activities/booking-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 1,
+          "offset": 634
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 751
+        },
+        "symbolName": "releaseHold"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:raceWorkflow:trace:activity-wins:activity-wins-run-id",
+  "staticAnalysisId": "analysis:race",
+  "runtimeTraceId": "trace:activity-wins:activity-wins-run-id",
+  "workflow": "raceWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:raceWorkflow",
+      "kind": "workflow",
+      "name": "raceWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 818
+        },
+        "end": {
+          "line": 37,
+          "column": 2,
+          "offset": 1316
+        },
+        "symbolName": "raceWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:raceWorkflow:fetchLivePrice:0",
+      "kind": "activity",
+      "name": "fetchLivePrice",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 5,
+          "offset": 955
+        },
+        "end": {
+          "line": 21,
+          "column": 33,
+          "offset": 983
+        },
+        "symbolName": "fetchLivePrice"
+      }
+    },
+    {
+      "id": "activity-call:raceWorkflow:recordQuote:2",
+      "kind": "activity",
+      "name": "recordQuote",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 11,
+          "offset": 1045
+        },
+        "end": {
+          "line": 26,
+          "column": 51,
+          "offset": 1085
+        },
+        "symbolName": "recordQuote"
+      }
+    },
+    {
+      "id": "timer:raceWorkflow:1",
+      "kind": "timer",
+      "name": "PRICE_DEADLINE",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 5,
+          "offset": 989
+        },
+        "end": {
+          "line": 22,
+          "column": 26,
+          "offset": 1010
+        }
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:raceWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to raceWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type raceWorkflow matched static Workflow raceWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:raceWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/race-workflow.ts:19.",
+          "staticNodeId": "workflow:raceWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:raceWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to raceWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type raceWorkflow matched static Workflow raceWorkflow.",
+          "eventIds": [18],
+          "staticNodeId": "workflow:raceWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/race-workflow.ts:19.",
+          "staticNodeId": "workflow:raceWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:fetchLivePrice:5",
+      "staticNodeId": "activity-call:raceWorkflow:fetchLivePrice:0",
+      "confidence": "exact",
+      "reason": "Activity fetchLivePrice matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type fetchLivePrice matched static Activity command fetchLivePrice.",
+          "eventIds": [5, 7, 8],
+          "staticNodeId": "activity-call:raceWorkflow:fetchLivePrice:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 7, 8],
+          "staticNodeId": "activity-call:raceWorkflow:fetchLivePrice:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/race-workflow.ts:21.",
+          "staticNodeId": "activity-call:raceWorkflow:fetchLivePrice:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordQuote:12",
+      "staticNodeId": "activity-call:raceWorkflow:recordQuote:2",
+      "confidence": "exact",
+      "reason": "Activity recordQuote matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordQuote matched static Activity command recordQuote.",
+          "eventIds": [12, 13, 14],
+          "staticNodeId": "activity-call:raceWorkflow:recordQuote:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [12, 13, 14],
+          "staticNodeId": "activity-call:raceWorkflow:recordQuote:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/race-workflow.ts:26.",
+          "staticNodeId": "activity-call:raceWorkflow:recordQuote:2"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "timer:1:6",
+      "staticNodeId": "timer:raceWorkflow:1",
+      "confidence": "exact",
+      "reason": "The only runtime timer matched the only static timer.",
+      "evidence": [
+        {
+          "kind": "timer-order",
+          "description": "Runtime timer 1 matched static timer command timer:raceWorkflow:1 by start order.",
+          "eventIds": [6],
+          "staticNodeId": "timer:raceWorkflow:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static timer source is src/workflows/race-workflow.ts:22.",
+          "staticNodeId": "timer:raceWorkflow:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 4,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 2,
+      "observed": 2,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 1,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 1
+    }
+  },
+  "diagnostics": []
+}

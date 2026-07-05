@@ -1,0 +1,398 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:race",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "race",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/race-workflow.ts": "f8fa4512079e8bb5d8df32d9cc8cae1d64f130ff966e9d375758f290124a1e2a"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "race",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 195
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 332
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:raceWorkflow",
+      "name": "raceWorkflow",
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 818
+        },
+        "end": {
+          "line": 37,
+          "column": 2,
+          "offset": 1316
+        },
+        "symbolName": "raceWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "raceWorkflow:arg:0:input",
+            "display": "RaceInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 36,
+                "offset": 853
+              },
+              "end": {
+                "line": 19,
+                "column": 52,
+                "offset": 869
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "raceWorkflow:result",
+          "display": "Promise<RaceResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "parallel",
+            "id": "flow:raceWorkflow:1",
+            "parallelKind": "race",
+            "source": {
+              "path": "src/workflows/race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 20,
+                "column": 43,
+                "offset": 936
+              },
+              "end": {
+                "line": 23,
+                "column": 5,
+                "offset": 1016
+              }
+            },
+            "cardinality": "fixed",
+            "branches": [
+              [
+                {
+                  "type": "command",
+                  "id": "flow:raceWorkflow:2",
+                  "commandId": "activity-call:raceWorkflow:fetchLivePrice:0",
+                  "source": {
+                    "path": "src/workflows/race-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 21,
+                      "column": 5,
+                      "offset": 955
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 33,
+                      "offset": 983
+                    },
+                    "symbolName": "fetchLivePrice"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "command",
+                  "id": "flow:raceWorkflow:3",
+                  "commandId": "timer:raceWorkflow:1",
+                  "source": {
+                    "path": "src/workflows/race-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 22,
+                      "column": 5,
+                      "offset": 989
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 26,
+                      "offset": 1010
+                    }
+                  }
+                }
+              ]
+            ]
+          },
+          {
+            "type": "branch",
+            "id": "flow:raceWorkflow:6",
+            "branchKind": "if",
+            "source": {
+              "path": "src/workflows/race-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 25,
+                "column": 3,
+                "offset": 1021
+              },
+              "end": {
+                "line": 34,
+                "column": 4,
+                "offset": 1224
+              }
+            },
+            "clauses": [
+              {
+                "label": "priced",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:raceWorkflow:4",
+                    "commandId": "activity-call:raceWorkflow:recordQuote:2",
+                    "source": {
+                      "path": "src/workflows/race-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 26,
+                        "column": 11,
+                        "offset": 1045
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 51,
+                        "offset": 1085
+                      },
+                      "symbolName": "recordQuote"
+                    }
+                  },
+                  {
+                    "type": "terminal",
+                    "id": "flow:raceWorkflow:5",
+                    "terminalKind": "return",
+                    "source": {
+                      "path": "src/workflows/race-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 28,
+                        "column": 5,
+                        "offset": 1092
+                      },
+                      "end": {
+                        "line": 33,
+                        "column": 7,
+                        "offset": 1220
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:raceWorkflow:fetchLivePrice:0",
+          "kind": "activity",
+          "name": "fetchLivePrice",
+          "source": {
+            "path": "src/workflows/race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 21,
+              "column": 5,
+              "offset": 955
+            },
+            "end": {
+              "line": 21,
+              "column": 33,
+              "offset": 983
+            },
+            "symbolName": "fetchLivePrice"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "timer:raceWorkflow:1",
+          "kind": "timer",
+          "name": "PRICE_DEADLINE",
+          "source": {
+            "path": "src/workflows/race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 22,
+              "column": 5,
+              "offset": 989
+            },
+            "end": {
+              "line": 22,
+              "column": 26,
+              "offset": 1010
+            }
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:raceWorkflow:recordQuote:2",
+          "kind": "activity",
+          "name": "recordQuote",
+          "source": {
+            "path": "src/workflows/race-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 26,
+              "column": 11,
+              "offset": 1045
+            },
+            "end": {
+              "line": 26,
+              "column": 51,
+              "offset": 1085
+            },
+            "symbolName": "recordQuote"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "RaceInput",
+          "module": "src/activities/market-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "RaceResult",
+          "module": "src/activities/market-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:fetchLivePrice",
+      "name": "fetchLivePrice",
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 5,
+          "offset": 955
+        },
+        "end": {
+          "line": 21,
+          "column": 33,
+          "offset": 983
+        },
+        "symbolName": "fetchLivePrice"
+      },
+      "implementationSource": {
+        "path": "src/activities/market-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 297
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 407
+        },
+        "symbolName": "fetchLivePrice"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:recordQuote",
+      "name": "recordQuote",
+      "source": {
+        "path": "src/workflows/race-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 11,
+          "offset": 1045
+        },
+        "end": {
+          "line": 26,
+          "column": 51,
+          "offset": 1085
+        },
+        "symbolName": "recordQuote"
+      },
+      "implementationSource": {
+        "path": "src/activities/market-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 1,
+          "offset": 409
+        },
+        "end": {
+          "line": 28,
+          "column": 2,
+          "offset": 552
+        },
+        "symbolName": "recordQuote"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

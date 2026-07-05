@@ -90,6 +90,9 @@ export type TemporalGraphEdge = {
   state: RuntimeOverlayState;
   runtimeOperationIds: string[];
   eventReferences: EventReference[];
+  // A loop `repeat` / continue-as-new back-edge, which the flow panel routes as a
+  // downward arc so it reads as a return path instead of overlapping the forward edge.
+  variant?: 'loop-back';
 };
 
 export type TimelineRow = {

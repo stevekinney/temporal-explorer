@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LoopBackEdge from '$lib/components/loop-back-edge.svelte';
   import TemporalFlowNodeComponent, {
     type TemporalFlowNodeData,
   } from '$lib/components/temporal-flow-node.svelte';
@@ -44,13 +45,14 @@
     eventSummary: string;
     runtimeOperationIds: string[];
   };
-  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep'>;
+  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep' | 'loopback'>;
   type Props = {
     graphProjection: GraphProjection | undefined;
     traceArtifactId: string | undefined;
   };
 
   const nodeTypes = { temporal: TemporalFlowNodeComponent };
+  const edgeTypes = { loopback: LoopBackEdge };
 
   let { graphProjection, traceArtifactId }: Props = $props();
   let selectedRuntimeOperationId = $state<string | undefined>();
@@ -222,14 +224,14 @@
 
     return {
       id: edge.id,
-      type: 'smoothstep',
+      type: edge.variant === 'loop-back' ? 'loopback' : 'smoothstep',
       source: edge.source,
       target: edge.target,
       label: edge.label,
       animated: active,
       hidden: muted,
       focusable: true,
-      markerEnd: { type: MarkerType.ArrowClosed },
+      markerEnd: { type: MarkerType.ArrowClosed, color: '#475569', width: 20, height: 20 },
       data: {
         state: edge.state,
         eventSummary: compactEventSummary(edge.eventReferences),
@@ -354,12 +356,13 @@
             nodes={flowNodes}
             edges={flowEdges}
             {nodeTypes}
+            {edgeTypes}
             fitView
             fitViewOptions={{ padding: 0.22, maxZoom: 1.1 }}
             nodesDraggable={false}
             nodesConnectable={false}
             elementsSelectable
-            minZoom={0.35}
+            minZoom={0.02}
             maxZoom={1.45}
             colorMode="light"
             colorModeSSR="light"
@@ -602,11 +605,33 @@
 
   :global(.temporal-flow) {
     --xy-background-pattern-dots-color-default: #b7c6d1;
-    --xy-edge-stroke-default: #73838f;
-    --xy-edge-stroke-width-default: 1.4;
+    --xy-edge-stroke-default: #475569;
+    --xy-edge-stroke-width-default: 2;
     --xy-edge-stroke-selected-default: #2f6fed;
     width: 100%;
     height: 100%;
+  }
+
+  /* xyflow-svelte renders each edge in its own `<svg class="svelte-flow__edge-wrapper">`
+     that it never sizes, relying on `overflow: visible` to paint the path outside a
+     zero-width viewport. Chromium does not paint SVG content when the viewport width
+     is 0, so every edge is laid out (correct geometry) but never painted — the graph
+     reads as disconnected nodes. Giving the edge layer and each wrapper a real size
+     makes the paths paint. */
+  :global(.temporal-flow .svelte-flow__edges),
+  :global(.temporal-flow .svelte-flow__edge-wrapper) {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* xyflow-svelte does not set a non-scaling stroke on edge paths, so an edge's
+     stroke-width is expressed in flow coordinates and shrinks with the viewport
+     zoom. A graph wide enough for `fitView` to zoom out (e.g. below ~0.7) then
+     renders its edges sub-pixel and effectively invisible, which reads as a
+     disconnected set of nodes. Pinning the stroke to screen pixels keeps every
+     edge legible at any zoom. */
+  :global(.temporal-flow .svelte-flow__edge-path) {
+    vector-effect: non-scaling-stroke;
   }
 
   :global(.temporal-flow .svelte-flow__edge.selected-flow-edge .svelte-flow__edge-path) {

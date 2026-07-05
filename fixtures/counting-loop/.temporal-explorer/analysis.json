@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:counting-loop",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "counting-loop",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/batch-workflow.ts": "b6390094b7fd5106126d0d43940f503bded0eb6450f3a295736aece87739246a"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "counting-loop",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 202
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 340
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:batchWorkflow",
+      "name": "batchWorkflow",
+      "source": {
+        "path": "src/workflows/batch-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 679
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1068
+        },
+        "symbolName": "batchWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "batchWorkflow:arg:0:input",
+            "display": "BatchInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/batch-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 37,
+                "offset": 715
+              },
+              "end": {
+                "line": 16,
+                "column": 54,
+                "offset": 732
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "batchWorkflow:result",
+          "display": "Promise<BatchResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "loop",
+            "id": "flow:batchWorkflow:6",
+            "loopKind": "for",
+            "source": {
+              "path": "src/workflows/batch-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 3,
+                "offset": 782
+              },
+              "end": {
+                "line": 30,
+                "column": 4,
+                "offset": 1017
+              }
+            },
+            "body": [
+              {
+                "type": "branch",
+                "id": "flow:batchWorkflow:2",
+                "branchKind": "if",
+                "source": {
+                  "path": "src/workflows/batch-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 20,
+                    "column": 5,
+                    "offset": 841
+                  },
+                  "end": {
+                    "line": 22,
+                    "column": 6,
+                    "offset": 890
+                  }
+                },
+                "clauses": [
+                  {
+                    "label": "index === input.skip",
+                    "body": [
+                      {
+                        "type": "terminal",
+                        "id": "flow:batchWorkflow:1",
+                        "terminalKind": "continue",
+                        "source": {
+                          "path": "src/workflows/batch-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 21,
+                            "column": 7,
+                            "offset": 875
+                          },
+                          "end": {
+                            "line": 21,
+                            "column": 16,
+                            "offset": 884
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "command",
+                "id": "flow:batchWorkflow:3",
+                "commandId": "activity-call:batchWorkflow:processItem:0",
+                "source": {
+                  "path": "src/workflows/batch-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 24,
+                    "column": 11,
+                    "offset": 902
+                  },
+                  "end": {
+                    "line": 24,
+                    "column": 44,
+                    "offset": 935
+                  },
+                  "symbolName": "processItem"
+                }
+              },
+              {
+                "type": "branch",
+                "id": "flow:batchWorkflow:5",
+                "branchKind": "if",
+                "source": {
+                  "path": "src/workflows/batch-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 27,
+                    "column": 5,
+                    "offset": 962
+                  },
+                  "end": {
+                    "line": 29,
+                    "column": 6,
+                    "offset": 1013
+                  }
+                },
+                "clauses": [
+                  {
+                    "label": "index === input.stopAfter",
+                    "body": [
+                      {
+                        "type": "terminal",
+                        "id": "flow:batchWorkflow:4",
+                        "terminalKind": "break",
+                        "source": {
+                          "path": "src/workflows/batch-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 28,
+                            "column": 7,
+                            "offset": 1001
+                          },
+                          "end": {
+                            "line": 28,
+                            "column": 13,
+                            "offset": 1007
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:batchWorkflow:processItem:0",
+          "kind": "activity",
+          "name": "processItem",
+          "source": {
+            "path": "src/workflows/batch-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 24,
+              "column": 11,
+              "offset": 902
+            },
+            "end": {
+              "line": 24,
+              "column": 44,
+              "offset": 935
+            },
+            "symbolName": "processItem"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "BatchInput",
+          "module": "src/activities/batch-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "BatchResult",
+          "module": "src/activities/batch-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:processItem",
+      "name": "processItem",
+      "source": {
+        "path": "src/workflows/batch-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 11,
+          "offset": 902
+        },
+        "end": {
+          "line": 24,
+          "column": 44,
+          "offset": 935
+        },
+        "symbolName": "processItem"
+      },
+      "implementationSource": {
+        "path": "src/activities/batch-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 225
+        },
+        "end": {
+          "line": 19,
+          "column": 2,
+          "offset": 364
+        },
+        "symbolName": "processItem"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

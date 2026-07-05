@@ -1,0 +1,14 @@
+flowchart TD
+  start(["broadcastWorkflow"])
+  flow_broadcastWorkflow_1["prepareBroadcast"]
+  flow_broadcastWorkflow_2{{"Promise.all"}}
+  n1(( ))
+  flow_broadcastWorkflow_3["deliverToChannel ×N"]
+  flow_broadcastWorkflow_4["summarizeBroadcast"]
+  complete(["complete"])
+  start --> flow_broadcastWorkflow_1
+  flow_broadcastWorkflow_1 --> flow_broadcastWorkflow_2
+  flow_broadcastWorkflow_2 -->|"×N"| flow_broadcastWorkflow_3
+  flow_broadcastWorkflow_3 --> n1
+  n1 --> flow_broadcastWorkflow_4
+  flow_broadcastWorkflow_4 --> complete

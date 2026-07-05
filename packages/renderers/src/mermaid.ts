@@ -1,7 +1,8 @@
-import type {
-  FlowNode,
-  TemporalAnalysisDocument,
-  TemporalCommand,
+import {
+  switchClauseBody,
+  type FlowNode,
+  type TemporalAnalysisDocument,
+  type TemporalCommand,
 } from '@temporal-explorer/schemas';
 
 import { commandDisplayName, getWorkflow } from './shared';
@@ -190,11 +191,13 @@ function renderBranchNode(
   context.nodes.push(`  ${join}(( ))`);
 
   for (const clause of node.clauses) {
-    renderArmInto(clause.body, decision, join, clause.label, context);
+    const body = switchClauseBody(clause.body, node.branchKind);
+    renderArmInto(body, decision, join, clause.label, context);
   }
 
   // An explicit `else`, or the implicit fall-through when there is no else.
-  renderArmInto(node.otherwise ?? [], decision, join, 'else', context);
+  const otherwise = switchClauseBody(node.otherwise ?? [], node.branchKind);
+  renderArmInto(otherwise, decision, join, 'else', context);
 
   return join;
 }

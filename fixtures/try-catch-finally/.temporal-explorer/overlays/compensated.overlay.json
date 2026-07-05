@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:bookingWorkflow:trace:compensated:compensated-run-id",
+  "staticAnalysisId": "analysis:try-catch-finally",
+  "runtimeTraceId": "trace:compensated:compensated-run-id",
+  "workflow": "bookingWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:bookingWorkflow",
+      "kind": "workflow",
+      "name": "bookingWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 737
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 1078
+        },
+        "symbolName": "bookingWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:bookingWorkflow:reserveSeats:0",
+      "kind": "activity",
+      "name": "reserveSeats",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 11,
+          "offset": 869
+        },
+        "end": {
+          "line": 21,
+          "column": 38,
+          "offset": 896
+        },
+        "symbolName": "reserveSeats"
+      }
+    },
+    {
+      "id": "activity-call:bookingWorkflow:recordFailure:1",
+      "kind": "activity",
+      "name": "recordFailure",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 11,
+          "offset": 920
+        },
+        "end": {
+          "line": 23,
+          "column": 39,
+          "offset": 948
+        },
+        "symbolName": "recordFailure"
+      }
+    },
+    {
+      "id": "activity-call:bookingWorkflow:releaseHold:2",
+      "kind": "activity",
+      "name": "releaseHold",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/booking-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 11,
+          "offset": 998
+        },
+        "end": {
+          "line": 26,
+          "column": 37,
+          "offset": 1024
+        },
+        "symbolName": "releaseHold"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:bookingWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to bookingWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type bookingWorkflow matched static Workflow bookingWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:bookingWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/booking-workflow.ts:17.",
+          "staticNodeId": "workflow:bookingWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:bookingWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to bookingWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type bookingWorkflow matched static Workflow bookingWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:bookingWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/booking-workflow.ts:17.",
+          "staticNodeId": "workflow:bookingWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:reserveSeats:5",
+      "staticNodeId": "activity-call:bookingWorkflow:reserveSeats:0",
+      "confidence": "exact",
+      "reason": "Activity reserveSeats matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type reserveSeats matched static Activity command reserveSeats.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:bookingWorkflow:reserveSeats:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:bookingWorkflow:reserveSeats:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/booking-workflow.ts:21.",
+          "staticNodeId": "activity-call:bookingWorkflow:reserveSeats:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordFailure:11",
+      "staticNodeId": "activity-call:bookingWorkflow:recordFailure:1",
+      "confidence": "exact",
+      "reason": "Activity recordFailure matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordFailure matched static Activity command recordFailure.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:bookingWorkflow:recordFailure:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:bookingWorkflow:recordFailure:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/booking-workflow.ts:23.",
+          "staticNodeId": "activity-call:bookingWorkflow:recordFailure:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:releaseHold:17",
+      "staticNodeId": "activity-call:bookingWorkflow:releaseHold:2",
+      "confidence": "exact",
+      "reason": "Activity releaseHold matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type releaseHold matched static Activity command releaseHold.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:bookingWorkflow:releaseHold:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:bookingWorkflow:releaseHold:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/booking-workflow.ts:26.",
+          "staticNodeId": "activity-call:bookingWorkflow:releaseHold:2"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 4,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 3,
+      "observed": 3,
+      "retried": 0,
+      "failed": 1
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

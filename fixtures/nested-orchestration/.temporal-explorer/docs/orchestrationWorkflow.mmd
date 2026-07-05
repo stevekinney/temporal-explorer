@@ -1,0 +1,32 @@
+flowchart TD
+  start(["orchestrationWorkflow"])
+  flow_orchestrationWorkflow_1["buildPlan"]
+  flow_orchestrationWorkflow_10{"loop (for-of)"}
+  flow_orchestrationWorkflow_9{"if"}
+  n1(( ))
+  flow_orchestrationWorkflow_2{{"Promise.all"}}
+  n2(( ))
+  flow_orchestrationWorkflow_3["reserveInventory"]
+  flow_orchestrationWorkflow_4["reserveShipping"]
+  flow_orchestrationWorkflow_5["confirmStage"]
+  flow_orchestrationWorkflow_7["auditStage"]
+  n3(( ))
+  flow_orchestrationWorkflow_8["compensateStage"]
+  complete(["complete"])
+  start --> flow_orchestrationWorkflow_1
+  flow_orchestrationWorkflow_1 --> flow_orchestrationWorkflow_10
+  flow_orchestrationWorkflow_10 -->|"each"| flow_orchestrationWorkflow_9
+  flow_orchestrationWorkflow_9 -->|"stage === 'fulfillment'"| flow_orchestrationWorkflow_2
+  flow_orchestrationWorkflow_2 --> flow_orchestrationWorkflow_3
+  flow_orchestrationWorkflow_3 --> n2
+  flow_orchestrationWorkflow_2 --> flow_orchestrationWorkflow_4
+  flow_orchestrationWorkflow_4 --> n2
+  n2 --> flow_orchestrationWorkflow_5
+  flow_orchestrationWorkflow_5 --> n1
+  flow_orchestrationWorkflow_9 -->|"else"| flow_orchestrationWorkflow_7
+  flow_orchestrationWorkflow_7 --> n3
+  flow_orchestrationWorkflow_9 -->|"catch"| flow_orchestrationWorkflow_8
+  flow_orchestrationWorkflow_8 --> n3
+  n3 --> n1
+  n1 -->|"repeat"| flow_orchestrationWorkflow_10
+  flow_orchestrationWorkflow_10 --> complete

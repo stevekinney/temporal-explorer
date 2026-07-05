@@ -1,0 +1,287 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:broadcastWorkflow:trace:fanned-out:fanned-out-run-id",
+  "staticAnalysisId": "analysis:dynamic-parallel",
+  "runtimeTraceId": "trace:fanned-out:fanned-out-run-id",
+  "workflow": "broadcastWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:broadcastWorkflow",
+      "kind": "workflow",
+      "name": "broadcastWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 770
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1258
+        },
+        "symbolName": "broadcastWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:broadcastWorkflow:prepareBroadcast:0",
+      "kind": "activity",
+      "name": "prepareBroadcast",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 26,
+          "offset": 886
+        },
+        "end": {
+          "line": 20,
+          "column": 59,
+          "offset": 919
+        },
+        "symbolName": "prepareBroadcast"
+      }
+    },
+    {
+      "id": "activity-call:broadcastWorkflow:deliverToChannel:1",
+      "kind": "activity",
+      "name": "deliverToChannel",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 37,
+          "offset": 996
+        },
+        "end": {
+          "line": 23,
+          "column": 84,
+          "offset": 1043
+        },
+        "symbolName": "deliverToChannel"
+      }
+    },
+    {
+      "id": "activity-call:broadcastWorkflow:summarizeBroadcast:2",
+      "kind": "activity",
+      "name": "summarizeBroadcast",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 25,
+          "offset": 1076
+        },
+        "end": {
+          "line": 26,
+          "column": 82,
+          "offset": 1133
+        },
+        "symbolName": "summarizeBroadcast"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:broadcastWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to broadcastWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type broadcastWorkflow matched static Workflow broadcastWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:broadcastWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/broadcast-workflow.ts:19.",
+          "staticNodeId": "workflow:broadcastWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:broadcastWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to broadcastWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type broadcastWorkflow matched static Workflow broadcastWorkflow.",
+          "eventIds": [35],
+          "staticNodeId": "workflow:broadcastWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/broadcast-workflow.ts:19.",
+          "staticNodeId": "workflow:broadcastWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:prepareBroadcast:5",
+      "staticNodeId": "activity-call:broadcastWorkflow:prepareBroadcast:0",
+      "confidence": "exact",
+      "reason": "Activity prepareBroadcast matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type prepareBroadcast matched static Activity command prepareBroadcast.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:broadcastWorkflow:prepareBroadcast:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:broadcastWorkflow:prepareBroadcast:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/broadcast-workflow.ts:20.",
+          "staticNodeId": "activity-call:broadcastWorkflow:prepareBroadcast:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:deliverToChannel:11",
+      "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1",
+      "confidence": "exact",
+      "reason": "Activity deliverToChannel matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type deliverToChannel matched static Activity command deliverToChannel.",
+          "eventIds": [11, 14, 15],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 14, 15],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/broadcast-workflow.ts:23.",
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:deliverToChannel:12",
+      "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1",
+      "confidence": "exact",
+      "reason": "Activity deliverToChannel matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type deliverToChannel matched static Activity command deliverToChannel.",
+          "eventIds": [12, 19, 20],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 2 matched static command order 1.",
+          "eventIds": [12, 19, 20],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/broadcast-workflow.ts:23.",
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:deliverToChannel:13",
+      "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1",
+      "confidence": "exact",
+      "reason": "Activity deliverToChannel matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type deliverToChannel matched static Activity command deliverToChannel.",
+          "eventIds": [13, 24, 25],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 3 matched static command order 1.",
+          "eventIds": [13, 24, 25],
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/broadcast-workflow.ts:23.",
+          "staticNodeId": "activity-call:broadcastWorkflow:deliverToChannel:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:summarizeBroadcast:29",
+      "staticNodeId": "activity-call:broadcastWorkflow:summarizeBroadcast:2",
+      "confidence": "exact",
+      "reason": "Activity summarizeBroadcast matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type summarizeBroadcast matched static Activity command summarizeBroadcast.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:broadcastWorkflow:summarizeBroadcast:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [29, 30, 31],
+          "staticNodeId": "activity-call:broadcastWorkflow:summarizeBroadcast:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/broadcast-workflow.ts:26.",
+          "staticNodeId": "activity-call:broadcastWorkflow:summarizeBroadcast:2"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 4,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 3,
+      "observed": 3,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

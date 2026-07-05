@@ -1,0 +1,474 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:branch-chain",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "branch-chain",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/review-workflow.ts": "6239d48fdb6a26e94e04ebddad8711a1ed9756db1b310cae5f67dd2587b19b13"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "branch-chain",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 204
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 343
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:reviewWorkflow",
+      "name": "reviewWorkflow",
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 681
+        },
+        "end": {
+          "line": 31,
+          "column": 2,
+          "offset": 1163
+        },
+        "symbolName": "reviewWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "reviewWorkflow:arg:0:input",
+            "display": "ReviewInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/review-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 38,
+                "offset": 718
+              },
+              "end": {
+                "line": 17,
+                "column": 56,
+                "offset": 736
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "reviewWorkflow:result",
+          "display": "Promise<ReviewResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "branch",
+            "id": "flow:reviewWorkflow:4",
+            "branchKind": "if",
+            "source": {
+              "path": "src/workflows/review-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 20,
+                "column": 3,
+                "offset": 798
+              },
+              "end": {
+                "line": 26,
+                "column": 4,
+                "offset": 1038
+              }
+            },
+            "clauses": [
+              {
+                "label": "input.amount > 10_000",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:reviewWorkflow:1",
+                    "commandId": "activity-call:reviewWorkflow:seniorApproval:0",
+                    "source": {
+                      "path": "src/workflows/review-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 21,
+                        "column": 22,
+                        "offset": 848
+                      },
+                      "end": {
+                        "line": 21,
+                        "column": 53,
+                        "offset": 879
+                      },
+                      "symbolName": "seniorApproval"
+                    }
+                  }
+                ]
+              },
+              {
+                "label": "input.amount > 1_000",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:reviewWorkflow:2",
+                    "commandId": "activity-call:reviewWorkflow:managerApproval:1",
+                    "source": {
+                      "path": "src/workflows/review-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 23,
+                        "column": 22,
+                        "offset": 939
+                      },
+                      "end": {
+                        "line": 23,
+                        "column": 54,
+                        "offset": 971
+                      },
+                      "symbolName": "managerApproval"
+                    }
+                  }
+                ]
+              }
+            ],
+            "otherwise": [
+              {
+                "type": "command",
+                "id": "flow:reviewWorkflow:3",
+                "commandId": "activity-call:reviewWorkflow:autoApprove:2",
+                "source": {
+                  "path": "src/workflows/review-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 25,
+                    "column": 22,
+                    "offset": 1005
+                  },
+                  "end": {
+                    "line": 25,
+                    "column": 50,
+                    "offset": 1033
+                  },
+                  "symbolName": "autoApprove"
+                }
+              }
+            ]
+          },
+          {
+            "type": "command",
+            "id": "flow:reviewWorkflow:5",
+            "commandId": "activity-call:reviewWorkflow:finalizeReview:3",
+            "source": {
+              "path": "src/workflows/review-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 28,
+                "column": 9,
+                "offset": 1048
+              },
+              "end": {
+                "line": 28,
+                "column": 56,
+                "offset": 1095
+              },
+              "symbolName": "finalizeReview"
+            }
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:reviewWorkflow:seniorApproval:0",
+          "kind": "activity",
+          "name": "seniorApproval",
+          "source": {
+            "path": "src/workflows/review-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 21,
+              "column": 22,
+              "offset": 848
+            },
+            "end": {
+              "line": 21,
+              "column": 53,
+              "offset": 879
+            },
+            "symbolName": "seniorApproval"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:reviewWorkflow:managerApproval:1",
+          "kind": "activity",
+          "name": "managerApproval",
+          "source": {
+            "path": "src/workflows/review-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 23,
+              "column": 22,
+              "offset": 939
+            },
+            "end": {
+              "line": 23,
+              "column": 54,
+              "offset": 971
+            },
+            "symbolName": "managerApproval"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:reviewWorkflow:autoApprove:2",
+          "kind": "activity",
+          "name": "autoApprove",
+          "source": {
+            "path": "src/workflows/review-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 25,
+              "column": 22,
+              "offset": 1005
+            },
+            "end": {
+              "line": 25,
+              "column": 50,
+              "offset": 1033
+            },
+            "symbolName": "autoApprove"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:reviewWorkflow:finalizeReview:3",
+          "kind": "activity",
+          "name": "finalizeReview",
+          "source": {
+            "path": "src/workflows/review-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 28,
+              "column": 9,
+              "offset": 1048
+            },
+            "end": {
+              "line": 28,
+              "column": 56,
+              "offset": 1095
+            },
+            "symbolName": "finalizeReview"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ReviewInput",
+          "module": "src/activities/approval-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ReviewResult",
+          "module": "src/activities/approval-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:seniorApproval",
+      "name": "seniorApproval",
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 22,
+          "offset": 848
+        },
+        "end": {
+          "line": 21,
+          "column": 53,
+          "offset": 879
+        },
+        "symbolName": "seniorApproval"
+      },
+      "implementationSource": {
+        "path": "src/activities/approval-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 271
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 420
+        },
+        "symbolName": "seniorApproval"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:managerApproval",
+      "name": "managerApproval",
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 22,
+          "offset": 939
+        },
+        "end": {
+          "line": 23,
+          "column": 54,
+          "offset": 971
+        },
+        "symbolName": "managerApproval"
+      },
+      "implementationSource": {
+        "path": "src/activities/approval-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 1,
+          "offset": 422
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 574
+        },
+        "symbolName": "managerApproval"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:autoApprove",
+      "name": "autoApprove",
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 22,
+          "offset": 1005
+        },
+        "end": {
+          "line": 25,
+          "column": 50,
+          "offset": 1033
+        },
+        "symbolName": "autoApprove"
+      },
+      "implementationSource": {
+        "path": "src/activities/approval-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 1,
+          "offset": 576
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 718
+        },
+        "symbolName": "autoApprove"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:finalizeReview",
+      "name": "finalizeReview",
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 9,
+          "offset": 1048
+        },
+        "end": {
+          "line": 28,
+          "column": 56,
+          "offset": 1095
+        },
+        "symbolName": "finalizeReview"
+      },
+      "implementationSource": {
+        "path": "src/activities/approval-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 32,
+          "column": 1,
+          "offset": 720
+        },
+        "end": {
+          "line": 34,
+          "column": 2,
+          "offset": 874
+        },
+        "symbolName": "finalizeReview"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

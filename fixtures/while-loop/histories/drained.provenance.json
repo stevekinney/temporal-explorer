@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "while-loop",
+  "history": "drained",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "drainWorkflow",
+  "workflowId": "while-loop-drained",
+  "runIdNormalization": { "replacement": "drained-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 23,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "10": 3,
+    "11": 3,
+    "12": 3
+  },
+  "contentSha256": "5ea8ec675edf189a2e9c493a7bf72d987b010dc14f9215699b93fd9b57f3e3dc"
+}

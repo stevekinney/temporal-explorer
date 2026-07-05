@@ -1,0 +1,16 @@
+flowchart TD
+  start(["screeningWorkflow"])
+  flow_screeningWorkflow_1{{"Promise.allSettled"}}
+  n1(( ))
+  flow_screeningWorkflow_2["checkInventory"]
+  flow_screeningWorkflow_3["checkPricing"]
+  flow_screeningWorkflow_4["checkCompliance"]
+  complete(["complete"])
+  start --> flow_screeningWorkflow_1
+  flow_screeningWorkflow_1 --> flow_screeningWorkflow_2
+  flow_screeningWorkflow_2 --> n1
+  flow_screeningWorkflow_1 --> flow_screeningWorkflow_3
+  flow_screeningWorkflow_3 --> n1
+  flow_screeningWorkflow_1 --> flow_screeningWorkflow_4
+  flow_screeningWorkflow_4 --> n1
+  n1 --> complete

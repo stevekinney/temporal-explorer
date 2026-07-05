@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:reviewWorkflow:trace:manager:manager-run-id",
+  "staticAnalysisId": "analysis:branch-chain",
+  "runtimeTraceId": "trace:manager:manager-run-id",
+  "workflow": "reviewWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:reviewWorkflow",
+      "kind": "workflow",
+      "name": "reviewWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 681
+        },
+        "end": {
+          "line": 31,
+          "column": 2,
+          "offset": 1163
+        },
+        "symbolName": "reviewWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:reviewWorkflow:seniorApproval:0",
+      "kind": "activity",
+      "name": "seniorApproval",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 22,
+          "offset": 848
+        },
+        "end": {
+          "line": 21,
+          "column": 53,
+          "offset": 879
+        },
+        "symbolName": "seniorApproval"
+      }
+    },
+    {
+      "id": "activity-call:reviewWorkflow:managerApproval:1",
+      "kind": "activity",
+      "name": "managerApproval",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 22,
+          "offset": 939
+        },
+        "end": {
+          "line": 23,
+          "column": 54,
+          "offset": 971
+        },
+        "symbolName": "managerApproval"
+      }
+    },
+    {
+      "id": "activity-call:reviewWorkflow:autoApprove:2",
+      "kind": "activity",
+      "name": "autoApprove",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 22,
+          "offset": 1005
+        },
+        "end": {
+          "line": 25,
+          "column": 50,
+          "offset": 1033
+        },
+        "symbolName": "autoApprove"
+      }
+    },
+    {
+      "id": "activity-call:reviewWorkflow:finalizeReview:3",
+      "kind": "activity",
+      "name": "finalizeReview",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/review-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 9,
+          "offset": 1048
+        },
+        "end": {
+          "line": 28,
+          "column": 56,
+          "offset": 1095
+        },
+        "symbolName": "finalizeReview"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:reviewWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to reviewWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type reviewWorkflow matched static Workflow reviewWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:reviewWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/review-workflow.ts:17.",
+          "staticNodeId": "workflow:reviewWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:reviewWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to reviewWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type reviewWorkflow matched static Workflow reviewWorkflow.",
+          "eventIds": [17],
+          "staticNodeId": "workflow:reviewWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/review-workflow.ts:17.",
+          "staticNodeId": "workflow:reviewWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:managerApproval:5",
+      "staticNodeId": "activity-call:reviewWorkflow:managerApproval:1",
+      "confidence": "exact",
+      "reason": "Activity managerApproval matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type managerApproval matched static Activity command managerApproval.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:reviewWorkflow:managerApproval:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:reviewWorkflow:managerApproval:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/review-workflow.ts:23.",
+          "staticNodeId": "activity-call:reviewWorkflow:managerApproval:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:finalizeReview:11",
+      "staticNodeId": "activity-call:reviewWorkflow:finalizeReview:3",
+      "confidence": "exact",
+      "reason": "Activity finalizeReview matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type finalizeReview matched static Activity command finalizeReview.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:reviewWorkflow:finalizeReview:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:reviewWorkflow:finalizeReview:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/review-workflow.ts:28.",
+          "staticNodeId": "activity-call:reviewWorkflow:finalizeReview:3"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 5,
+      "observed": 3,
+      "skipped": 2,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 4,
+      "observed": 2,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

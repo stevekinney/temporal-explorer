@@ -1,0 +1,21 @@
+flowchart TD
+  start(["raceWorkflow"])
+  flow_raceWorkflow_1{{"Promise.race"}}
+  n1(( ))
+  flow_raceWorkflow_2["fetchLivePrice"]
+  flow_raceWorkflow_3(("PRICE_DEADLINE"))
+  flow_raceWorkflow_6{"if"}
+  n2(( ))
+  flow_raceWorkflow_4["recordQuote"]
+  flow_raceWorkflow_5(["return"])
+  complete(["complete"])
+  start --> flow_raceWorkflow_1
+  flow_raceWorkflow_1 --> flow_raceWorkflow_2
+  flow_raceWorkflow_2 --> n1
+  flow_raceWorkflow_1 --> flow_raceWorkflow_3
+  flow_raceWorkflow_3 --> n1
+  n1 --> flow_raceWorkflow_6
+  flow_raceWorkflow_6 -->|"priced"| flow_raceWorkflow_4
+  flow_raceWorkflow_4 --> flow_raceWorkflow_5
+  flow_raceWorkflow_6 -->|"else"| n2
+  n2 --> complete

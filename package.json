@@ -33,6 +33,7 @@
     "declarations:typecheck-fixtures": "bun run scripts/declarations/typecheck-fixtures.ts",
     "dev": "turbo run dev",
     "examples:library": "bun run examples/analyze-workflow-files.ts && bun run examples/import-event-history.ts && bun run examples/analyze-project.ts",
+    "fixtures:assert-constructs": "bun run scripts/fixtures/assert-constructs.ts",
     "fixtures:generate-histories": "bun run scripts/fixtures/generate-histories.ts",
     "fixtures:regenerate-artifacts": "bun run scripts/fixtures/regenerate-artifacts.ts",
     "fixtures:validate": "bun run scripts/fixtures/validate-fixtures.ts",
@@ -41,6 +42,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,svelte,json,md}\"",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "lint:scripts": "oxlint scripts/",
     "package:check": "npm pack --dry-run --ignore-scripts",
     "prepack": "bun run scripts/release/build-dist.ts",
     "prepare": "lefthook install",
@@ -58,8 +60,10 @@
     "ui:accessibility": "bun run scripts/ui/accessibility.ts",
     "ui:e2e": "bun run scripts/ui/e2e.ts",
     "ui:e2e:graph": "bun run scripts/ui/e2e-graph.ts",
+    "ui:graph-geometry": "bun run scripts/ui/graph-geometry.ts",
+    "ui:screenshot-fixtures": "bun run scripts/ui/screenshot-fixtures.ts",
     "ui:server-lifecycle": "bun run scripts/ui/server-lifecycle.ts",
-    "validate": "bun run typecheck && turbo run lint test build --concurrency=5 && bun run format:check"
+    "validate": "bun run typecheck && turbo run lint test build --concurrency=5 && bun run lint:scripts && bun run format:check"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
