@@ -43,6 +43,10 @@
   type RuntimeOperation = PageProps['data']['traces'][number]['operations'][number];
   type ActivityOperation = Extract<RuntimeOperation, { kind: 'activity' }>;
 
+  const pageDescription =
+    'See what a Temporal TypeScript Workflow can do and what it actually did: static ' +
+    'control-flow graphs overlaid with real Event History runtime evidence.';
+
   let { data }: PageProps = $props();
   let selectedWorkflowOverride = $state<string | undefined>();
   let activeTab = $state('flow');
@@ -174,7 +178,24 @@
 
 <svelte:head>
   <title>Temporal Workflow Explorer</title>
-  <meta name="description" content="Local artifact-driven Temporal Workflow Explorer shell" />
+  <meta name="description" content={pageDescription} />
+  <meta property="og:title" content="Temporal Workflow Explorer" />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta
+    property="og:image:alt"
+    content="The Temporal Workflow Explorer showing a control-flow graph with runtime overlay"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Temporal Workflow Explorer" />
+  <meta name="twitter:description" content={pageDescription} />
+  {#if data.siteUrl}
+    <meta property="og:url" content={data.siteUrl} />
+    <meta property="og:image" content={`${data.siteUrl}/og.png`} />
+    <meta name="twitter:image" content={`${data.siteUrl}/og.png`} />
+  {/if}
 </svelte:head>
 
 <div class="explorer-shell">
