@@ -90,6 +90,17 @@
   const visibleTimelineRows = $derived(
     graphProjection?.timelineRows.filter(shouldShowTimelineRow) ?? [],
   );
+  // Runtime evidence is progressive enhancement: without a trace the flow view is a
+  // pure static-analysis projection, so the runtime-state filter chips and the timeline
+  // are suppressed entirely rather than shown as a row of zeroes.
+  const hasRuntime = $derived(Boolean(traceArtifactId));
+  // Only surface chips for states the execution actually produced, so a workflow that
+  // only completed activities shows two chips, not thirteen mostly-zero ones.
+  const visibleFilterStates = $derived(
+    hasRuntime
+      ? runtimeOverlayStates.filter((state) => (graphProjection?.statusCounts.get(state) ?? 0) > 0)
+      : [],
+  );
   const flowNodes = $derived(graphProjection?.nodes.map<TemporalFlowNode>(createFlowNode) ?? []);
   const flowEdges = $derived(graphProjection?.edges.map<TemporalFlowEdge>(createFlowEdge) ?? []);
   // Structural nodes are excluded from status counts, so the "All" total sums the per-state counts.
@@ -157,6 +168,15 @@
   });
 
   onDestroy(terminateGraphLayoutWorker);
+
+  // If the active filter is no longer among the visible states (trace cleared, or a
+  // different workflow selected in aggregate mode), fall back to "all" so nodes are
+  // never left muted by a filter the user can no longer see or clear.
+  $effect(() => {
+    if (statusFilter !== 'all' && !visibleFilterStates.includes(statusFilter)) {
+      statusFilter = 'all';
+    }
+  });
 
   function shouldShowTimelineRow(row: TimelineRow): boolean {
     return (
@@ -313,29 +333,31 @@
         </div>
       </div>
 
-      <div class="state-filters" aria-label="Runtime state filters">
-        <button
-          type="button"
-          aria-pressed={statusFilter === 'all'}
-          data-active={statusFilter === 'all' ? 'true' : undefined}
-          onclick={() => (statusFilter = 'all')}
-        >
-          All
-          <span>{filterableNodeCount}</span>
-        </button>
-        {#each runtimeOverlayStates as state (state)}
+      {#if hasRuntime && visibleFilterStates.length > 0}
+        <div class="state-filters" aria-label="Runtime state filters">
           <button
             type="button"
-            aria-pressed={statusFilter === state}
-            data-active={statusFilter === state ? 'true' : undefined}
-            data-state={runtimeStateToken(state)}
-            onclick={() => (statusFilter = state)}
+            aria-pressed={statusFilter === 'all'}
+            data-active={statusFilter === 'all' ? 'true' : undefined}
+            onclick={() => (statusFilter = 'all')}
           >
-            {state}
-            <span>{graphProjection.statusCounts.get(state) ?? 0}</span>
+            All
+            <span>{filterableNodeCount}</span>
           </button>
-        {/each}
-      </div>
+          {#each visibleFilterStates as state (state)}
+            <button
+              type="button"
+              aria-pressed={statusFilter === state}
+              data-active={statusFilter === state ? 'true' : undefined}
+              data-state={runtimeStateToken(state)}
+              onclick={() => (statusFilter = state)}
+            >
+              {state}
+              <span>{graphProjection.statusCounts.get(state) ?? 0}</span>
+            </button>
+          {/each}
+        </div>
+      {/if}
 
       {#if layoutStatus === 'failed'}
         <div class="layout-warning" role="alert">Graph layout failed: {layoutError}</div>
@@ -390,11 +412,13 @@
     </div>
 
     <div class="flow-sidecar">
-      <WorkflowTimelinePanel
-        rows={visibleTimelineRows}
-        {selectedRuntimeOperationId}
-        {selectTimelineRow}
-      />
+      {#if hasRuntime}
+        <WorkflowTimelinePanel
+          rows={visibleTimelineRows}
+          {selectedRuntimeOperationId}
+          {selectTimelineRow}
+        />
+      {/if}
       <WorkflowEdgePanel edges={graphProjection.edges} {selectedEdgeId} {selectEdge} />
       <WorkflowSelectionInspector
         title={activeInspectorTitle}
