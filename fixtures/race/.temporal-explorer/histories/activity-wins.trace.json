@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "temporal-trace/v1",
+  "artifactId": "trace:activity-wins:activity-wins-run-id",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-trace/v1",
+    "inputs": {
+      "projectRoot": "race",
+      "configHash": "14bcc1d788b84daeae60d63abae359592fe58ef9dcb11ae17490b968da073b54",
+      "sourceFileHashes": {},
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.18.1"
+      }
+    }
+  },
+  "execution": {
+    "workflowType": "raceWorkflow",
+    "workflowId": "race-activity-wins",
+    "runId": "activity-wins-run-id",
+    "status": "completed",
+    "startedAt": "2026-01-01T00:00:00.001Z",
+    "closedAt": "2026-01-01T00:00:00.018Z",
+    "durationMs": 17
+  },
+  "source": {
+    "taskQueue": "race-task-queue",
+    "eventCount": 18,
+    "importedFrom": "file"
+  },
+  "operations": [
+    {
+      "id": "workflow:start",
+      "kind": "workflow-lifecycle",
+      "status": "started",
+      "eventReferences": [
+        {
+          "eventId": 1,
+          "eventType": "WorkflowExecutionStarted"
+        }
+      ],
+      "payloadReferences": ["payload:event-1:input:0"]
+    },
+    {
+      "id": "workflow:completed",
+      "kind": "workflow-lifecycle",
+      "status": "completed",
+      "eventReferences": [
+        {
+          "eventId": 18,
+          "eventType": "WorkflowExecutionCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-18:result:0"]
+    },
+    {
+      "id": "activity:fetchLivePrice:5",
+      "kind": "activity",
+      "activityType": "fetchLivePrice",
+      "activityId": "1",
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "scheduledEventId": 5,
+          "startedEventId": 7,
+          "closedEventId": 8,
+          "status": "completed"
+        }
+      ],
+      "firstScheduledAt": "2026-01-01T00:00:00.005Z",
+      "closedAt": "2026-01-01T00:00:00.008Z",
+      "durationMs": 3,
+      "eventReferences": [
+        {
+          "eventId": 5,
+          "eventType": "ActivityTaskScheduled"
+        },
+        {
+          "eventId": 7,
+          "eventType": "ActivityTaskStarted"
+        },
+        {
+          "eventId": 8,
+          "eventType": "ActivityTaskCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-5:input:0", "payload:event-8:result:0"]
+    },
+    {
+      "id": "activity:recordQuote:12",
+      "kind": "activity",
+      "activityType": "recordQuote",
+      "activityId": "2",
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "scheduledEventId": 12,
+          "startedEventId": 13,
+          "closedEventId": 14,
+          "status": "completed"
+        }
+      ],
+      "firstScheduledAt": "2026-01-01T00:00:00.012Z",
+      "closedAt": "2026-01-01T00:00:00.014Z",
+      "durationMs": 2,
+      "eventReferences": [
+        {
+          "eventId": 12,
+          "eventType": "ActivityTaskScheduled"
+        },
+        {
+          "eventId": 13,
+          "eventType": "ActivityTaskStarted"
+        },
+        {
+          "eventId": 14,
+          "eventType": "ActivityTaskCompleted"
+        }
+      ],
+      "payloadReferences": [
+        "payload:event-12:input:0",
+        "payload:event-12:input:1",
+        "payload:event-14:result:0"
+      ]
+    },
+    {
+      "id": "timer:1:6",
+      "kind": "timer",
+      "timerId": "1",
+      "status": "pending",
+      "startedAt": "2026-01-01T00:00:00.006Z",
+      "durationText": "600s",
+      "eventReferences": [
+        {
+          "eventId": 6,
+          "eventType": "TimerStarted"
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "id": "timeline:1",
+      "operationId": "workflow:start",
+      "at": "2026-01-01T00:00:00.001Z",
+      "label": "Workflow started",
+      "eventIds": [1]
+    },
+    {
+      "id": "timeline:5",
+      "operationId": "activity:fetchLivePrice:5",
+      "at": "2026-01-01T00:00:00.005Z",
+      "label": "fetchLivePrice scheduled",
+      "eventIds": [5]
+    },
+    {
+      "id": "timeline:6",
+      "operationId": "timer:1:6",
+      "at": "2026-01-01T00:00:00.006Z",
+      "label": "Timer 1 started",
+      "eventIds": [6]
+    },
+    {
+      "id": "timeline:8",
+      "operationId": "activity:fetchLivePrice:5",
+      "at": "2026-01-01T00:00:00.008Z",
+      "label": "fetchLivePrice completed",
+      "eventIds": [8]
+    },
+    {
+      "id": "timeline:12",
+      "operationId": "activity:recordQuote:12",
+      "at": "2026-01-01T00:00:00.012Z",
+      "label": "recordQuote scheduled",
+      "eventIds": [12]
+    },
+    {
+      "id": "timeline:14",
+      "operationId": "activity:recordQuote:12",
+      "at": "2026-01-01T00:00:00.014Z",
+      "label": "recordQuote completed",
+      "eventIds": [14]
+    },
+    {
+      "id": "timeline:closed:18",
+      "operationId": "workflow:completed",
+      "at": "2026-01-01T00:00:00.018Z",
+      "label": "Workflow closed",
+      "eventIds": [18]
+    }
+  ],
+  "payloads": [
+    {
+      "id": "payload:event-1:input:0",
+      "eventId": 1,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-18:result:0",
+      "eventId": 18,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-5:input:0",
+      "eventId": 5,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-8:result:0",
+      "eventId": 8,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-12:input:0",
+      "eventId": 12,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-12:input:1",
+      "eventId": 12,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-14:result:0",
+      "eventId": 14,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    }
+  ],
+  "diagnostics": []
+}

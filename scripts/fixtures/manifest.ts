@@ -2,6 +2,8 @@ import type { WorkflowHandle } from '@temporalio/client';
 import type { DataConverter } from '@temporalio/common';
 import type { TestWorkflowEnvironment } from '@temporalio/testing';
 
+import { controlFlowHistories } from './control-flow-histories';
+
 /** Context passed to a fixture scenario while its Workflow Execution is running. */
 export type FixtureScenarioContext = {
   environment: TestWorkflowEnvironment;
@@ -66,8 +68,8 @@ async function settleWorkflowTasks(environment: TestWorkflowEnvironment): Promis
   await environment.sleep('10 seconds');
 }
 
-/** Every generated fixture history, in generation order. */
-export const fixtureHistories: FixtureHistoryDefinition[] = [
+/** Fixture histories exercising Temporal primitives — signals, queries, updates, retries, child/external workflows, cancellation, continue-as-new, patching, payload codecs, and scale. */
+const coreHistories: FixtureHistoryDefinition[] = [
   {
     fixture: 'basic-order',
     history: 'success',
@@ -324,6 +326,12 @@ export const fixtureHistories: FixtureHistoryDefinition[] = [
     args: [{ orderId: 'order-011', sku: 'sku-parallel', destination: '456 Concurrent Ave' }],
     expectedOutcome: 'completed',
   },
+];
+
+/** Every generated fixture history, in generation order: primitive fixtures first, then control-flow constructs. */
+export const fixtureHistories: FixtureHistoryDefinition[] = [
+  ...coreHistories,
+  ...controlFlowHistories,
 ];
 
 /** Returns the manifest entries selected by an optional `--fixture` filter. */

@@ -1,0 +1,237 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:screeningWorkflow:trace:settled:settled-run-id",
+  "staticAnalysisId": "analysis:all-settled",
+  "runtimeTraceId": "trace:settled:settled-run-id",
+  "workflow": "screeningWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:screeningWorkflow",
+      "kind": "workflow",
+      "name": "screeningWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 723
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 1140
+        },
+        "symbolName": "screeningWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:screeningWorkflow:checkInventory:0",
+      "kind": "activity",
+      "name": "checkInventory",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 5,
+          "offset": 863
+        },
+        "end": {
+          "line": 20,
+          "column": 30,
+          "offset": 888
+        },
+        "symbolName": "checkInventory"
+      }
+    },
+    {
+      "id": "activity-call:screeningWorkflow:checkPricing:1",
+      "kind": "activity",
+      "name": "checkPricing",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 5,
+          "offset": 894
+        },
+        "end": {
+          "line": 21,
+          "column": 28,
+          "offset": 917
+        },
+        "symbolName": "checkPricing"
+      }
+    },
+    {
+      "id": "activity-call:screeningWorkflow:checkCompliance:2",
+      "kind": "activity",
+      "name": "checkCompliance",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 5,
+          "offset": 923
+        },
+        "end": {
+          "line": 22,
+          "column": 31,
+          "offset": 949
+        },
+        "symbolName": "checkCompliance"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:screeningWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to screeningWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type screeningWorkflow matched static Workflow screeningWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:screeningWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/screening-workflow.ts:18.",
+          "staticNodeId": "workflow:screeningWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:screeningWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to screeningWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type screeningWorkflow matched static Workflow screeningWorkflow.",
+          "eventIds": [20],
+          "staticNodeId": "workflow:screeningWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/screening-workflow.ts:18.",
+          "staticNodeId": "workflow:screeningWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:checkInventory:5",
+      "staticNodeId": "activity-call:screeningWorkflow:checkInventory:0",
+      "confidence": "exact",
+      "reason": "Activity checkInventory matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type checkInventory matched static Activity command checkInventory.",
+          "eventIds": [5, 8, 9],
+          "staticNodeId": "activity-call:screeningWorkflow:checkInventory:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 8, 9],
+          "staticNodeId": "activity-call:screeningWorkflow:checkInventory:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/screening-workflow.ts:20.",
+          "staticNodeId": "activity-call:screeningWorkflow:checkInventory:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:checkPricing:6",
+      "staticNodeId": "activity-call:screeningWorkflow:checkPricing:1",
+      "confidence": "exact",
+      "reason": "Activity checkPricing matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type checkPricing matched static Activity command checkPricing.",
+          "eventIds": [6, 13, 14],
+          "staticNodeId": "activity-call:screeningWorkflow:checkPricing:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [6, 13, 14],
+          "staticNodeId": "activity-call:screeningWorkflow:checkPricing:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/screening-workflow.ts:21.",
+          "staticNodeId": "activity-call:screeningWorkflow:checkPricing:1"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:checkCompliance:7",
+      "staticNodeId": "activity-call:screeningWorkflow:checkCompliance:2",
+      "confidence": "exact",
+      "reason": "Activity checkCompliance matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type checkCompliance matched static Activity command checkCompliance.",
+          "eventIds": [7, 15, 16],
+          "staticNodeId": "activity-call:screeningWorkflow:checkCompliance:2"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 2.",
+          "eventIds": [7, 15, 16],
+          "staticNodeId": "activity-call:screeningWorkflow:checkCompliance:2"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/screening-workflow.ts:22.",
+          "staticNodeId": "activity-call:screeningWorkflow:checkCompliance:2"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 4,
+      "observed": 4,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 3,
+      "observed": 3,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

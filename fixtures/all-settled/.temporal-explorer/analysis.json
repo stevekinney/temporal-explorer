@@ -1,0 +1,392 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:all-settled",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "all-settled",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/screening-workflow.ts": "817bd522483c93f7db8341b702f33b2a1794a0773ba06d416e56ff555e48a0fc"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "all-settled",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 204
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 346
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:screeningWorkflow",
+      "name": "screeningWorkflow",
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 723
+        },
+        "end": {
+          "line": 30,
+          "column": 2,
+          "offset": 1140
+        },
+        "symbolName": "screeningWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "screeningWorkflow:arg:0:input",
+            "display": "ScreeningInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/screening-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 41,
+                "offset": 763
+              },
+              "end": {
+                "line": 18,
+                "column": 62,
+                "offset": 784
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "screeningWorkflow:result",
+          "display": "Promise<ScreeningResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "parallel",
+            "id": "flow:screeningWorkflow:1",
+            "parallelKind": "allSettled",
+            "source": {
+              "path": "src/workflows/screening-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 25,
+                "offset": 838
+              },
+              "end": {
+                "line": 23,
+                "column": 5,
+                "offset": 955
+              }
+            },
+            "cardinality": "fixed",
+            "branches": [
+              [
+                {
+                  "type": "command",
+                  "id": "flow:screeningWorkflow:2",
+                  "commandId": "activity-call:screeningWorkflow:checkInventory:0",
+                  "source": {
+                    "path": "src/workflows/screening-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 20,
+                      "column": 5,
+                      "offset": 863
+                    },
+                    "end": {
+                      "line": 20,
+                      "column": 30,
+                      "offset": 888
+                    },
+                    "symbolName": "checkInventory"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "command",
+                  "id": "flow:screeningWorkflow:3",
+                  "commandId": "activity-call:screeningWorkflow:checkPricing:1",
+                  "source": {
+                    "path": "src/workflows/screening-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 21,
+                      "column": 5,
+                      "offset": 894
+                    },
+                    "end": {
+                      "line": 21,
+                      "column": 28,
+                      "offset": 917
+                    },
+                    "symbolName": "checkPricing"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "command",
+                  "id": "flow:screeningWorkflow:4",
+                  "commandId": "activity-call:screeningWorkflow:checkCompliance:2",
+                  "source": {
+                    "path": "src/workflows/screening-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 22,
+                      "column": 5,
+                      "offset": 923
+                    },
+                    "end": {
+                      "line": 22,
+                      "column": 31,
+                      "offset": 949
+                    },
+                    "symbolName": "checkCompliance"
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:screeningWorkflow:checkInventory:0",
+          "kind": "activity",
+          "name": "checkInventory",
+          "source": {
+            "path": "src/workflows/screening-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 20,
+              "column": 5,
+              "offset": 863
+            },
+            "end": {
+              "line": 20,
+              "column": 30,
+              "offset": 888
+            },
+            "symbolName": "checkInventory"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:screeningWorkflow:checkPricing:1",
+          "kind": "activity",
+          "name": "checkPricing",
+          "source": {
+            "path": "src/workflows/screening-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 21,
+              "column": 5,
+              "offset": 894
+            },
+            "end": {
+              "line": 21,
+              "column": 28,
+              "offset": 917
+            },
+            "symbolName": "checkPricing"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:screeningWorkflow:checkCompliance:2",
+          "kind": "activity",
+          "name": "checkCompliance",
+          "source": {
+            "path": "src/workflows/screening-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 22,
+              "column": 5,
+              "offset": 923
+            },
+            "end": {
+              "line": 22,
+              "column": 31,
+              "offset": 949
+            },
+            "symbolName": "checkCompliance"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ScreeningInput",
+          "module": "src/activities/screening-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "ScreeningResult",
+          "module": "src/activities/screening-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:checkInventory",
+      "name": "checkInventory",
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 5,
+          "offset": 863
+        },
+        "end": {
+          "line": 20,
+          "column": 30,
+          "offset": 888
+        },
+        "symbolName": "checkInventory"
+      },
+      "implementationSource": {
+        "path": "src/activities/screening-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 17,
+          "column": 1,
+          "offset": 229
+        },
+        "end": {
+          "line": 19,
+          "column": 2,
+          "offset": 358
+        },
+        "symbolName": "checkInventory"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:checkPricing",
+      "name": "checkPricing",
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 5,
+          "offset": 894
+        },
+        "end": {
+          "line": 21,
+          "column": 28,
+          "offset": 917
+        },
+        "symbolName": "checkPricing"
+      },
+      "implementationSource": {
+        "path": "src/activities/screening-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 1,
+          "offset": 360
+        },
+        "end": {
+          "line": 23,
+          "column": 2,
+          "offset": 485
+        },
+        "symbolName": "checkPricing"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:checkCompliance",
+      "name": "checkCompliance",
+      "source": {
+        "path": "src/workflows/screening-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 5,
+          "offset": 923
+        },
+        "end": {
+          "line": 22,
+          "column": 31,
+          "offset": 949
+        },
+        "symbolName": "checkCompliance"
+      },
+      "implementationSource": {
+        "path": "src/activities/screening-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 1,
+          "offset": 487
+        },
+        "end": {
+          "line": 27,
+          "column": 2,
+          "offset": 618
+        },
+        "symbolName": "checkCompliance"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

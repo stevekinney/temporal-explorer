@@ -1,0 +1,9 @@
+flowchart TD
+  start(["drainWorkflow"])
+  flow_drainWorkflow_2{"loop (while)"}
+  flow_drainWorkflow_1["drainOne"]
+  complete(["complete"])
+  start --> flow_drainWorkflow_2
+  flow_drainWorkflow_2 -->|"each"| flow_drainWorkflow_1
+  flow_drainWorkflow_1 -->|"repeat"| flow_drainWorkflow_2
+  flow_drainWorkflow_2 --> complete

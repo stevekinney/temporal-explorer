@@ -1,0 +1,13 @@
+flowchart TD
+  start(["regionWorkflow"])
+  flow_regionWorkflow_1{{"Promise.any"}}
+  n1(( ))
+  flow_regionWorkflow_2["queryPrimaryRegion"]
+  flow_regionWorkflow_3["queryFallbackRegion"]
+  complete(["complete"])
+  start --> flow_regionWorkflow_1
+  flow_regionWorkflow_1 --> flow_regionWorkflow_2
+  flow_regionWorkflow_2 --> n1
+  flow_regionWorkflow_1 --> flow_regionWorkflow_3
+  flow_regionWorkflow_3 --> n1
+  n1 --> complete

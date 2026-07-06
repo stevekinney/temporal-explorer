@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "for-in-loop",
+  "history": "applied",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "flagWorkflow",
+  "workflowId": "for-in-loop-applied",
+  "runIdNormalization": { "replacement": "applied-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 17,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 2,
+    "11": 2,
+    "12": 2
+  },
+  "contentSha256": "de6ce0549c38df8bccd15f64da03fad1c0bbcf1d5f426a03f4acea7b5d5c628f"
+}

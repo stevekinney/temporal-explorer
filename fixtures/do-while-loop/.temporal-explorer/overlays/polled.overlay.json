@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:pollWorkflow:trace:polled:polled-run-id",
+  "staticAnalysisId": "analysis:do-while-loop",
+  "runtimeTraceId": "trace:polled:polled-run-id",
+  "workflow": "pollWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:pollWorkflow",
+      "kind": "workflow",
+      "name": "pollWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/poll-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 561
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 821
+        },
+        "symbolName": "pollWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:pollWorkflow:pollStatus:0",
+      "kind": "activity",
+      "name": "pollStatus",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/poll-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 11,
+          "offset": 674
+        },
+        "end": {
+          "line": 19,
+          "column": 43,
+          "offset": 706
+        },
+        "symbolName": "pollStatus"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:pollWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to pollWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type pollWorkflow matched static Workflow pollWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:pollWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/poll-workflow.ts:15.",
+          "staticNodeId": "workflow:pollWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:pollWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to pollWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type pollWorkflow matched static Workflow pollWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:pollWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/poll-workflow.ts:15.",
+          "staticNodeId": "workflow:pollWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:pollStatus:5",
+      "staticNodeId": "activity-call:pollWorkflow:pollStatus:0",
+      "confidence": "exact",
+      "reason": "Activity pollStatus matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type pollStatus matched static Activity command pollStatus.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/poll-workflow.ts:19.",
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:pollStatus:11",
+      "staticNodeId": "activity-call:pollWorkflow:pollStatus:0",
+      "confidence": "exact",
+      "reason": "Activity pollStatus matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type pollStatus matched static Activity command pollStatus.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 2 matched static command order 0.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/poll-workflow.ts:19.",
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:pollStatus:17",
+      "staticNodeId": "activity-call:pollWorkflow:pollStatus:0",
+      "confidence": "exact",
+      "reason": "Activity pollStatus matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type pollStatus matched static Activity command pollStatus.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 3 matched static command order 0.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/poll-workflow.ts:19.",
+          "staticNodeId": "activity-call:pollWorkflow:pollStatus:0"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 2,
+      "observed": 2,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

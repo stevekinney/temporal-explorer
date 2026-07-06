@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "dynamic-parallel",
+  "history": "fanned-out",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "broadcastWorkflow",
+  "workflowId": "dynamic-parallel-fanned-out",
+  "runIdNormalization": { "replacement": "fanned-out-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 35,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 6,
+    "6": 6,
+    "7": 6,
+    "10": 5,
+    "11": 5,
+    "12": 5
+  },
+  "contentSha256": "26e6f4646371010feb008012b13db3d9898085289f292f2eed39163515c2d284"
+}

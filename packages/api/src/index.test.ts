@@ -36,6 +36,12 @@ const overlayArtifactFile = Bun.file(
   `${fixtureRoot}/.temporal-explorer/overlays/success.overlay.json`,
 );
 
+// Several tests below are real end-to-end analyzer runs (ts-morph project analysis,
+// documentation/parity generation). On a cold 2-core CI runner they legitimately take
+// 3-6s each — over bun:test's 5s default — so this package runs with an extended
+// `--timeout` (see its package.json test script). They are slow integration tests, not
+// hangs; the tight default caused intermittent CI timeouts (and a Bun teardown crash)
+// while passing locally.
 describe('public API scaffold', () => {
   it('exposes the product version and artifact versions', () => {
     expect(getTemporalExplorerVersion()).toBe(temporalExplorerPackageJson.version);

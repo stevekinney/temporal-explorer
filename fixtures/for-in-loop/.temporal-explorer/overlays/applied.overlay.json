@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:flagWorkflow:trace:applied:applied-run-id",
+  "staticAnalysisId": "analysis:for-in-loop",
+  "runtimeTraceId": "trace:applied:applied-run-id",
+  "workflow": "flagWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:flagWorkflow",
+      "kind": "workflow",
+      "name": "flagWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/flag-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 626
+        },
+        "end": {
+          "line": 29,
+          "column": 2,
+          "offset": 964
+        },
+        "symbolName": "flagWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:flagWorkflow:applyFlag:0",
+      "kind": "activity",
+      "name": "applyFlag",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/flag-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 11,
+          "offset": 859
+        },
+        "end": {
+          "line": 24,
+          "column": 42,
+          "offset": 890
+        },
+        "symbolName": "applyFlag"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:flagWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to flagWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type flagWorkflow matched static Workflow flagWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:flagWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/flag-workflow.ts:16.",
+          "staticNodeId": "workflow:flagWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:flagWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to flagWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type flagWorkflow matched static Workflow flagWorkflow.",
+          "eventIds": [17],
+          "staticNodeId": "workflow:flagWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/flag-workflow.ts:16.",
+          "staticNodeId": "workflow:flagWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:applyFlag:5",
+      "staticNodeId": "activity-call:flagWorkflow:applyFlag:0",
+      "confidence": "exact",
+      "reason": "Activity applyFlag matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type applyFlag matched static Activity command applyFlag.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/flag-workflow.ts:24.",
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:applyFlag:11",
+      "staticNodeId": "activity-call:flagWorkflow:applyFlag:0",
+      "confidence": "exact",
+      "reason": "Activity applyFlag matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type applyFlag matched static Activity command applyFlag.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 2 matched static command order 0.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/flag-workflow.ts:24.",
+          "staticNodeId": "activity-call:flagWorkflow:applyFlag:0"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 2,
+      "observed": 2,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

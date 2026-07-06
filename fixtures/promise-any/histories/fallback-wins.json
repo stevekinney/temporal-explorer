@@ -1,0 +1,290 @@
+{
+  "events": [
+    {
+      "links": [],
+      "eventId": "1",
+      "eventTime": "2026-01-01T00:00:00.001Z",
+      "eventType": 1,
+      "workflowExecutionStartedEventAttributes": {
+        "completionCallbacks": [],
+        "workflowType": { "name": "regionWorkflow" },
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "input": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJyZXF1ZXN0SWQiOiJyZXF1ZXN0LTAxNSIsImtleSI6ImtleS0wMTUifQ=="
+            }
+          ]
+        },
+        "workflowExecutionTimeout": { "seconds": "315360000" },
+        "workflowRunTimeout": { "seconds": "315360000" },
+        "workflowTaskTimeout": { "seconds": "10" },
+        "originalExecutionRunId": "fallback-wins-run-id",
+        "identity": "temporal-explorer-fixture-worker",
+        "firstExecutionRunId": "fallback-wins-run-id",
+        "attempt": 1,
+        "firstWorkflowTaskBackoff": {},
+        "header": { "fields": {} }
+      }
+    },
+    {
+      "links": [],
+      "eventId": "2",
+      "eventTime": "2026-01-01T00:00:00.002Z",
+      "eventType": 5,
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "startToCloseTimeout": { "seconds": "10" },
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "3",
+      "eventTime": "2026-01-01T00:00:00.003Z",
+      "eventType": 6,
+      "workflowTaskStartedEventAttributes": {
+        "suggestContinueAsNewReasons": [],
+        "scheduledEventId": "2",
+        "identity": "temporal-explorer-fixture-worker",
+        "historySizeBytes": "0"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "4",
+      "eventTime": "2026-01-01T00:00:00.004Z",
+      "eventType": 7,
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "2",
+        "identity": "temporal-explorer-fixture-worker",
+        "binaryChecksum": "@temporalio/worker@1.18.1+506a1a8a22af3f73c11698ac3c17b106ef41c58ac136767d51169fd6772c9ebd",
+        "sdkMetadata": {
+          "coreUsedFlags": [1, 2, 3],
+          "langUsedFlags": [],
+          "sdkName": "temporal-typescript",
+          "sdkVersion": "1.18.1"
+        },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "links": [],
+      "eventId": "5",
+      "eventTime": "2026-01-01T00:00:00.005Z",
+      "eventType": 10,
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "1",
+        "activityType": { "name": "queryPrimaryRegion" },
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "header": { "fields": {} },
+        "input": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "ImtleS0wMTUi"
+            }
+          ]
+        },
+        "scheduleToCloseTimeout": { "seconds": "315360000" },
+        "scheduleToStartTimeout": { "seconds": "315360000" },
+        "startToCloseTimeout": { "seconds": "60" },
+        "heartbeatTimeout": {},
+        "workflowTaskCompletedEventId": "3",
+        "retryPolicy": {
+          "nonRetryableErrorTypes": [],
+          "initialInterval": { "seconds": "1" },
+          "backoffCoefficient": 2,
+          "maximumInterval": { "seconds": "100" },
+          "maximumAttempts": 1
+        }
+      }
+    },
+    {
+      "links": [],
+      "eventId": "6",
+      "eventTime": "2026-01-01T00:00:00.006Z",
+      "eventType": 10,
+      "activityTaskScheduledEventAttributes": {
+        "activityId": "2",
+        "activityType": { "name": "queryFallbackRegion" },
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "header": { "fields": {} },
+        "input": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "ImtleS0wMTUi"
+            }
+          ]
+        },
+        "scheduleToCloseTimeout": { "seconds": "315360000" },
+        "scheduleToStartTimeout": { "seconds": "315360000" },
+        "startToCloseTimeout": { "seconds": "60" },
+        "heartbeatTimeout": {},
+        "workflowTaskCompletedEventId": "3",
+        "retryPolicy": {
+          "nonRetryableErrorTypes": [],
+          "initialInterval": { "seconds": "1" },
+          "backoffCoefficient": 2,
+          "maximumInterval": { "seconds": "100" },
+          "maximumAttempts": 1
+        }
+      }
+    },
+    {
+      "links": [],
+      "eventId": "7",
+      "eventTime": "2026-01-01T00:00:00.007Z",
+      "eventType": 11,
+      "activityTaskStartedEventAttributes": {
+        "scheduledEventId": "5",
+        "identity": "temporal-explorer-fixture-worker",
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "8",
+      "eventTime": "2026-01-01T00:00:00.008Z",
+      "eventType": 13,
+      "activityTaskFailedEventAttributes": {
+        "failure": {
+          "message": "primary region unavailable for key-015",
+          "source": "TypeScriptSDK",
+          "stackTrace": "Error: primary region unavailable for key-015\n    at queryPrimaryRegion (<repository>/fixtures/promise-any/src/activities/region-activities.ts:19:13)",
+          "applicationFailureInfo": { "type": "Error" }
+        },
+        "scheduledEventId": "5",
+        "startedEventId": "7",
+        "identity": "temporal-explorer-fixture-worker",
+        "retryState": 4
+      }
+    },
+    {
+      "links": [],
+      "eventId": "9",
+      "eventTime": "2026-01-01T00:00:00.009Z",
+      "eventType": 5,
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "startToCloseTimeout": { "seconds": "10" },
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "10",
+      "eventTime": "2026-01-01T00:00:00.010Z",
+      "eventType": 6,
+      "workflowTaskStartedEventAttributes": {
+        "suggestContinueAsNewReasons": [],
+        "scheduledEventId": "9",
+        "identity": "temporal-explorer-fixture-worker",
+        "historySizeBytes": "0"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "11",
+      "eventTime": "2026-01-01T00:00:00.011Z",
+      "eventType": 7,
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "9",
+        "identity": "temporal-explorer-fixture-worker",
+        "binaryChecksum": "@temporalio/worker@1.18.1+506a1a8a22af3f73c11698ac3c17b106ef41c58ac136767d51169fd6772c9ebd",
+        "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "links": [],
+      "eventId": "12",
+      "eventTime": "2026-01-01T00:00:00.012Z",
+      "eventType": 11,
+      "activityTaskStartedEventAttributes": {
+        "scheduledEventId": "6",
+        "identity": "temporal-explorer-fixture-worker",
+        "attempt": 1
+      }
+    },
+    {
+      "links": [],
+      "eventId": "13",
+      "eventTime": "2026-01-01T00:00:00.013Z",
+      "eventType": 12,
+      "activityTaskCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJyZWdpb24iOiJmYWxsYmFjayIsInZhbHVlIjoidmFsdWUta2V5LTAxNSJ9"
+            }
+          ]
+        },
+        "scheduledEventId": "6",
+        "startedEventId": "11",
+        "identity": "temporal-explorer-fixture-worker"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "14",
+      "eventTime": "2026-01-01T00:00:00.014Z",
+      "eventType": 5,
+      "workflowTaskScheduledEventAttributes": {
+        "taskQueue": { "name": "promise-any-task-queue", "kind": 1 },
+        "startToCloseTimeout": { "seconds": "10" },
+        "attempt": 2
+      }
+    },
+    {
+      "links": [],
+      "eventId": "15",
+      "eventTime": "2026-01-01T00:00:00.015Z",
+      "eventType": 6,
+      "workflowTaskStartedEventAttributes": {
+        "suggestContinueAsNewReasons": [],
+        "scheduledEventId": "14",
+        "identity": "temporal-explorer-fixture-worker",
+        "historySizeBytes": "0"
+      }
+    },
+    {
+      "links": [],
+      "eventId": "16",
+      "eventTime": "2026-01-01T00:00:00.016Z",
+      "eventType": 7,
+      "workflowTaskCompletedEventAttributes": {
+        "scheduledEventId": "14",
+        "identity": "temporal-explorer-fixture-worker",
+        "binaryChecksum": "@temporalio/worker@1.18.1+506a1a8a22af3f73c11698ac3c17b106ef41c58ac136767d51169fd6772c9ebd",
+        "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
+        "meteringMetadata": {}
+      }
+    },
+    {
+      "links": [],
+      "eventId": "17",
+      "eventTime": "2026-01-01T00:00:00.017Z",
+      "eventType": 2,
+      "workflowExecutionCompletedEventAttributes": {
+        "result": {
+          "payloads": [
+            {
+              "metadata": { "encoding": "anNvbi9wbGFpbg==" },
+              "externalPayloads": [],
+              "data": "eyJyZXF1ZXN0SWQiOiJyZXF1ZXN0LTAxNSIsInJlZ2lvbiI6ImZhbGxiYWNrIiwidmFsdWUiOiJ2YWx1ZS1rZXktMDE1In0="
+            }
+          ]
+        },
+        "workflowTaskCompletedEventId": "15"
+      }
+    }
+  ]
+}

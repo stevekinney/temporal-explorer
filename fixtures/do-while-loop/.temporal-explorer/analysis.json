@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:do-while-loop",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "do-while-loop",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/poll-workflow.ts": "fc462c0081143bc21f11ef7fbb8c7a3ce73ee21e6af1b4cd34954519475f597a"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "do-while-loop",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 200
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 337
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:pollWorkflow",
+      "name": "pollWorkflow",
+      "source": {
+        "path": "src/workflows/poll-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 561
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 821
+        },
+        "symbolName": "pollWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "pollWorkflow:arg:0:input",
+            "display": "PollInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/poll-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 15,
+                "column": 36,
+                "offset": 596
+              },
+              "end": {
+                "line": 15,
+                "column": 52,
+                "offset": 612
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "pollWorkflow:result",
+          "display": "Promise<PollResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "loop",
+            "id": "flow:pollWorkflow:2",
+            "loopKind": "do-while",
+            "source": {
+              "path": "src/workflows/poll-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 3,
+                "offset": 659
+              },
+              "end": {
+                "line": 21,
+                "column": 41,
+                "offset": 766
+              }
+            },
+            "body": [
+              {
+                "type": "command",
+                "id": "flow:pollWorkflow:1",
+                "commandId": "activity-call:pollWorkflow:pollStatus:0",
+                "source": {
+                  "path": "src/workflows/poll-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 19,
+                    "column": 11,
+                    "offset": 674
+                  },
+                  "end": {
+                    "line": 19,
+                    "column": 43,
+                    "offset": 706
+                  },
+                  "symbolName": "pollStatus"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:pollWorkflow:pollStatus:0",
+          "kind": "activity",
+          "name": "pollStatus",
+          "source": {
+            "path": "src/workflows/poll-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 11,
+              "offset": 674
+            },
+            "end": {
+              "line": 19,
+              "column": 43,
+              "offset": 706
+            },
+            "symbolName": "pollStatus"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "PollInput",
+          "module": "src/activities/poll-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "PollResult",
+          "module": "src/activities/poll-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:pollStatus",
+      "name": "pollStatus",
+      "source": {
+        "path": "src/workflows/poll-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 11,
+          "offset": 674
+        },
+        "end": {
+          "line": 19,
+          "column": 43,
+          "offset": 706
+        },
+        "symbolName": "pollStatus"
+      },
+      "implementationSource": {
+        "path": "src/activities/poll-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 206
+        },
+        "end": {
+          "line": 18,
+          "column": 2,
+          "offset": 362
+        },
+        "symbolName": "pollStatus"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

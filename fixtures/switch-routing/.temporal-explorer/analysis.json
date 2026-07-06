@@ -1,0 +1,512 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:switch-routing",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "switch-routing",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/routing-workflow.ts": "6be9f90fb583431ffb9a2a14a222f25d2af74bd3b4c4aa82bdabd7f4b8e1d949"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "switch-routing",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 209
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 349
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:routingWorkflow",
+      "name": "routingWorkflow",
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 695
+        },
+        "end": {
+          "line": 37,
+          "column": 2,
+          "offset": 1254
+        },
+        "symbolName": "routingWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "routingWorkflow:arg:0:input",
+            "display": "RoutingInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/routing-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 20,
+                "column": 39,
+                "offset": 733
+              },
+              "end": {
+                "line": 20,
+                "column": 58,
+                "offset": 752
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "routingWorkflow:result",
+          "display": "Promise<RoutingResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "branch",
+            "id": "flow:routingWorkflow:6",
+            "branchKind": "switch",
+            "source": {
+              "path": "src/workflows/routing-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 23,
+                "column": 3,
+                "offset": 821
+              },
+              "end": {
+                "line": 32,
+                "column": 4,
+                "offset": 1109
+              }
+            },
+            "clauses": [
+              {
+                "label": "'gold'",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:routingWorkflow:1",
+                    "commandId": "activity-call:routingWorkflow:premiumFulfillment:0",
+                    "source": {
+                      "path": "src/workflows/routing-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 25,
+                        "column": 27,
+                        "offset": 886
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 62,
+                        "offset": 921
+                      },
+                      "symbolName": "premiumFulfillment"
+                    }
+                  },
+                  {
+                    "type": "terminal",
+                    "id": "flow:routingWorkflow:2",
+                    "terminalKind": "break",
+                    "source": {
+                      "path": "src/workflows/routing-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 26,
+                        "column": 7,
+                        "offset": 929
+                      },
+                      "end": {
+                        "line": 26,
+                        "column": 13,
+                        "offset": 935
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "label": "'silver'",
+                "body": [
+                  {
+                    "type": "command",
+                    "id": "flow:routingWorkflow:3",
+                    "commandId": "activity-call:routingWorkflow:standardFulfillment:1",
+                    "source": {
+                      "path": "src/workflows/routing-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 28,
+                        "column": 27,
+                        "offset": 981
+                      },
+                      "end": {
+                        "line": 28,
+                        "column": 63,
+                        "offset": 1017
+                      },
+                      "symbolName": "standardFulfillment"
+                    }
+                  },
+                  {
+                    "type": "terminal",
+                    "id": "flow:routingWorkflow:4",
+                    "terminalKind": "break",
+                    "source": {
+                      "path": "src/workflows/routing-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 29,
+                        "column": 7,
+                        "offset": 1025
+                      },
+                      "end": {
+                        "line": 29,
+                        "column": 13,
+                        "offset": 1031
+                      }
+                    }
+                  }
+                ]
+              }
+            ],
+            "otherwise": [
+              {
+                "type": "command",
+                "id": "flow:routingWorkflow:5",
+                "commandId": "activity-call:routingWorkflow:basicFulfillment:2",
+                "source": {
+                  "path": "src/workflows/routing-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 31,
+                    "column": 27,
+                    "offset": 1071
+                  },
+                  "end": {
+                    "line": 31,
+                    "column": 60,
+                    "offset": 1104
+                  },
+                  "symbolName": "basicFulfillment"
+                }
+              }
+            ]
+          },
+          {
+            "type": "command",
+            "id": "flow:routingWorkflow:7",
+            "commandId": "activity-call:routingWorkflow:recordRouting:3",
+            "source": {
+              "path": "src/workflows/routing-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 34,
+                "column": 9,
+                "offset": 1119
+              },
+              "end": {
+                "line": 34,
+                "column": 57,
+                "offset": 1167
+              },
+              "symbolName": "recordRouting"
+            }
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:routingWorkflow:premiumFulfillment:0",
+          "kind": "activity",
+          "name": "premiumFulfillment",
+          "source": {
+            "path": "src/workflows/routing-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 25,
+              "column": 27,
+              "offset": 886
+            },
+            "end": {
+              "line": 25,
+              "column": 62,
+              "offset": 921
+            },
+            "symbolName": "premiumFulfillment"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:routingWorkflow:standardFulfillment:1",
+          "kind": "activity",
+          "name": "standardFulfillment",
+          "source": {
+            "path": "src/workflows/routing-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 28,
+              "column": 27,
+              "offset": 981
+            },
+            "end": {
+              "line": 28,
+              "column": 63,
+              "offset": 1017
+            },
+            "symbolName": "standardFulfillment"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        },
+        {
+          "id": "activity-call:routingWorkflow:basicFulfillment:2",
+          "kind": "activity",
+          "name": "basicFulfillment",
+          "source": {
+            "path": "src/workflows/routing-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 31,
+              "column": 27,
+              "offset": 1071
+            },
+            "end": {
+              "line": 31,
+              "column": 60,
+              "offset": 1104
+            },
+            "symbolName": "basicFulfillment"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        },
+        {
+          "id": "activity-call:routingWorkflow:recordRouting:3",
+          "kind": "activity",
+          "name": "recordRouting",
+          "source": {
+            "path": "src/workflows/routing-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 34,
+              "column": 9,
+              "offset": 1119
+            },
+            "end": {
+              "line": 34,
+              "column": 57,
+              "offset": 1167
+            },
+            "symbolName": "recordRouting"
+          },
+          "confidence": "exact",
+          "staticOrder": 3
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "RoutingInput",
+          "module": "src/activities/fulfillment-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "RoutingResult",
+          "module": "src/activities/fulfillment-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:premiumFulfillment",
+      "name": "premiumFulfillment",
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 27,
+          "offset": 886
+        },
+        "end": {
+          "line": 25,
+          "column": 62,
+          "offset": 921
+        },
+        "symbolName": "premiumFulfillment"
+      },
+      "implementationSource": {
+        "path": "src/activities/fulfillment-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 21,
+          "column": 1,
+          "offset": 288
+        },
+        "end": {
+          "line": 23,
+          "column": 2,
+          "offset": 444
+        },
+        "symbolName": "premiumFulfillment"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:standardFulfillment",
+      "name": "standardFulfillment",
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 27,
+          "offset": 981
+        },
+        "end": {
+          "line": 28,
+          "column": 63,
+          "offset": 1017
+        },
+        "symbolName": "standardFulfillment"
+      },
+      "implementationSource": {
+        "path": "src/activities/fulfillment-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 1,
+          "offset": 446
+        },
+        "end": {
+          "line": 27,
+          "column": 2,
+          "offset": 605
+        },
+        "symbolName": "standardFulfillment"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:basicFulfillment",
+      "name": "basicFulfillment",
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 27,
+          "offset": 1071
+        },
+        "end": {
+          "line": 31,
+          "column": 60,
+          "offset": 1104
+        },
+        "symbolName": "basicFulfillment"
+      },
+      "implementationSource": {
+        "path": "src/activities/fulfillment-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 29,
+          "column": 1,
+          "offset": 607
+        },
+        "end": {
+          "line": 31,
+          "column": 2,
+          "offset": 757
+        },
+        "symbolName": "basicFulfillment"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:recordRouting",
+      "name": "recordRouting",
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 34,
+          "column": 9,
+          "offset": 1119
+        },
+        "end": {
+          "line": 34,
+          "column": 57,
+          "offset": 1167
+        },
+        "symbolName": "recordRouting"
+      },
+      "implementationSource": {
+        "path": "src/activities/fulfillment-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 33,
+          "column": 1,
+          "offset": 759
+        },
+        "end": {
+          "line": 35,
+          "column": 2,
+          "offset": 910
+        },
+        "symbolName": "recordRouting"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

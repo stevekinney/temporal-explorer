@@ -51,11 +51,33 @@
   let activeTab = $state('flow');
   let inspectorOpen = $state(false);
 
+  // Default to the workflow the requested trace actually ran, so a project with several
+  // workflows (a parent plus its children) opens on the one being inspected rather than
+  // whichever happens to be first — which can be a trivial child that renders as a lone node.
+  const defaultWorkflowId = $derived.by(() => {
+    if (data.requestedTrace) {
+      const requestedTrace = data.traces.find(
+        (trace) =>
+          trace.artifactId.includes(`trace:${data.requestedTrace}:`) ||
+          trace.execution.workflowId === data.requestedTrace ||
+          trace.execution.runId === data.requestedTrace,
+      );
+      const traced = requestedTrace
+        ? data.analysis.workflows.find(
+            (workflow) => workflow.name === requestedTrace.execution.workflowType,
+          )
+        : undefined;
+
+      if (traced) {
+        return traced.id;
+      }
+    }
+
+    return data.analysis.workflows[0]?.id ?? '';
+  });
   // Select by the unique workflow id, not the display name: versioned workflows
   // can share a registered name, so a name would not identify a single one.
-  const selectedWorkflowId = $derived(
-    selectedWorkflowOverride ?? data.analysis.workflows[0]?.id ?? '',
-  );
+  const selectedWorkflowId = $derived(selectedWorkflowOverride ?? defaultWorkflowId);
   const selectedWorkflow = $derived.by(() => {
     return (
       data.analysis.workflows.find((workflow) => workflow.id === selectedWorkflowId) ??

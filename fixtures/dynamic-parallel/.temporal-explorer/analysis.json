@@ -1,0 +1,387 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:dynamic-parallel",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "dynamic-parallel",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/broadcast-workflow.ts": "0aea2a99440e99f955d3885b6cc2d0d018aec0c73288f7fd1ad8138338115fd3"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "dynamic-parallel",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 209
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 351
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:broadcastWorkflow",
+      "name": "broadcastWorkflow",
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 1,
+          "offset": 770
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1258
+        },
+        "symbolName": "broadcastWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "broadcastWorkflow:arg:0:input",
+            "display": "BroadcastInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/broadcast-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 41,
+                "offset": 810
+              },
+              "end": {
+                "line": 19,
+                "column": 62,
+                "offset": 831
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "broadcastWorkflow:result",
+          "display": "Promise<BroadcastResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "command",
+            "id": "flow:broadcastWorkflow:1",
+            "commandId": "activity-call:broadcastWorkflow:prepareBroadcast:0",
+            "source": {
+              "path": "src/workflows/broadcast-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 20,
+                "column": 26,
+                "offset": 886
+              },
+              "end": {
+                "line": 20,
+                "column": 59,
+                "offset": 919
+              },
+              "symbolName": "prepareBroadcast"
+            }
+          },
+          {
+            "type": "parallel",
+            "id": "flow:broadcastWorkflow:2",
+            "parallelKind": "all",
+            "source": {
+              "path": "src/workflows/broadcast-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 22,
+                "column": 26,
+                "offset": 947
+              },
+              "end": {
+                "line": 24,
+                "column": 4,
+                "offset": 1049
+              }
+            },
+            "cardinality": "dynamic",
+            "templateBranch": [
+              {
+                "type": "command",
+                "id": "flow:broadcastWorkflow:3",
+                "commandId": "activity-call:broadcastWorkflow:deliverToChannel:1",
+                "source": {
+                  "path": "src/workflows/broadcast-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 23,
+                    "column": 37,
+                    "offset": 996
+                  },
+                  "end": {
+                    "line": 23,
+                    "column": 84,
+                    "offset": 1043
+                  },
+                  "symbolName": "deliverToChannel"
+                }
+              }
+            ]
+          },
+          {
+            "type": "command",
+            "id": "flow:broadcastWorkflow:4",
+            "commandId": "activity-call:broadcastWorkflow:summarizeBroadcast:2",
+            "source": {
+              "path": "src/workflows/broadcast-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 26,
+                "column": 25,
+                "offset": 1076
+              },
+              "end": {
+                "line": 26,
+                "column": 82,
+                "offset": 1133
+              },
+              "symbolName": "summarizeBroadcast"
+            }
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:broadcastWorkflow:prepareBroadcast:0",
+          "kind": "activity",
+          "name": "prepareBroadcast",
+          "source": {
+            "path": "src/workflows/broadcast-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 20,
+              "column": 26,
+              "offset": 886
+            },
+            "end": {
+              "line": 20,
+              "column": 59,
+              "offset": 919
+            },
+            "symbolName": "prepareBroadcast"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:broadcastWorkflow:deliverToChannel:1",
+          "kind": "activity",
+          "name": "deliverToChannel",
+          "source": {
+            "path": "src/workflows/broadcast-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 23,
+              "column": 37,
+              "offset": 996
+            },
+            "end": {
+              "line": 23,
+              "column": 84,
+              "offset": 1043
+            },
+            "symbolName": "deliverToChannel"
+          },
+          "confidence": "exact",
+          "staticOrder": 1,
+          "cardinality": "fan-out"
+        },
+        {
+          "id": "activity-call:broadcastWorkflow:summarizeBroadcast:2",
+          "kind": "activity",
+          "name": "summarizeBroadcast",
+          "source": {
+            "path": "src/workflows/broadcast-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 26,
+              "column": 25,
+              "offset": 1076
+            },
+            "end": {
+              "line": 26,
+              "column": 82,
+              "offset": 1133
+            },
+            "symbolName": "summarizeBroadcast"
+          },
+          "confidence": "exact",
+          "staticOrder": 2
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "BroadcastInput",
+          "module": "src/activities/broadcast-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "BroadcastResult",
+          "module": "src/activities/broadcast-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:prepareBroadcast",
+      "name": "prepareBroadcast",
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 26,
+          "offset": 886
+        },
+        "end": {
+          "line": 20,
+          "column": 59,
+          "offset": 919
+        },
+        "symbolName": "prepareBroadcast"
+      },
+      "implementationSource": {
+        "path": "src/activities/broadcast-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 1,
+          "offset": 394
+        },
+        "end": {
+          "line": 28,
+          "column": 2,
+          "offset": 535
+        },
+        "symbolName": "prepareBroadcast"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:deliverToChannel",
+      "name": "deliverToChannel",
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 23,
+          "column": 37,
+          "offset": 996
+        },
+        "end": {
+          "line": 23,
+          "column": 84,
+          "offset": 1043
+        },
+        "symbolName": "deliverToChannel"
+      },
+      "implementationSource": {
+        "path": "src/activities/broadcast-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 30,
+          "column": 1,
+          "offset": 537
+        },
+        "end": {
+          "line": 35,
+          "column": 2,
+          "offset": 711
+        },
+        "symbolName": "deliverToChannel"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:summarizeBroadcast",
+      "name": "summarizeBroadcast",
+      "source": {
+        "path": "src/workflows/broadcast-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 26,
+          "column": 25,
+          "offset": 1076
+        },
+        "end": {
+          "line": 26,
+          "column": 82,
+          "offset": 1133
+        },
+        "symbolName": "summarizeBroadcast"
+      },
+      "implementationSource": {
+        "path": "src/activities/broadcast-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 37,
+          "column": 1,
+          "offset": 713
+        },
+        "end": {
+          "line": 42,
+          "column": 2,
+          "offset": 892
+        },
+        "symbolName": "summarizeBroadcast"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

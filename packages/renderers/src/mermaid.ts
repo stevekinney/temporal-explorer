@@ -1,7 +1,8 @@
-import type {
-  FlowNode,
-  TemporalAnalysisDocument,
-  TemporalCommand,
+import {
+  switchClauseBody,
+  type FlowNode,
+  type TemporalAnalysisDocument,
+  type TemporalCommand,
 } from '@temporal-explorer/schemas';
 
 import { commandDisplayName, getWorkflow } from './shared';
@@ -52,11 +53,7 @@ function shapeForKind(kind: TemporalCommand['kind'], id: string, label: string):
     return `  ${id}[["${label}"]]`;
   }
 
-  if (kind === 'nexus-operation') {
-    return `  ${id}[/"${label}"/]`;
-  }
-
-  if (kind === 'dynamic') {
+  if (kind === 'nexus-operation' || kind === 'dynamic') {
     return `  ${id}[/"${label}"/]`;
   }
 
@@ -69,6 +66,8 @@ type RenderContext = {
   counter: { value: number };
   startId: string;
   commandsById: Map<string, TemporalCommand>;
+  // Converge join of the nearest enclosing `try` with a `finally`; terminals route here.
+  finallyTarget: string | undefined;
 };
 
 function nextNodeId(context: RenderContext): string {
@@ -161,15 +160,14 @@ function renderTerminalNode(
     return undefined;
   }
 
-  const terminalLabels: Record<string, string> = {
-    return: 'return',
-    throw: 'throw',
-    break: 'break',
-    continue: 'continue',
-  };
-
-  context.nodes.push(`  ${id}(["${terminalLabels[node.terminalKind] ?? node.terminalKind}"])`);
+  // return / throw / break / continue all render as their own keyword.
+  context.nodes.push(`  ${id}(["${node.terminalKind}"])`);
   pushEdge(context, entry, id, label);
+
+  // A `finally` runs on abrupt exits too, so route the terminal into it, not a dead end.
+  if (context.finallyTarget !== undefined) {
+    pushEdge(context, id, context.finallyTarget);
+  }
 
   return undefined;
 }
@@ -190,11 +188,13 @@ function renderBranchNode(
   context.nodes.push(`  ${join}(( ))`);
 
   for (const clause of node.clauses) {
-    renderArmInto(clause.body, decision, join, clause.label, context);
+    const body = switchClauseBody(clause.body, node.branchKind);
+    renderArmInto(body, decision, join, clause.label, context);
   }
 
   // An explicit `else`, or the implicit fall-through when there is no else.
-  renderArmInto(node.otherwise ?? [], decision, join, 'else', context);
+  const otherwise = switchClauseBody(node.otherwise ?? [], node.branchKind);
+  renderArmInto(otherwise, decision, join, 'else', context);
 
   return join;
 }
@@ -207,12 +207,17 @@ function renderLoopNode(
 ): string {
   const loop = toMermaidId(node.id);
   context.nodes.push(`  ${loop}{"loop (${node.loopKind})"}`);
-  pushEdge(context, entry, loop, label);
 
-  const bodyExit = renderSequence(node.body, loop, context, 'each');
-  if (bodyExit !== undefined) {
-    pushEdge(context, bodyExit, loop, 'repeat');
-  }
+  // A do-while runs its body before the exit condition, so anchor the body entry and
+  // place the condition after it — the loop exit is never reachable without an iteration.
+  const doWhile = node.loopKind === 'do-while';
+  const bodyEntry = doWhile ? nextNodeId(context) : loop;
+  if (doWhile) context.nodes.push(`  ${bodyEntry}(( ))`);
+
+  pushEdge(context, entry, bodyEntry, label);
+  const bodyExit = renderSequence(node.body, bodyEntry, context, 'each');
+  if (bodyExit !== undefined) pushEdge(context, bodyExit, loop, doWhile ? undefined : 'repeat');
+  if (doWhile) pushEdge(context, loop, bodyEntry, 'repeat');
 
   return loop;
 }
@@ -248,9 +253,17 @@ function renderTryNode(
   context: RenderContext,
   label: string | undefined,
 ): string | undefined {
-  const bodyExit = renderSequence(node.body, entry, context, label);
   const converge = nextNodeId(context);
   context.nodes.push(`  ${converge}(( ))`);
+  const finalizer = node.finalizer && node.finalizer.length > 0 ? node.finalizer : undefined;
+
+  // Route terminals through `converge` while a finalizer exists; save/restore nests safely.
+  const previousFinallyTarget = context.finallyTarget;
+  if (finalizer) {
+    context.finallyTarget = converge;
+  }
+
+  const bodyExit = renderSequence(node.body, entry, context, label);
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, converge);
@@ -263,8 +276,10 @@ function renderTryNode(
     }
   }
 
-  if (node.finalizer && node.finalizer.length > 0) {
-    return renderSequence(node.finalizer, converge, context, 'finally');
+  context.finallyTarget = previousFinallyTarget;
+
+  if (finalizer) {
+    return renderSequence(finalizer, converge, context, 'finally');
   }
 
   return converge;
@@ -340,6 +355,7 @@ export function renderWorkflowMermaid(
     counter: { value: 0 },
     startId,
     commandsById,
+    finallyTarget: undefined,
   };
 
   const exit = renderSequence(workflow.body.nodes, context.startId, context);

@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:regionWorkflow:trace:fallback-wins:fallback-wins-run-id",
+  "staticAnalysisId": "analysis:promise-any",
+  "runtimeTraceId": "trace:fallback-wins:fallback-wins-run-id",
+  "workflow": "regionWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:regionWorkflow",
+      "kind": "workflow",
+      "name": "regionWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 829
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 1096
+        },
+        "symbolName": "regionWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:regionWorkflow:queryPrimaryRegion:0",
+      "kind": "activity",
+      "name": "queryPrimaryRegion",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 37,
+          "offset": 944
+        },
+        "end": {
+          "line": 19,
+          "column": 66,
+          "offset": 973
+        },
+        "symbolName": "queryPrimaryRegion"
+      }
+    },
+    {
+      "id": "activity-call:regionWorkflow:queryFallbackRegion:1",
+      "kind": "activity",
+      "name": "queryFallbackRegion",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 68,
+          "offset": 975
+        },
+        "end": {
+          "line": 19,
+          "column": 98,
+          "offset": 1005
+        },
+        "symbolName": "queryFallbackRegion"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:regionWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to regionWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type regionWorkflow matched static Workflow regionWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:regionWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/region-workflow.ts:18.",
+          "staticNodeId": "workflow:regionWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:regionWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to regionWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type regionWorkflow matched static Workflow regionWorkflow.",
+          "eventIds": [17],
+          "staticNodeId": "workflow:regionWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/region-workflow.ts:18.",
+          "staticNodeId": "workflow:regionWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:queryPrimaryRegion:5",
+      "staticNodeId": "activity-call:regionWorkflow:queryPrimaryRegion:0",
+      "confidence": "exact",
+      "reason": "Activity queryPrimaryRegion matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type queryPrimaryRegion matched static Activity command queryPrimaryRegion.",
+          "eventIds": [5, 7, 8],
+          "staticNodeId": "activity-call:regionWorkflow:queryPrimaryRegion:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 7, 8],
+          "staticNodeId": "activity-call:regionWorkflow:queryPrimaryRegion:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/region-workflow.ts:19.",
+          "staticNodeId": "activity-call:regionWorkflow:queryPrimaryRegion:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:queryFallbackRegion:6",
+      "staticNodeId": "activity-call:regionWorkflow:queryFallbackRegion:1",
+      "confidence": "exact",
+      "reason": "Activity queryFallbackRegion matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type queryFallbackRegion matched static Activity command queryFallbackRegion.",
+          "eventIds": [6, 12, 13],
+          "staticNodeId": "activity-call:regionWorkflow:queryFallbackRegion:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [6, 12, 13],
+          "staticNodeId": "activity-call:regionWorkflow:queryFallbackRegion:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/region-workflow.ts:19.",
+          "staticNodeId": "activity-call:regionWorkflow:queryFallbackRegion:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 3,
+      "observed": 3,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 2,
+      "observed": 2,
+      "retried": 0,
+      "failed": 1
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

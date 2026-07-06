@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:promise-any",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "promise-any",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/region-workflow.ts": "1a1913de03593b63e5e6ccd2891ca5dd0f185f2c6221d4604e38288a14e778fd"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "promise-any",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 201
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 340
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:regionWorkflow",
+      "name": "regionWorkflow",
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 829
+        },
+        "end": {
+          "line": 22,
+          "column": 2,
+          "offset": 1096
+        },
+        "symbolName": "regionWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "regionWorkflow:arg:0:input",
+            "display": "RegionInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/region-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 18,
+                "column": 38,
+                "offset": 866
+              },
+              "end": {
+                "line": 18,
+                "column": 56,
+                "offset": 884
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "regionWorkflow:result",
+          "display": "Promise<AnyResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "parallel",
+            "id": "flow:regionWorkflow:1",
+            "parallelKind": "any",
+            "source": {
+              "path": "src/workflows/region-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 24,
+                "offset": 931
+              },
+              "end": {
+                "line": 19,
+                "column": 100,
+                "offset": 1007
+              }
+            },
+            "cardinality": "fixed",
+            "branches": [
+              [
+                {
+                  "type": "command",
+                  "id": "flow:regionWorkflow:2",
+                  "commandId": "activity-call:regionWorkflow:queryPrimaryRegion:0",
+                  "source": {
+                    "path": "src/workflows/region-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 19,
+                      "column": 37,
+                      "offset": 944
+                    },
+                    "end": {
+                      "line": 19,
+                      "column": 66,
+                      "offset": 973
+                    },
+                    "symbolName": "queryPrimaryRegion"
+                  }
+                }
+              ],
+              [
+                {
+                  "type": "command",
+                  "id": "flow:regionWorkflow:3",
+                  "commandId": "activity-call:regionWorkflow:queryFallbackRegion:1",
+                  "source": {
+                    "path": "src/workflows/region-workflow.ts",
+                    "pathKind": "project-relative",
+                    "start": {
+                      "line": 19,
+                      "column": 68,
+                      "offset": 975
+                    },
+                    "end": {
+                      "line": 19,
+                      "column": 98,
+                      "offset": 1005
+                    },
+                    "symbolName": "queryFallbackRegion"
+                  }
+                }
+              ]
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:regionWorkflow:queryPrimaryRegion:0",
+          "kind": "activity",
+          "name": "queryPrimaryRegion",
+          "source": {
+            "path": "src/workflows/region-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 37,
+              "offset": 944
+            },
+            "end": {
+              "line": 19,
+              "column": 66,
+              "offset": 973
+            },
+            "symbolName": "queryPrimaryRegion"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:regionWorkflow:queryFallbackRegion:1",
+          "kind": "activity",
+          "name": "queryFallbackRegion",
+          "source": {
+            "path": "src/workflows/region-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 19,
+              "column": 68,
+              "offset": 975
+            },
+            "end": {
+              "line": 19,
+              "column": 98,
+              "offset": 1005
+            },
+            "symbolName": "queryFallbackRegion"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "AnyResult",
+          "module": "src/activities/region-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "RegionInput",
+          "module": "src/activities/region-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:queryPrimaryRegion",
+      "name": "queryPrimaryRegion",
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 37,
+          "offset": 944
+        },
+        "end": {
+          "line": 19,
+          "column": 66,
+          "offset": 973
+        },
+        "symbolName": "queryPrimaryRegion"
+      },
+      "implementationSource": {
+        "path": "src/activities/region-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 302
+        },
+        "end": {
+          "line": 20,
+          "column": 2,
+          "offset": 441
+        },
+        "symbolName": "queryPrimaryRegion"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:queryFallbackRegion",
+      "name": "queryFallbackRegion",
+      "source": {
+        "path": "src/workflows/region-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 19,
+          "column": 68,
+          "offset": 975
+        },
+        "end": {
+          "line": 19,
+          "column": 98,
+          "offset": 1005
+        },
+        "symbolName": "queryFallbackRegion"
+      },
+      "implementationSource": {
+        "path": "src/activities/region-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 443
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 579
+        },
+        "symbolName": "queryFallbackRegion"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

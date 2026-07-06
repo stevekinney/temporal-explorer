@@ -57,6 +57,22 @@ export type FlowNode =
       commandId?: string | undefined;
     };
 
+/**
+ * The effective body of a `switch`/branch clause. A trailing `break` in a `switch` case only
+ * means "leave the switch", i.e. converge on the region's join — drawing it as a terminal would
+ * dead-end the arm, so drop it and let the arm converge like any other. Shared by every renderer
+ * so the explorer graph and the Mermaid docs agree on how a switch converges.
+ */
+export function switchClauseBody(body: FlowNode[], branchKind: string): FlowNode[] {
+  const last = body.at(-1);
+
+  if (branchKind === 'switch' && last?.type === 'terminal' && last.terminalKind === 'break') {
+    return body.slice(0, -1);
+  }
+
+  return body;
+}
+
 export const flowNodeSchema: z.ZodType<FlowNode> = z.lazy(() =>
   z.union([
     z

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "counting-loop",
+  "history": "iterated",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "batchWorkflow",
+  "workflowId": "counting-loop-iterated",
+  "runIdNormalization": { "replacement": "iterated-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 23,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "10": 3,
+    "11": 3,
+    "12": 3
+  },
+  "contentSha256": "ffefa7a6f92f8124207d70e143f377ac01a857f201361c8f84dbe909fe5a7041"
+}

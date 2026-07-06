@@ -40,8 +40,8 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
     expect(shape(projection)).toEqual([
       { kind: 'workflow', label: 'cancellationWorkflow', state: 'canceled' },
       { kind: 'try-region', label: 'try', state: 'observed' },
-      { kind: 'terminal', label: 'return', state: 'observed' },
       { kind: 'join', label: '', state: 'observed' },
+      { kind: 'terminal', label: 'return', state: 'observed' },
       { kind: 'branch-region', label: 'if', state: 'observed' },
       { kind: 'decision', label: 'if', state: 'observed' },
       { kind: 'join', label: '', state: 'observed' },
@@ -60,7 +60,7 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
     const tryRegion = projection.nodes.find((node) => node.kind === 'try-region');
     expect(
       projection.nodes.filter((node) => node.parentId === tryRegion?.id).map((node) => node.kind),
-    ).toEqual(['terminal', 'join', 'branch-region', 'terminal']);
+    ).toEqual(['join', 'terminal', 'branch-region', 'terminal']);
     expect(
       projection.edges
         .filter((edge) => edge.target === 'workflow:cancellationWorkflow')

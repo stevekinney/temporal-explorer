@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:batchWorkflow:trace:iterated:iterated-run-id",
+  "staticAnalysisId": "analysis:counting-loop",
+  "runtimeTraceId": "trace:iterated:iterated-run-id",
+  "workflow": "batchWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:batchWorkflow",
+      "kind": "workflow",
+      "name": "batchWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/batch-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 679
+        },
+        "end": {
+          "line": 33,
+          "column": 2,
+          "offset": 1068
+        },
+        "symbolName": "batchWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:batchWorkflow:processItem:0",
+      "kind": "activity",
+      "name": "processItem",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/batch-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 24,
+          "column": 11,
+          "offset": 902
+        },
+        "end": {
+          "line": 24,
+          "column": 44,
+          "offset": 935
+        },
+        "symbolName": "processItem"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:batchWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to batchWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type batchWorkflow matched static Workflow batchWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:batchWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/batch-workflow.ts:16.",
+          "staticNodeId": "workflow:batchWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:batchWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to batchWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type batchWorkflow matched static Workflow batchWorkflow.",
+          "eventIds": [23],
+          "staticNodeId": "workflow:batchWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/batch-workflow.ts:16.",
+          "staticNodeId": "workflow:batchWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:processItem:5",
+      "staticNodeId": "activity-call:batchWorkflow:processItem:0",
+      "confidence": "exact",
+      "reason": "Activity processItem matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type processItem matched static Activity command processItem.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/batch-workflow.ts:24.",
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:processItem:11",
+      "staticNodeId": "activity-call:batchWorkflow:processItem:0",
+      "confidence": "exact",
+      "reason": "Activity processItem matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type processItem matched static Activity command processItem.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 2 matched static command order 0.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/batch-workflow.ts:24.",
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:processItem:17",
+      "staticNodeId": "activity-call:batchWorkflow:processItem:0",
+      "confidence": "exact",
+      "reason": "Activity processItem matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type processItem matched static Activity command processItem.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 3 matched static command order 0.",
+          "eventIds": [17, 18, 19],
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/batch-workflow.ts:24.",
+          "staticNodeId": "activity-call:batchWorkflow:processItem:0"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 2,
+      "observed": 2,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 1,
+      "observed": 1,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

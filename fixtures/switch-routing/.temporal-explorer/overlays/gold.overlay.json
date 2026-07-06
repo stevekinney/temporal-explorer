@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:routingWorkflow:trace:gold:gold-run-id",
+  "staticAnalysisId": "analysis:switch-routing",
+  "runtimeTraceId": "trace:gold:gold-run-id",
+  "workflow": "routingWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:routingWorkflow",
+      "kind": "workflow",
+      "name": "routingWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 1,
+          "offset": 695
+        },
+        "end": {
+          "line": 37,
+          "column": 2,
+          "offset": 1254
+        },
+        "symbolName": "routingWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:routingWorkflow:premiumFulfillment:0",
+      "kind": "activity",
+      "name": "premiumFulfillment",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 25,
+          "column": 27,
+          "offset": 886
+        },
+        "end": {
+          "line": 25,
+          "column": 62,
+          "offset": 921
+        },
+        "symbolName": "premiumFulfillment"
+      }
+    },
+    {
+      "id": "activity-call:routingWorkflow:standardFulfillment:1",
+      "kind": "activity",
+      "name": "standardFulfillment",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 28,
+          "column": 27,
+          "offset": 981
+        },
+        "end": {
+          "line": 28,
+          "column": 63,
+          "offset": 1017
+        },
+        "symbolName": "standardFulfillment"
+      }
+    },
+    {
+      "id": "activity-call:routingWorkflow:basicFulfillment:2",
+      "kind": "activity",
+      "name": "basicFulfillment",
+      "observed": false,
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 31,
+          "column": 27,
+          "offset": 1071
+        },
+        "end": {
+          "line": 31,
+          "column": 60,
+          "offset": 1104
+        },
+        "symbolName": "basicFulfillment"
+      }
+    },
+    {
+      "id": "activity-call:routingWorkflow:recordRouting:3",
+      "kind": "activity",
+      "name": "recordRouting",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/routing-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 34,
+          "column": 9,
+          "offset": 1119
+        },
+        "end": {
+          "line": 34,
+          "column": 57,
+          "offset": 1167
+        },
+        "symbolName": "recordRouting"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:routingWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to routingWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type routingWorkflow matched static Workflow routingWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:routingWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/routing-workflow.ts:20.",
+          "staticNodeId": "workflow:routingWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:routingWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to routingWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type routingWorkflow matched static Workflow routingWorkflow.",
+          "eventIds": [17],
+          "staticNodeId": "workflow:routingWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/routing-workflow.ts:20.",
+          "staticNodeId": "workflow:routingWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:premiumFulfillment:5",
+      "staticNodeId": "activity-call:routingWorkflow:premiumFulfillment:0",
+      "confidence": "exact",
+      "reason": "Activity premiumFulfillment matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type premiumFulfillment matched static Activity command premiumFulfillment.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:routingWorkflow:premiumFulfillment:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:routingWorkflow:premiumFulfillment:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/routing-workflow.ts:25.",
+          "staticNodeId": "activity-call:routingWorkflow:premiumFulfillment:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:recordRouting:11",
+      "staticNodeId": "activity-call:routingWorkflow:recordRouting:3",
+      "confidence": "exact",
+      "reason": "Activity recordRouting matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type recordRouting matched static Activity command recordRouting.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:routingWorkflow:recordRouting:3"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 3.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:routingWorkflow:recordRouting:3"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/routing-workflow.ts:34.",
+          "staticNodeId": "activity-call:routingWorkflow:recordRouting:3"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 5,
+      "observed": 3,
+      "skipped": 2,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 4,
+      "observed": 2,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "branch-chain",
+  "history": "manager",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "reviewWorkflow",
+  "workflowId": "branch-chain-manager",
+  "runIdNormalization": { "replacement": "manager-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 17,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 2,
+    "11": 2,
+    "12": 2
+  },
+  "contentSha256": "678094311b51e9e80ff45641f52a712fce7814cdf8fdbd48cbb0e90bdac6c3f6"
+}

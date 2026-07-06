@@ -1,0 +1,191 @@
+{
+  "schemaVersion": "temporal-overlay/v1",
+  "artifactId": "overlay:chargeWorkflow:trace:charged:charged-run-id",
+  "staticAnalysisId": "analysis:try-finally",
+  "runtimeTraceId": "trace:charged:charged-run-id",
+  "workflow": "chargeWorkflow",
+  "staticNodes": [
+    {
+      "id": "workflow:chargeWorkflow",
+      "kind": "workflow",
+      "name": "chargeWorkflow",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 661
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 944
+        },
+        "symbolName": "chargeWorkflow"
+      }
+    },
+    {
+      "id": "activity-call:chargeWorkflow:chargeAccount:0",
+      "kind": "activity",
+      "name": "chargeAccount",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 27,
+          "offset": 781
+        },
+        "end": {
+          "line": 18,
+          "column": 57,
+          "offset": 811
+        },
+        "symbolName": "chargeAccount"
+      }
+    },
+    {
+      "id": "activity-call:chargeWorkflow:releaseLock:1",
+      "kind": "activity",
+      "name": "releaseLock",
+      "observed": true,
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 11,
+          "offset": 909
+        },
+        "end": {
+          "line": 22,
+          "column": 39,
+          "offset": 937
+        },
+        "symbolName": "releaseLock"
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "runtimeOperationId": "workflow:start",
+      "staticNodeId": "workflow:chargeWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to chargeWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type chargeWorkflow matched static Workflow chargeWorkflow.",
+          "eventIds": [1],
+          "staticNodeId": "workflow:chargeWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/charge-workflow.ts:16.",
+          "staticNodeId": "workflow:chargeWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "workflow:completed",
+      "staticNodeId": "workflow:chargeWorkflow",
+      "confidence": "exact",
+      "reason": "Workflow lifecycle event belongs to chargeWorkflow.",
+      "evidence": [
+        {
+          "kind": "workflow-type",
+          "description": "Runtime Workflow type chargeWorkflow matched static Workflow chargeWorkflow.",
+          "eventIds": [17],
+          "staticNodeId": "workflow:chargeWorkflow"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Workflow source is src/workflows/charge-workflow.ts:16.",
+          "staticNodeId": "workflow:chargeWorkflow"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:chargeAccount:5",
+      "staticNodeId": "activity-call:chargeWorkflow:chargeAccount:0",
+      "confidence": "exact",
+      "reason": "Activity chargeAccount matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type chargeAccount matched static Activity command chargeAccount.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:chargeWorkflow:chargeAccount:0"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 0.",
+          "eventIds": [5, 6, 7],
+          "staticNodeId": "activity-call:chargeWorkflow:chargeAccount:0"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/charge-workflow.ts:18.",
+          "staticNodeId": "activity-call:chargeWorkflow:chargeAccount:0"
+        }
+      ]
+    },
+    {
+      "runtimeOperationId": "activity:releaseLock:11",
+      "staticNodeId": "activity-call:chargeWorkflow:releaseLock:1",
+      "confidence": "exact",
+      "reason": "Activity releaseLock matched by Activity type and command order.",
+      "evidence": [
+        {
+          "kind": "activity-type",
+          "description": "Runtime Activity type releaseLock matched static Activity command releaseLock.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:chargeWorkflow:releaseLock:1"
+        },
+        {
+          "kind": "command-order",
+          "description": "Runtime Activity occurrence 1 matched static command order 1.",
+          "eventIds": [11, 12, 13],
+          "staticNodeId": "activity-call:chargeWorkflow:releaseLock:1"
+        },
+        {
+          "kind": "source-location",
+          "description": "Static Activity source is src/workflows/charge-workflow.ts:22.",
+          "staticNodeId": "activity-call:chargeWorkflow:releaseLock:1"
+        }
+      ]
+    }
+  ],
+  "branchOutcomes": [],
+  "coverage": {
+    "nodes": {
+      "total": 3,
+      "observed": 3,
+      "skipped": 0,
+      "unmappedRuntimeOperations": 0
+    },
+    "activities": {
+      "staticTotal": 2,
+      "observed": 2,
+      "retried": 0,
+      "failed": 0
+    },
+    "messages": {
+      "staticSignals": 0,
+      "receivedSignals": [],
+      "staticUpdates": 0,
+      "receivedUpdates": [],
+      "staticQueries": 0
+    },
+    "timers": {
+      "staticTotal": 0,
+      "fired": 0,
+      "canceled": 0,
+      "pending": 0
+    }
+  },
+  "diagnostics": []
+}

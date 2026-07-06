@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "nested-orchestration",
+  "history": "orchestrated",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "orchestrationWorkflow",
+  "workflowId": "nested-orchestration-orchestrated",
+  "runIdNormalization": { "replacement": "orchestrated-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 41,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 7,
+    "6": 7,
+    "7": 7,
+    "10": 6,
+    "11": 6,
+    "12": 5,
+    "13": 1
+  },
+  "contentSha256": "d996279023a47f10c6b02eae8c7ab45d7a4d3c7ae849f5db102fccca5282e241"
+}

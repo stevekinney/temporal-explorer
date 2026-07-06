@@ -4,7 +4,9 @@ const fixtureRoot = new URL('../../fixtures/basic-order/', import.meta.url).path
 
 async function verifyServerLifecycle(): Promise<void> {
   const server = await startExplorerServer({ projectRoot: fixtureRoot });
-  const readinessUrl = new URL('/@vite/client', server.url);
+  // Probe the app root: the server is the built SvelteKit adapter-node app, which serves no
+  // Vite dev endpoints (`/@vite/client` only exists under `vite dev`), so it would 404.
+  const readinessUrl = new URL('/', server.url);
   const response = await fetch(readinessUrl, { signal: AbortSignal.timeout(1_000) });
 
   if (!response.ok) {

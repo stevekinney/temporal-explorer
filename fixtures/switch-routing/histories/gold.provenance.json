@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "temporal-history-fixture/v1",
+  "fixture": "switch-routing",
+  "history": "gold",
+  "generatedBy": "scripts/fixtures/generate-histories.ts",
+  "generationCommand": "bun run fixtures:generate-histories",
+  "temporalSdkVersion": "^1.18.1",
+  "testEnvironment": "TestWorkflowEnvironment.createTimeSkipping",
+  "workflowType": "routingWorkflow",
+  "workflowId": "switch-routing-gold",
+  "runIdNormalization": { "replacement": "gold-run-id" },
+  "identityNormalization": {
+    "replacement": "temporal-explorer-fixture-worker"
+  },
+  "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "eventCount": 17,
+  "eventTypes": {
+    "1": 1,
+    "2": 1,
+    "5": 3,
+    "6": 3,
+    "7": 3,
+    "10": 2,
+    "11": 2,
+    "12": 2
+  },
+  "contentSha256": "0bd11cfe52421ebd9ab051e2c9d0d71959d7cee80b02614e3aa0f7d30ef5cd31"
+}

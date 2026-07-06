@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:while-loop",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "while-loop",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/drain-workflow.ts": "6d4e2b420a305e7a003ae11c286682c314d3c8b1b3f319c521f93f79d88ec628"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "while-loop",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 199
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 337
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:drainWorkflow",
+      "name": "drainWorkflow",
+      "source": {
+        "path": "src/workflows/drain-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 552
+        },
+        "end": {
+          "line": 26,
+          "column": 2,
+          "offset": 844
+        },
+        "symbolName": "drainWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "drainWorkflow:arg:0:input",
+            "display": "DrainInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/drain-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 15,
+                "column": 37,
+                "offset": 588
+              },
+              "end": {
+                "line": 15,
+                "column": 54,
+                "offset": 605
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "drainWorkflow:result",
+          "display": "Promise<DrainResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "loop",
+            "id": "flow:drainWorkflow:2",
+            "loopKind": "while",
+            "source": {
+              "path": "src/workflows/drain-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 19,
+                "column": 3,
+                "offset": 684
+              },
+              "end": {
+                "line": 23,
+                "column": 4,
+                "offset": 795
+              }
+            },
+            "body": [
+              {
+                "type": "command",
+                "id": "flow:drainWorkflow:1",
+                "commandId": "activity-call:drainWorkflow:drainOne:0",
+                "source": {
+                  "path": "src/workflows/drain-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 20,
+                    "column": 11,
+                    "offset": 718
+                  },
+                  "end": {
+                    "line": 20,
+                    "column": 45,
+                    "offset": 752
+                  },
+                  "symbolName": "drainOne"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:drainWorkflow:drainOne:0",
+          "kind": "activity",
+          "name": "drainOne",
+          "source": {
+            "path": "src/workflows/drain-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 20,
+              "column": 11,
+              "offset": 718
+            },
+            "end": {
+              "line": 20,
+              "column": 45,
+              "offset": 752
+            },
+            "symbolName": "drainOne"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "DrainInput",
+          "module": "src/activities/drain-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "DrainResult",
+          "module": "src/activities/drain-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:drainOne",
+      "name": "drainOne",
+      "source": {
+        "path": "src/workflows/drain-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 20,
+          "column": 11,
+          "offset": 718
+        },
+        "end": {
+          "line": 20,
+          "column": 45,
+          "offset": 752
+        },
+        "symbolName": "drainOne"
+      },
+      "implementationSource": {
+        "path": "src/activities/drain-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 15,
+          "column": 1,
+          "offset": 191
+        },
+        "end": {
+          "line": 17,
+          "column": 2,
+          "offset": 339
+        },
+        "symbolName": "drainOne"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

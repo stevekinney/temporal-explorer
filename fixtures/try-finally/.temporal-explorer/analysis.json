@@ -1,0 +1,328 @@
+{
+  "schemaVersion": "temporal-analysis/v1",
+  "artifactId": "analysis:try-finally",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-analysis/v1",
+    "inputs": {
+      "projectRoot": "try-finally",
+      "configHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "tsconfigHash": "6f644f078c41c372eda877ce845914dc22bbc47454473f3ed381b698708e3194",
+      "sourceFileHashes": {
+        "src/workflows/charge-workflow.ts": "426a31a8f1a759107a70f6e40fb9bec25c52ef70ec0346cd97b02a598f3bbe8a"
+      },
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.13.2"
+      }
+    }
+  },
+  "project": {
+    "root": "try-finally",
+    "tsconfig": "tsconfig.json"
+  },
+  "sdk": {
+    "temporalTypeScriptVersion": "^1.13.2",
+    "detectedPackages": ["@temporalio/workflow"]
+  },
+  "workers": [
+    {
+      "id": "worker:0",
+      "source": {
+        "path": "src/worker.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 6,
+          "column": 10,
+          "offset": 201
+        },
+        "end": {
+          "line": 10,
+          "column": 5,
+          "offset": 340
+        },
+        "symbolName": "Worker.create"
+      },
+      "confidence": "inferred"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "workflow:chargeWorkflow",
+      "name": "chargeWorkflow",
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 16,
+          "column": 1,
+          "offset": 661
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 944
+        },
+        "symbolName": "chargeWorkflow"
+      },
+      "exported": true,
+      "signature": {
+        "args": [
+          {
+            "id": "chargeWorkflow:arg:0:input",
+            "display": "ChargeInput",
+            "displayName": "input",
+            "kind": "external",
+            "source": {
+              "path": "src/workflows/charge-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 16,
+                "column": 38,
+                "offset": 698
+              },
+              "end": {
+                "line": 16,
+                "column": 56,
+                "offset": 716
+              },
+              "symbolName": "input"
+            },
+            "confidence": "exact"
+          }
+        ],
+        "result": {
+          "id": "chargeWorkflow:result",
+          "display": "Promise<TryFinallyResult>",
+          "kind": "external",
+          "confidence": "exact"
+        }
+      },
+      "messageSurface": {
+        "signals": [],
+        "queries": [],
+        "updates": []
+      },
+      "state": {
+        "variables": []
+      },
+      "body": {
+        "nodes": [
+          {
+            "type": "try",
+            "id": "flow:chargeWorkflow:1",
+            "source": {
+              "path": "src/workflows/charge-workflow.ts",
+              "pathKind": "project-relative",
+              "start": {
+                "line": 17,
+                "column": 3,
+                "offset": 749
+              },
+              "end": {
+                "line": 23,
+                "column": 4,
+                "offset": 942
+              }
+            },
+            "body": [
+              {
+                "type": "command",
+                "id": "flow:chargeWorkflow:2",
+                "commandId": "activity-call:chargeWorkflow:chargeAccount:0",
+                "source": {
+                  "path": "src/workflows/charge-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 18,
+                    "column": 27,
+                    "offset": 781
+                  },
+                  "end": {
+                    "line": 18,
+                    "column": 57,
+                    "offset": 811
+                  },
+                  "symbolName": "chargeAccount"
+                }
+              },
+              {
+                "type": "terminal",
+                "id": "flow:chargeWorkflow:3",
+                "terminalKind": "return",
+                "source": {
+                  "path": "src/workflows/charge-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 20,
+                    "column": 5,
+                    "offset": 818
+                  },
+                  "end": {
+                    "line": 20,
+                    "column": 71,
+                    "offset": 884
+                  }
+                }
+              }
+            ],
+            "finalizer": [
+              {
+                "type": "command",
+                "id": "flow:chargeWorkflow:4",
+                "commandId": "activity-call:chargeWorkflow:releaseLock:1",
+                "source": {
+                  "path": "src/workflows/charge-workflow.ts",
+                  "pathKind": "project-relative",
+                  "start": {
+                    "line": 22,
+                    "column": 11,
+                    "offset": 909
+                  },
+                  "end": {
+                    "line": 22,
+                    "column": 39,
+                    "offset": 937
+                  },
+                  "symbolName": "releaseLock"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "temporalCommands": [
+        {
+          "id": "activity-call:chargeWorkflow:chargeAccount:0",
+          "kind": "activity",
+          "name": "chargeAccount",
+          "source": {
+            "path": "src/workflows/charge-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 18,
+              "column": 27,
+              "offset": 781
+            },
+            "end": {
+              "line": 18,
+              "column": 57,
+              "offset": 811
+            },
+            "symbolName": "chargeAccount"
+          },
+          "confidence": "exact",
+          "staticOrder": 0
+        },
+        {
+          "id": "activity-call:chargeWorkflow:releaseLock:1",
+          "kind": "activity",
+          "name": "releaseLock",
+          "source": {
+            "path": "src/workflows/charge-workflow.ts",
+            "pathKind": "project-relative",
+            "start": {
+              "line": 22,
+              "column": 11,
+              "offset": 909
+            },
+            "end": {
+              "line": 22,
+              "column": 39,
+              "offset": 937
+            },
+            "symbolName": "releaseLock"
+          },
+          "confidence": "exact",
+          "staticOrder": 1
+        }
+      ],
+      "dependencies": [
+        {
+          "kind": "type-import",
+          "name": "ChargeInput",
+          "module": "src/activities/charge-activities"
+        },
+        {
+          "kind": "type-import",
+          "name": "TryFinallyResult",
+          "module": "src/activities/charge-activities"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity:chargeAccount",
+      "name": "chargeAccount",
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 27,
+          "offset": 781
+        },
+        "end": {
+          "line": 18,
+          "column": 57,
+          "offset": 811
+        },
+        "symbolName": "chargeAccount"
+      },
+      "implementationSource": {
+        "path": "src/activities/charge-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 18,
+          "column": 1,
+          "offset": 238
+        },
+        "end": {
+          "line": 20,
+          "column": 2,
+          "offset": 366
+        },
+        "symbolName": "chargeAccount"
+      },
+      "confidence": "exact"
+    },
+    {
+      "id": "activity:releaseLock",
+      "name": "releaseLock",
+      "source": {
+        "path": "src/workflows/charge-workflow.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 11,
+          "offset": 909
+        },
+        "end": {
+          "line": 22,
+          "column": 39,
+          "offset": 937
+        },
+        "symbolName": "releaseLock"
+      },
+      "implementationSource": {
+        "path": "src/activities/charge-activities.ts",
+        "pathKind": "project-relative",
+        "start": {
+          "line": 22,
+          "column": 1,
+          "offset": 368
+        },
+        "end": {
+          "line": 24,
+          "column": 2,
+          "offset": 489
+        },
+        "symbolName": "releaseLock"
+      },
+      "confidence": "exact"
+    }
+  ],
+  "clients": [],
+  "diagnostics": []
+}

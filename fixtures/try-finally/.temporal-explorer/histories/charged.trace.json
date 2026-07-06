@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "temporal-trace/v1",
+  "artifactId": "trace:charged:charged-run-id",
+  "metadata": {
+    "temporalExplorerVersion": "0.0.1-mvp",
+    "schemaVersion": "temporal-trace/v1",
+    "inputs": {
+      "projectRoot": "try-finally",
+      "configHash": "16804f113d40e63f734a52712700e2e4d477e32bca70c05faf4173d0844a3c65",
+      "sourceFileHashes": {},
+      "temporalSdkVersions": {
+        "@temporalio/workflow": "^1.18.1"
+      }
+    }
+  },
+  "execution": {
+    "workflowType": "chargeWorkflow",
+    "workflowId": "try-finally-charged",
+    "runId": "charged-run-id",
+    "status": "completed",
+    "startedAt": "2026-01-01T00:00:00.001Z",
+    "closedAt": "2026-01-01T00:00:00.017Z",
+    "durationMs": 16
+  },
+  "source": {
+    "taskQueue": "try-finally-task-queue",
+    "eventCount": 17,
+    "importedFrom": "file"
+  },
+  "operations": [
+    {
+      "id": "workflow:start",
+      "kind": "workflow-lifecycle",
+      "status": "started",
+      "eventReferences": [
+        {
+          "eventId": 1,
+          "eventType": "WorkflowExecutionStarted"
+        }
+      ],
+      "payloadReferences": ["payload:event-1:input:0"]
+    },
+    {
+      "id": "workflow:completed",
+      "kind": "workflow-lifecycle",
+      "status": "completed",
+      "eventReferences": [
+        {
+          "eventId": 17,
+          "eventType": "WorkflowExecutionCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-17:result:0"]
+    },
+    {
+      "id": "activity:chargeAccount:5",
+      "kind": "activity",
+      "activityType": "chargeAccount",
+      "activityId": "1",
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "scheduledEventId": 5,
+          "startedEventId": 6,
+          "closedEventId": 7,
+          "status": "completed"
+        }
+      ],
+      "firstScheduledAt": "2026-01-01T00:00:00.005Z",
+      "closedAt": "2026-01-01T00:00:00.007Z",
+      "durationMs": 2,
+      "eventReferences": [
+        {
+          "eventId": 5,
+          "eventType": "ActivityTaskScheduled"
+        },
+        {
+          "eventId": 6,
+          "eventType": "ActivityTaskStarted"
+        },
+        {
+          "eventId": 7,
+          "eventType": "ActivityTaskCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-5:input:0", "payload:event-7:result:0"]
+    },
+    {
+      "id": "activity:releaseLock:11",
+      "kind": "activity",
+      "activityType": "releaseLock",
+      "activityId": "2",
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt": 1,
+          "scheduledEventId": 11,
+          "startedEventId": 12,
+          "closedEventId": 13,
+          "status": "completed"
+        }
+      ],
+      "firstScheduledAt": "2026-01-01T00:00:00.011Z",
+      "closedAt": "2026-01-01T00:00:00.013Z",
+      "durationMs": 2,
+      "eventReferences": [
+        {
+          "eventId": 11,
+          "eventType": "ActivityTaskScheduled"
+        },
+        {
+          "eventId": 12,
+          "eventType": "ActivityTaskStarted"
+        },
+        {
+          "eventId": 13,
+          "eventType": "ActivityTaskCompleted"
+        }
+      ],
+      "payloadReferences": ["payload:event-11:input:0", "payload:event-13:result:0"]
+    }
+  ],
+  "timeline": [
+    {
+      "id": "timeline:1",
+      "operationId": "workflow:start",
+      "at": "2026-01-01T00:00:00.001Z",
+      "label": "Workflow started",
+      "eventIds": [1]
+    },
+    {
+      "id": "timeline:5",
+      "operationId": "activity:chargeAccount:5",
+      "at": "2026-01-01T00:00:00.005Z",
+      "label": "chargeAccount scheduled",
+      "eventIds": [5]
+    },
+    {
+      "id": "timeline:7",
+      "operationId": "activity:chargeAccount:5",
+      "at": "2026-01-01T00:00:00.007Z",
+      "label": "chargeAccount completed",
+      "eventIds": [7]
+    },
+    {
+      "id": "timeline:11",
+      "operationId": "activity:releaseLock:11",
+      "at": "2026-01-01T00:00:00.011Z",
+      "label": "releaseLock scheduled",
+      "eventIds": [11]
+    },
+    {
+      "id": "timeline:13",
+      "operationId": "activity:releaseLock:11",
+      "at": "2026-01-01T00:00:00.013Z",
+      "label": "releaseLock completed",
+      "eventIds": [13]
+    },
+    {
+      "id": "timeline:closed:17",
+      "operationId": "workflow:completed",
+      "at": "2026-01-01T00:00:00.017Z",
+      "label": "Workflow closed",
+      "eventIds": [17]
+    }
+  ],
+  "payloads": [
+    {
+      "id": "payload:event-1:input:0",
+      "eventId": 1,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-17:result:0",
+      "eventId": 17,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-5:input:0",
+      "eventId": 5,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-7:result:0",
+      "eventId": 7,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-11:input:0",
+      "eventId": 11,
+      "kind": "input",
+      "decoded": false,
+      "redacted": true
+    },
+    {
+      "id": "payload:event-13:result:0",
+      "eventId": 13,
+      "kind": "result",
+      "decoded": false,
+      "redacted": true
+    }
+  ],
+  "diagnostics": []
+}
