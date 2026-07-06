@@ -57,18 +57,28 @@ async function graphClip(
       right = Math.max(right, rect.right);
       bottom = Math.max(bottom, rect.bottom);
     }
-    return { left, top, right, bottom };
+    // getBoundingClientRect is viewport-relative; page.screenshot({ clip }) is page-relative,
+    // so add scroll offsets. Expose the page size to clamp the padded box within bounds.
+    return {
+      left: left + window.scrollX,
+      top: top + window.scrollY,
+      right: right + window.scrollX,
+      bottom: bottom + window.scrollY,
+      pageWidth: document.documentElement.scrollWidth,
+      pageHeight: document.documentElement.scrollHeight,
+    };
   });
 
   if (!bounds) return null;
 
+  // Clamp every edge independently so width/height always match the padded box actually
+  // captured — never a fixed padded span bolted onto a clamped origin.
   const padding = 28;
-  return {
-    x: Math.max(0, bounds.left - padding),
-    y: Math.max(0, bounds.top - padding),
-    width: bounds.right - bounds.left + padding * 2,
-    height: bounds.bottom - bounds.top + padding * 2,
-  };
+  const x = Math.max(0, bounds.left - padding);
+  const y = Math.max(0, bounds.top - padding);
+  const right = Math.min(bounds.pageWidth, bounds.right + padding);
+  const bottom = Math.min(bounds.pageHeight, bounds.bottom + padding);
+  return { x, y, width: right - x, height: bottom - y };
 }
 const requestedFixtures = fixtureFilter
   ? fixtureFilter.split(',').map((name) => name.trim())
