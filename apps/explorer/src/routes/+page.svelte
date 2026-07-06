@@ -32,7 +32,16 @@
   let errorMessage = $state('');
 
   const displayArtifacts = $derived(artifacts ?? data.artifacts);
-  const selectedWorkflowName = $derived(displayArtifacts?.analysis.workflows[0]?.name);
+  const ignoredUploadSegments = new Set([
+    '.git',
+    '.svelte-kit',
+    '.temporal-explorer',
+    '.turbo',
+    'build',
+    'coverage',
+    'dist',
+    'node_modules',
+  ]);
 
   function createWorker(): Worker {
     return new Worker(new URL('$lib/analysis.worker.ts', import.meta.url), {
@@ -61,21 +70,36 @@
     });
   }
 
-  function shouldReadFile(file: File): boolean {
-    return /\.(ts|tsx|json)$/u.test(file.name);
-  }
-
   function getRelativePath(file: File): string {
     return file.webkitRelativePath || file.name;
   }
 
+  function shouldReadFile(file: File): boolean {
+    return (
+      /\.(ts|tsx|json)$/u.test(file.name) &&
+      !getRelativePath(file)
+        .split('/')
+        .some((segment) => ignoredUploadSegments.has(segment))
+    );
+  }
+
+  function getProjectRelativePath(file: File, selectedProjectName: string): string {
+    const relativePath = getRelativePath(file);
+    const projectPrefix = `${selectedProjectName}/`;
+
+    return relativePath.startsWith(projectPrefix)
+      ? relativePath.slice(projectPrefix.length)
+      : relativePath;
+  }
+
   async function readFileEntries(files: FileList): Promise<{ path: string; contents: string }[]> {
     const entries: { path: string; contents: string }[] = [];
+    const selectedProjectName = getProjectName(files);
 
     for (const file of files) {
       if (shouldReadFile(file)) {
         entries.push({
-          path: `/project/${getRelativePath(file)}`,
+          path: `/project/${getProjectRelativePath(file, selectedProjectName)}`,
           contents: await file.text(),
         });
       }
@@ -128,7 +152,6 @@
         type: 'analyzeWithHistory',
         files: fileEntries,
         history: JSON.parse(await file.text()) as unknown,
-        workflowName: selectedWorkflowName,
         projectName,
       });
       status = 'ready';
@@ -169,6 +192,11 @@
       </label>
       {#if displayArtifacts.traces.length > 0}
         <button type="button" onclick={clearHistory}>Remove history</button>
+      {/if}
+      {#if status === 'loading'}
+        <p class="status">Loading history...</p>
+      {:else if status === 'error'}
+        <EmptyState title="History import failed" description={errorMessage} headingLevel={2} />
       {/if}
     </section>
   {/if}

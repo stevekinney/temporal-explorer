@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { relative } from 'node:path';
 
 import {
   analyzeProject,
@@ -98,6 +99,20 @@ describe('public API scaffold', () => {
     expect(optionsResult.value.workflows[0]?.name).toBe('basicOrderWorkflow');
   });
 
+  it('keeps relative project roots normalized before emitting project paths', async () => {
+    const result = await analyzeProject({
+      root: relative(process.cwd(), fixtureRoot),
+      workflowFiles: ['src/workflows/basic-order-workflow.ts'],
+    });
+
+    expect(Object.keys(result.value.metadata.inputs.sourceFileHashes)).toEqual([
+      'src/workflows/basic-order-workflow.ts',
+    ]);
+    expect(result.value.workflows[0]?.temporalCommands[0]?.source.path).toBe(
+      'src/workflows/basic-order-workflow.ts',
+    );
+  });
+
   it('analyzes explicit workflow files through the public API', async () => {
     const explicitFilesResult = await analyzeWorkflowFiles({
       projectRoot: fixtureRoot,
@@ -137,6 +152,36 @@ describe('public API scaffold', () => {
     expect(result.value.traces).toHaveLength(1);
     expect(result.value.overlays).toHaveLength(1);
     expect(result.value.overlays[0]?.coverage.nodes.unmappedRuntimeOperations).toBe(0);
+  });
+
+  it('reports history diagnostics from browser Explorer bundles', async () => {
+    const result = await createExplorerBundle({
+      root: '/project/basic-order',
+      projectName: 'basic-order',
+      files: await readFixtureFileEntries('basic-order'),
+      history: {
+        events: [
+          {
+            eventId: 1,
+            eventTime: '2026-01-01T00:00:00.001Z',
+            eventType: 1,
+            workflowExecutionStartedEventAttributes: {
+              workflowType: { name: 'basicOrderWorkflow' },
+              originalExecutionRunId: 'basic-order-run-id',
+            },
+          },
+          {
+            eventId: 2,
+            eventTime: '2026-01-01T00:00:00.002Z',
+            eventType: 999,
+          },
+        ],
+      },
+    });
+
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+      'TEH_UNKNOWN_EVENT_TYPE',
+    );
   });
 
   it('imports the basic order history through the public API', async () => {

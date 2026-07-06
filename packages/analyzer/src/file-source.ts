@@ -1,4 +1,4 @@
-import { Project, type CompilerOptions } from 'ts-morph';
+import { Project, ts, type CompilerOptions } from 'ts-morph';
 
 import { joinProjectPath, normalizeProjectPath, resolveProjectPath, toProjectPath } from './paths';
 
@@ -58,7 +58,7 @@ function matchesGlob(relativePath: string, glob: string): boolean {
   return matchSegments(glob.split('/'), relativePath.split('/'));
 }
 
-function parseCompilerOptions(tsconfigText: string | undefined): CompilerOptions {
+function parseCompilerOptions(tsconfigText: string | undefined, root: string): CompilerOptions {
   const defaults: CompilerOptions = {
     target: 99,
     module: 99,
@@ -73,18 +73,24 @@ function parseCompilerOptions(tsconfigText: string | undefined): CompilerOptions
   }
 
   try {
-    const parsed: unknown = JSON.parse(tsconfigText);
-    const compilerOptions =
-      parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-        ? (parsed as { compilerOptions?: unknown }).compilerOptions
-        : undefined;
+    const parsed = ts.parseConfigFileTextToJson(
+      resolveProjectPath(root, 'tsconfig.json'),
+      tsconfigText,
+    );
 
-    return {
-      ...defaults,
-      ...(compilerOptions && typeof compilerOptions === 'object' && !Array.isArray(compilerOptions)
-        ? (compilerOptions as CompilerOptions)
-        : {}),
-    };
+    if (parsed.error || !parsed.config || typeof parsed.config !== 'object') {
+      return defaults;
+    }
+
+    const compilerOptions =
+      'compilerOptions' in parsed.config &&
+      parsed.config.compilerOptions &&
+      typeof parsed.config.compilerOptions === 'object'
+        ? parsed.config.compilerOptions
+        : {};
+    const converted = ts.convertCompilerOptionsFromJson(compilerOptions, root);
+
+    return { ...defaults, ...converted.options };
   } catch {
     return defaults;
   }
@@ -138,7 +144,7 @@ export class BunFileSource implements FileSource {
     const project = new Project(
       tsconfigPath
         ? { tsConfigFilePath: tsconfigPath }
-        : { compilerOptions: parseCompilerOptions(undefined) },
+        : { compilerOptions: parseCompilerOptions(undefined, this.root) },
     );
 
     for (const file of files) {
@@ -200,7 +206,7 @@ export class InMemoryFileSource implements FileSource {
       tsconfigPath && (await this.exists(tsconfigPath)) ? await this.read(tsconfigPath) : undefined;
     const project = new Project({
       useInMemoryFileSystem: true,
-      compilerOptions: parseCompilerOptions(tsconfigText),
+      compilerOptions: parseCompilerOptions(tsconfigText, this.root),
     });
 
     for (const [path, contents] of this.files) {

@@ -119,10 +119,41 @@ function resolveProjectPaths(
   };
 }
 
+function resolveProjectRoot(root: string, fileSource: FileSource | undefined): string {
+  const normalizedRoot = normalizeProjectPath(root);
+
+  if (normalizedRoot.startsWith('/') || fileSource) {
+    return normalizedRoot;
+  }
+
+  return collapseDotSegments(resolveProjectPath(process.cwd(), normalizedRoot));
+}
+
+function collapseDotSegments(path: string): string {
+  const normalizedPath = normalizeProjectPath(path);
+  const absolute = normalizedPath.startsWith('/');
+  const segments: string[] = [];
+
+  for (const segment of normalizedPath.split('/')) {
+    if (!segment || segment === '.') {
+      continue;
+    }
+
+    if (segment === '..') {
+      segments.pop();
+      continue;
+    }
+
+    segments.push(segment);
+  }
+
+  return normalizeProjectPath(`${absolute ? '/' : ''}${segments.join('/')}`);
+}
+
 export async function loadTemporalExplorerProject(
   options: LoadTemporalExplorerProjectOptions = {},
 ): Promise<TemporalExplorerProject> {
-  const root = normalizeProjectPath(options.root ?? process.cwd());
+  const root = resolveProjectRoot(options.root ?? process.cwd(), options.fileSource);
   const fileSource = options.fileSource ?? new BunFileSource(root);
   const configuration = options.fileSource
     ? undefined
@@ -275,7 +306,7 @@ function noWorkflowsDiagnostic(workflows: WorkflowDefinition[], workers: unknown
 export async function analyzeWorkflowFiles(
   options: AnalyzeWorkflowFilesOptions,
 ): Promise<TemporalAnalysisDocument> {
-  const root = normalizeProjectPath(options.projectRoot);
+  const root = resolveProjectRoot(options.projectRoot, options.fileSource);
   const source = options.fileSource ?? new BunFileSource(root);
   const workflowFiles = options.workflowFiles.map((file) => resolveProjectPath(root, file));
   const tsconfig = options.tsconfig ? resolveProjectPath(root, options.tsconfig) : undefined;

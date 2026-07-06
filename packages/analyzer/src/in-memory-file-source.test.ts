@@ -45,6 +45,36 @@ describe('in-memory file source', () => {
     ).toBeDefined();
   });
 
+  it('parses uploaded JSONC tsconfig compiler options', async () => {
+    const fileSource = new InMemoryFileSource(
+      [
+        [
+          '/project/src/workflows.ts',
+          "import { helper } from '@shared/helper';\nimport { sleep } from '@temporalio/workflow';\nexport async function memoryWorkflow(): Promise<void> { helper(); await sleep('1 second'); }\n",
+        ],
+        ['/project/src/shared/helper.ts', 'export function helper(): void {}\n'],
+        [
+          '/project/tsconfig.json',
+          '{\n  // Browser uploads preserve normal tsconfig JSONC.\n  "compilerOptions": {\n    "baseUrl": "src",\n    "paths": { "@shared/*": ["shared/*"] },\n  },\n}\n',
+        ],
+      ],
+      '/project',
+    );
+    const project = await fileSource.createProject('/project/tsconfig.json', [
+      '/project/src/workflows.ts',
+    ]);
+    const workflowFile = project.getSourceFileOrThrow('/project/src/workflows.ts');
+
+    expect(
+      String(
+        workflowFile
+          .getImportDeclaration('@shared/helper')
+          ?.getModuleSpecifierSourceFile()
+          ?.getFilePath(),
+      ),
+    ).toBe('/project/src/shared/helper.ts');
+  });
+
   it('has committed analysis artifacts for every expected parity fixture', () => {
     expect(analysisFixtureNames).toHaveLength(29);
   });

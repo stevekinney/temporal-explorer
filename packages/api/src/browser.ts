@@ -8,6 +8,7 @@ import { parseEventHistory } from '@temporal-explorer/history/browser';
 import { createExecutionOverlay } from '@temporal-explorer/mapper';
 import {
   explorerBundleSchema,
+  type Diagnostic,
   type ExplorerArtifacts,
   type RuntimeTraceDocument,
 } from '@temporal-explorer/schemas';
@@ -67,6 +68,12 @@ export async function createExplorerBundle(
     ];
   }
 
+  const diagnostics: Diagnostic[] = [
+    ...analysis.diagnostics,
+    ...traces.flatMap((trace) => trace.diagnostics),
+    ...overlays.flatMap((overlay) => overlay.diagnostics),
+  ];
+
   const bundle = explorerBundleSchema.parse({
     projectName: options.projectName ?? 'Uploaded Project',
     artifactDirectory: 'in-browser',
@@ -76,8 +83,8 @@ export async function createExplorerBundle(
   });
 
   return createTemporalExplorerResult(bundle, {
-    diagnostics: analysis.diagnostics,
-    warnings: analysis.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning'),
+    diagnostics,
+    warnings: diagnostics.filter((diagnostic) => diagnostic.severity === 'warning'),
     metadata: analysis.metadata,
   });
 }

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@lostgradient/cinder": "^0.4.1",
+    "@temporal-explorer/api": "workspace:*",
     "@temporal-explorer/schemas": "workspace:*",
     "@xyflow/svelte": "^1.6.1",
     "elkjs": "^0.11.1",
