@@ -530,12 +530,20 @@
     gap: 0.4rem;
     flex: 0 0 auto;
     min-height: 2rem;
+    /* The pill radius eats the edges, so leave room for the leading dot and the
+       trailing count badge instead of jamming them against the rounded ends. */
+    padding: 0 0.4rem 0 0.75rem;
     border: 1px solid #c7d2da;
     border-radius: 999px;
     background: #f7f9fb;
     color: #34434f;
     font-size: 0.8125rem;
     cursor: pointer;
+  }
+
+  /* The "All" chip carries no state dot, so it needs the same left inset as the label. */
+  .state-filters button:not([data-state]) {
+    padding-left: 0.85rem;
   }
 
   .state-filters button[data-active='true'] {
@@ -580,11 +588,12 @@
   .state-filters span {
     display: inline-grid;
     place-items: center;
-    min-width: 1.35rem;
-    height: 1.35rem;
-    padding: 0 0.25rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.3rem;
     border-radius: 999px;
-    background: #ffffff;
+    /* A hair darker than the chip so the count reads as its own badge, not floating text. */
+    background: #e7edf2;
     color: #172026;
     font-size: 0.75rem;
   }

@@ -208,6 +208,8 @@
      fills the top padding ELK reserves (54px), reading as a deliberate frame
      rather than a dashed placeholder, while the pale body recedes behind its
      child nodes. */
+  /* Region bodies are nearly opaque: a nested region (e.g. an IF inside a TRY) must
+     read as its own tint rather than muddying into the parent's color underneath. */
   .region-container {
     position: relative;
     overflow: hidden;
@@ -215,22 +217,22 @@
     height: 100%;
     border: 1px solid #6a8fae;
     border-radius: 0.75rem;
-    background: rgba(241, 245, 249, 0.55);
+    background: rgba(240, 244, 248, 0.92);
   }
 
   .region-container[data-kind='loop-region'] {
     border-color: #b78a3a;
-    background: rgba(247, 238, 220, 0.45);
+    background: rgba(249, 242, 227, 0.92);
   }
 
   .region-container[data-kind='parallel-region'] {
     border-color: #4c8fb5;
-    background: rgba(220, 238, 247, 0.45);
+    background: rgba(225, 239, 248, 0.92);
   }
 
   .region-container[data-kind='try-region'] {
     border-color: #b56a6a;
-    background: rgba(247, 228, 228, 0.4);
+    background: rgba(250, 234, 234, 0.92);
   }
 
   .region-container[data-active='true'] {
@@ -296,8 +298,10 @@
     pointer-events: none;
   }
 
+  /* White fill (like the activity cards) so the diamond and its label stay legible
+     against a region container's tinted body instead of blending into it. */
   .marker-shape polygon {
-    fill: #f2f5f8;
+    fill: #ffffff;
     stroke: #5d6b75;
     stroke-width: 1.5;
   }
