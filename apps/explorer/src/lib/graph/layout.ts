@@ -1,4 +1,4 @@
-import type { ELK as ElkInstance, ElkNode } from 'elkjs/lib/elk-api.js';
+import type { ELK as ElkInstance, ElkLabel, ElkNode } from 'elkjs/lib/elk-api.js';
 import ELK from 'elkjs/lib/elk-api.js';
 import elkWorkerUrl from 'elkjs/lib/elk-worker.min.js?url';
 
@@ -7,6 +7,17 @@ import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 export type LayoutPosition = { x: number; y: number; width: number; height: number };
 export type LayoutPositions = Record<string, LayoutPosition>;
 export type LayoutStatus = 'idle' | 'running' | 'ready' | 'failed';
+
+export type LayoutPoint = { x: number; y: number };
+/**
+ * ELK's computed orthogonal route for an edge: the polyline waypoints from
+ * source to target (in absolute flow coordinates) plus the center of its label.
+ * Rendering these instead of letting Svelte Flow re-route keeps edges inside the
+ * region containers ELK routed them around.
+ */
+export type EdgeRoute = { points: LayoutPoint[]; labelX?: number; labelY?: number };
+export type EdgeRoutes = Record<string, EdgeRoute>;
+export type GraphLayout = { positions: LayoutPositions; edgeRoutes: EdgeRoutes };
 
 let elk: ElkInstance | undefined;
 
@@ -39,7 +50,7 @@ function edgeLabelSize(label: string): { width: number; height: number } {
 export async function layoutGraph(
   nodes: TemporalGraphNode[],
   edges: TemporalGraphEdge[],
-): Promise<LayoutPositions> {
+): Promise<GraphLayout> {
   const childrenByParent = new Map<string | undefined, TemporalGraphNode[]>();
 
   for (const node of nodes) {
@@ -94,7 +105,35 @@ export async function layoutGraph(
     collect(child);
   }
 
-  return positions;
+  return { positions, edgeRoutes: extractEdgeRoutes(layout.edges) };
+}
+
+/**
+ * Reads ELK's routing sections into {@link EdgeRoute}s. Edges are declared on the
+ * root graph, so their sections come back in absolute flow coordinates — exactly
+ * what Svelte Flow's edge renderer expects — and each label's center is derived
+ * from its absolute top-left box.
+ */
+function extractEdgeRoutes(elkEdges: ElkNode['edges']): EdgeRoutes {
+  const edgeRoutes: EdgeRoutes = {};
+
+  for (const elkEdge of elkEdges ?? []) {
+    const section = elkEdge.sections?.[0];
+    if (!section) continue;
+
+    edgeRoutes[elkEdge.id] = {
+      points: [section.startPoint, ...(section.bendPoints ?? []), section.endPoint],
+      ...labelCenter(elkEdge.labels?.[0]),
+    };
+  }
+
+  return edgeRoutes;
+}
+
+/** Center point of an ELK edge label, derived from its absolute top-left box. */
+function labelCenter(label: ElkLabel | undefined): Pick<EdgeRoute, 'labelX' | 'labelY'> {
+  if (label?.x === undefined || label.y === undefined) return {};
+  return { labelX: label.x + (label.width ?? 0) / 2, labelY: label.y + (label.height ?? 0) / 2 };
 }
 
 export function terminateGraphLayoutWorker(): void {

@@ -75,7 +75,9 @@
 
   .timeline-item {
     display: grid;
-    grid-template-columns: 4.25rem minmax(0, 1fr);
+    /* The timestamp is a fixed-width `HH:MM:SS.mmm` string; the column must be wide
+       enough to hold all twelve monospace characters or it overruns the label. */
+    grid-template-columns: 5.5rem minmax(0, 1fr);
     gap: 0.15rem 0.75rem;
     width: 100%;
     padding: 0.6rem 0.65rem;
@@ -108,6 +110,10 @@
     color: #5d6b75;
     font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
     font-size: 0.75rem;
+  }
+
+  .timeline-item span {
+    white-space: nowrap;
   }
 
   .timeline-item small {

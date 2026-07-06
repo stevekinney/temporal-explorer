@@ -1,5 +1,6 @@
 <script lang="ts">
   import LoopBackEdge from '$lib/components/loop-back-edge.svelte';
+  import RoutedEdge from '$lib/components/routed-edge.svelte';
   import TemporalFlowNodeComponent, {
     type TemporalFlowNodeData,
   } from '$lib/components/temporal-flow-node.svelte';
@@ -9,6 +10,8 @@
   import {
     layoutGraph,
     terminateGraphLayoutWorker,
+    type EdgeRoutes,
+    type LayoutPoint,
     type LayoutPositions,
     type LayoutStatus,
   } from '$lib/graph/layout';
@@ -44,15 +47,18 @@
     state: RuntimeOverlayState;
     eventSummary: string;
     runtimeOperationIds: string[];
+    routePoints?: LayoutPoint[];
+    routeLabelX?: number;
+    routeLabelY?: number;
   };
-  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep' | 'loopback'>;
+  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep' | 'loopback' | 'routed'>;
   type Props = {
     graphProjection: GraphProjection | undefined;
     traceArtifactId: string | undefined;
   };
 
   const nodeTypes = { temporal: TemporalFlowNodeComponent };
-  const edgeTypes = { loopback: LoopBackEdge };
+  const edgeTypes = { loopback: LoopBackEdge, routed: RoutedEdge };
 
   let { graphProjection, traceArtifactId }: Props = $props();
   let selectedRuntimeOperationId = $state<string | undefined>();
@@ -61,6 +67,7 @@
   let statusFilter = $state<RuntimeOverlayState | 'all'>('all');
   let legendOpen = $state(false);
   let layoutPositions = $state.raw<LayoutPositions>({});
+  let layoutEdgeRoutes = $state.raw<EdgeRoutes>({});
   let layoutStatus = $state<LayoutStatus>('idle');
   let layoutError = $state<string | undefined>();
 
@@ -89,6 +96,17 @@
   );
   const visibleTimelineRows = $derived(
     graphProjection?.timelineRows.filter(shouldShowTimelineRow) ?? [],
+  );
+  // Runtime evidence is progressive enhancement: without a trace the flow view is a
+  // pure static-analysis projection, so the runtime-state filter chips and the timeline
+  // are suppressed entirely rather than shown as a row of zeroes.
+  const hasRuntime = $derived(Boolean(traceArtifactId));
+  // Only surface chips for states the execution actually produced, so a workflow that
+  // only completed activities shows two chips, not thirteen mostly-zero ones.
+  const visibleFilterStates = $derived(
+    hasRuntime
+      ? runtimeOverlayStates.filter((state) => (graphProjection?.statusCounts.get(state) ?? 0) > 0)
+      : [],
   );
   const flowNodes = $derived(graphProjection?.nodes.map<TemporalFlowNode>(createFlowNode) ?? []);
   const flowEdges = $derived(graphProjection?.edges.map<TemporalFlowEdge>(createFlowEdge) ?? []);
@@ -129,6 +147,7 @@
 
     if (!projection) {
       layoutPositions = {};
+      layoutEdgeRoutes = {};
       layoutStatus = 'idle';
       layoutError = undefined;
       return;
@@ -140,9 +159,10 @@
 
     void (async () => {
       try {
-        const positions = await layoutGraph(projection.nodes, projection.edges);
+        const { positions, edgeRoutes } = await layoutGraph(projection.nodes, projection.edges);
         if (cancelled) return;
         layoutPositions = positions;
+        layoutEdgeRoutes = edgeRoutes;
         layoutStatus = 'ready';
       } catch (error) {
         if (cancelled) return;
@@ -157,6 +177,15 @@
   });
 
   onDestroy(terminateGraphLayoutWorker);
+
+  // If the active filter is no longer among the visible states (trace cleared, or a
+  // different workflow selected in aggregate mode), fall back to "all" so nodes are
+  // never left muted by a filter the user can no longer see or clear.
+  $effect(() => {
+    if (statusFilter !== 'all' && !visibleFilterStates.includes(statusFilter)) {
+      statusFilter = 'all';
+    }
+  });
 
   function shouldShowTimelineRow(row: TimelineRow): boolean {
     return (
@@ -214,6 +243,28 @@
     };
   }
 
+  // Loop-back edges keep their hand-drawn downward arc. Every other edge follows ELK's
+  // computed orthogonal route (once layout resolves) so it stays inside the region
+  // containers ELK routed it around; before layout, it falls back to smoothstep.
+  function edgeRoutePresentation(edge: TemporalGraphEdge): {
+    type: TemporalFlowEdge['type'];
+    routeData: Partial<TemporalFlowEdgeData>;
+  } {
+    if (edge.variant === 'loop-back') return { type: 'loopback', routeData: {} };
+
+    const route = layoutEdgeRoutes[edge.id];
+    if (!route) return { type: 'smoothstep', routeData: {} };
+
+    return {
+      type: 'routed',
+      routeData: {
+        routePoints: route.points,
+        routeLabelX: route.labelX,
+        routeLabelY: route.labelY,
+      },
+    };
+  }
+
   function createFlowEdge(edge: TemporalGraphEdge): TemporalFlowEdge {
     const active =
       edge.id === selectedEdgeId ||
@@ -221,10 +272,11 @@
     const muted =
       statusFilter !== 'all' &&
       (edge.state !== statusFilter || !graphProjection?.nodesById.has(edge.target));
+    const { type, routeData } = edgeRoutePresentation(edge);
 
     return {
       id: edge.id,
-      type: edge.variant === 'loop-back' ? 'loopback' : 'smoothstep',
+      type,
       source: edge.source,
       target: edge.target,
       label: edge.label,
@@ -236,6 +288,7 @@
         state: edge.state,
         eventSummary: compactEventSummary(edge.eventReferences),
         runtimeOperationIds: edge.runtimeOperationIds,
+        ...routeData,
       },
       class: active ? 'selected-flow-edge' : undefined,
       domAttributes: {
@@ -313,29 +366,31 @@
         </div>
       </div>
 
-      <div class="state-filters" aria-label="Runtime state filters">
-        <button
-          type="button"
-          aria-pressed={statusFilter === 'all'}
-          data-active={statusFilter === 'all' ? 'true' : undefined}
-          onclick={() => (statusFilter = 'all')}
-        >
-          All
-          <span>{filterableNodeCount}</span>
-        </button>
-        {#each runtimeOverlayStates as state (state)}
+      {#if hasRuntime && visibleFilterStates.length > 0}
+        <div class="state-filters" aria-label="Runtime state filters">
           <button
             type="button"
-            aria-pressed={statusFilter === state}
-            data-active={statusFilter === state ? 'true' : undefined}
-            data-state={runtimeStateToken(state)}
-            onclick={() => (statusFilter = state)}
+            aria-pressed={statusFilter === 'all'}
+            data-active={statusFilter === 'all' ? 'true' : undefined}
+            onclick={() => (statusFilter = 'all')}
           >
-            {state}
-            <span>{graphProjection.statusCounts.get(state) ?? 0}</span>
+            All
+            <span>{filterableNodeCount}</span>
           </button>
-        {/each}
-      </div>
+          {#each visibleFilterStates as state (state)}
+            <button
+              type="button"
+              aria-pressed={statusFilter === state}
+              data-active={statusFilter === state ? 'true' : undefined}
+              data-state={runtimeStateToken(state)}
+              onclick={() => (statusFilter = state)}
+            >
+              {state}
+              <span>{graphProjection.statusCounts.get(state) ?? 0}</span>
+            </button>
+          {/each}
+        </div>
+      {/if}
 
       {#if layoutStatus === 'failed'}
         <div class="layout-warning" role="alert">Graph layout failed: {layoutError}</div>
@@ -390,11 +445,13 @@
     </div>
 
     <div class="flow-sidecar">
-      <WorkflowTimelinePanel
-        rows={visibleTimelineRows}
-        {selectedRuntimeOperationId}
-        {selectTimelineRow}
-      />
+      {#if hasRuntime}
+        <WorkflowTimelinePanel
+          rows={visibleTimelineRows}
+          {selectedRuntimeOperationId}
+          {selectTimelineRow}
+        />
+      {/if}
       <WorkflowEdgePanel edges={graphProjection.edges} {selectedEdgeId} {selectEdge} />
       <WorkflowSelectionInspector
         title={activeInspectorTitle}

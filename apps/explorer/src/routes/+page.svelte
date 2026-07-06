@@ -10,11 +10,9 @@
     statusBadgeVariant,
   } from '$lib/graph/runtime-display';
   import { Badge } from '$cinder-components/badge';
-  import { Button } from '$cinder-components/button';
   import { Card } from '$cinder-components/card';
   import { DescriptionList } from '$cinder-components/description-list';
   import { EmptyState } from '$cinder-components/empty-state';
-  import { Sheet } from '$cinder-components/sheet';
   import { SideNavigation } from '$cinder-components/side-navigation';
   import { SideNavigationItem } from '$cinder-components/side-navigation-item';
   import { Sidebar } from '$cinder-components/sidebar';
@@ -36,7 +34,6 @@
     GitBranch,
     History,
     MessageSquare,
-    PanelRightOpen,
     Route,
   } from 'lucide-svelte';
 
@@ -46,10 +43,13 @@
   type RuntimeOperation = PageProps['data']['traces'][number]['operations'][number];
   type ActivityOperation = Extract<RuntimeOperation, { kind: 'activity' }>;
 
+  const pageDescription =
+    'See what a Temporal TypeScript Workflow can do and what it actually did: static ' +
+    'control-flow graphs overlaid with real Event History runtime evidence.';
+
   let { data }: PageProps = $props();
   let selectedWorkflowOverride = $state<string | undefined>();
   let activeTab = $state('flow');
-  let inspectorOpen = $state(false);
 
   // Default to the workflow the requested trace actually ran, so a project with several
   // workflows (a parent plus its children) opens on the one being inspected rather than
@@ -133,6 +133,13 @@
     selectedWorkflow?.temporalCommands.filter((command) => command.kind === 'activity') ?? [],
   );
   const activityOperations = $derived(selectedTrace?.operations.filter(isActivityOperation) ?? []);
+  // A static-analysis fact worth surfacing in the baseline signal strip, alongside
+  // Activities and Diagnostics, so the strip stays meaningful before any trace loads.
+  const messageSurfaceCount = $derived(
+    (selectedWorkflow?.messageSurface.signals.length ?? 0) +
+      (selectedWorkflow?.messageSurface.queries.length ?? 0) +
+      (selectedWorkflow?.messageSurface.updates.length ?? 0),
+  );
   const diagnostics = $derived([
     ...(selectedWorkflow?.diagnostics ?? []),
     ...(selectedTrace?.diagnostics ?? []),
@@ -171,7 +178,24 @@
 
 <svelte:head>
   <title>Temporal Workflow Explorer</title>
-  <meta name="description" content="Local artifact-driven Temporal Workflow Explorer shell" />
+  <meta name="description" content={pageDescription} />
+  <meta property="og:title" content="Temporal Workflow Explorer" />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta
+    property="og:image:alt"
+    content="The Temporal Workflow Explorer showing a control-flow graph with runtime overlay"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Temporal Workflow Explorer" />
+  <meta name="twitter:description" content={pageDescription} />
+  {#if data.siteUrl}
+    <meta property="og:url" content={data.siteUrl} />
+    <meta property="og:image" content={`${data.siteUrl}/og.png`} />
+    <meta name="twitter:image" content={`${data.siteUrl}/og.png`} />
+  {/if}
 </svelte:head>
 
 <div class="explorer-shell">
@@ -216,10 +240,6 @@
           <h1 id="workflow-title">{selectedWorkflow.name}</h1>
           <p class="signature">{workflowSignature(selectedWorkflow)}</p>
         </div>
-        <Button variant="secondary" size="sm" onclick={() => (inspectorOpen = true)}>
-          <PanelRightOpen size={16} aria-hidden="true" />
-          Inspector
-        </Button>
       </section>
 
       <section class="signal-strip" aria-label="Artifact summary">
@@ -228,13 +248,19 @@
           <strong>{activityCommands.length}</strong>
         </div>
         <div>
-          <span>Observed</span>
-          <strong>{selectedOverlay?.coverage.activities.observed ?? 0}</strong>
+          <span>Messages</span>
+          <strong>{messageSurfaceCount}</strong>
         </div>
-        <div>
-          <span>Runtime status</span>
-          <strong>{selectedTrace?.execution.status ?? 'not imported'}</strong>
-        </div>
+        {#if selectedTrace}
+          <div>
+            <span>Observed</span>
+            <strong>{selectedOverlay?.coverage.activities.observed ?? 0}</strong>
+          </div>
+          <div>
+            <span>Runtime status</span>
+            <strong>{selectedTrace.execution.status}</strong>
+          </div>
+        {/if}
         <div>
           <span>Diagnostics</span>
           <strong>{diagnostics.length}</strong>
@@ -364,6 +390,22 @@
                       term: 'Duration',
                       definition: formatDuration(selectedTrace.execution.durationMs),
                     },
+                    ...(selectedOverlay
+                      ? [
+                          {
+                            term: 'Mapped operations',
+                            definition: `${selectedOverlay.mappings.length} mapped, ${selectedOverlay.coverage.nodes.unmappedRuntimeOperations} unmapped`,
+                          },
+                        ]
+                      : []),
+                    ...(workflowEventReferences.length > 0
+                      ? [
+                          {
+                            term: 'Workflow events',
+                            definition: formatEventReferences(workflowEventReferences),
+                          },
+                        ]
+                      : []),
                   ]}
                 />
               {:else}
@@ -490,35 +532,6 @@
           {/if}
         </TabPanel>
       </Tabs>
-
-      <Sheet bind:open={inspectorOpen} title="Source and type inspector">
-        <div class="inspector-stack">
-          <section>
-            <h2>Source</h2>
-            <p>{sourceText(selectedWorkflow.source)}</p>
-          </section>
-          <section>
-            <h2>Signature</h2>
-            <pre>{workflowSignature(selectedWorkflow)}</pre>
-          </section>
-          <section>
-            <h2>Runtime evidence</h2>
-            <p>
-              {selectedOverlay
-                ? `${selectedOverlay.mappings.length} mapped operations with ${selectedOverlay.coverage.nodes.unmappedRuntimeOperations} unmapped.`
-                : 'No overlay artifact is loaded.'}
-            </p>
-          </section>
-          <section>
-            <h2>Workflow raw events</h2>
-            <pre>
-              {workflowEventReferences.length > 0
-                ? formatEventReferences(workflowEventReferences)
-                : 'none'}
-            </pre>
-          </section>
-        </div>
-      </Sheet>
     {:else}
       <EmptyState
         title="No Workflows found"
@@ -604,7 +617,7 @@
   }
 
   .workflow-header {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     align-items: start;
     margin-bottom: 1rem;
   }
@@ -626,7 +639,8 @@
 
   .signal-strip {
     position: relative;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     align-items: stretch;
     padding: 0.875rem 1rem;
     margin-bottom: 1rem;
@@ -665,37 +679,12 @@
     background: #ffffff;
   }
 
-  code,
-  pre {
-    font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
   code {
     display: block;
     padding: 0.625rem 0;
-  }
-
-  .inspector-stack {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .inspector-stack section {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .inspector-stack h2 {
-    margin: 0 0 0.35rem;
-    font-size: 0.875rem;
-  }
-
-  .inspector-stack p,
-  .inspector-stack pre {
-    margin: 0;
-    color: #34434f;
+    font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 
   @media (max-width: 840px) {
@@ -709,9 +698,13 @@
     }
 
     .workflow-header,
-    .signal-strip,
     .panel-grid {
       grid-template-columns: 1fr;
+    }
+
+    .signal-strip {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
     }
   }
 </style>

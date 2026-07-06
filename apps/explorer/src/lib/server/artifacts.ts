@@ -113,7 +113,8 @@ export async function loadExplorerArtifacts(
   );
 
   return {
-    projectName: basename(projectRoot),
+    // The showcase build sets a friendly name; locally it is the project directory.
+    projectName: process.env['TEMPORAL_EXPLORER_PROJECT_NAME'] ?? basename(projectRoot),
     artifactDirectory: '.temporal-explorer',
     analysis: await readAnalysisArtifact(projectRoot),
     traces: await Promise.all(tracePaths.map(readTraceArtifact)),
