@@ -174,7 +174,7 @@ describe('nested control-flow projection per FlowNode type', () => {
     }
 
     expect(complete).toBeDefined();
-    expect(reachable.has(complete as string)).toBe(false);
+    expect(complete !== undefined && reachable.has(complete)).toBe(false);
   });
 
   it('projects a parallel region forking to and joining fixed branches', () => {

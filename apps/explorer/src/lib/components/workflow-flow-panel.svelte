@@ -1,5 +1,6 @@
 <script lang="ts">
   import LoopBackEdge from '$lib/components/loop-back-edge.svelte';
+  import RoutedEdge from '$lib/components/routed-edge.svelte';
   import TemporalFlowNodeComponent, {
     type TemporalFlowNodeData,
   } from '$lib/components/temporal-flow-node.svelte';
@@ -9,6 +10,8 @@
   import {
     layoutGraph,
     terminateGraphLayoutWorker,
+    type EdgeRoutes,
+    type LayoutPoint,
     type LayoutPositions,
     type LayoutStatus,
   } from '$lib/graph/layout';
@@ -44,15 +47,18 @@
     state: RuntimeOverlayState;
     eventSummary: string;
     runtimeOperationIds: string[];
+    routePoints?: LayoutPoint[];
+    routeLabelX?: number;
+    routeLabelY?: number;
   };
-  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep' | 'loopback'>;
+  type TemporalFlowEdge = Edge<TemporalFlowEdgeData, 'smoothstep' | 'loopback' | 'routed'>;
   type Props = {
     graphProjection: GraphProjection | undefined;
     traceArtifactId: string | undefined;
   };
 
   const nodeTypes = { temporal: TemporalFlowNodeComponent };
-  const edgeTypes = { loopback: LoopBackEdge };
+  const edgeTypes = { loopback: LoopBackEdge, routed: RoutedEdge };
 
   let { graphProjection, traceArtifactId }: Props = $props();
   let selectedRuntimeOperationId = $state<string | undefined>();
@@ -61,6 +67,7 @@
   let statusFilter = $state<RuntimeOverlayState | 'all'>('all');
   let legendOpen = $state(false);
   let layoutPositions = $state.raw<LayoutPositions>({});
+  let layoutEdgeRoutes = $state.raw<EdgeRoutes>({});
   let layoutStatus = $state<LayoutStatus>('idle');
   let layoutError = $state<string | undefined>();
 
@@ -140,6 +147,7 @@
 
     if (!projection) {
       layoutPositions = {};
+      layoutEdgeRoutes = {};
       layoutStatus = 'idle';
       layoutError = undefined;
       return;
@@ -151,9 +159,10 @@
 
     void (async () => {
       try {
-        const positions = await layoutGraph(projection.nodes, projection.edges);
+        const { positions, edgeRoutes } = await layoutGraph(projection.nodes, projection.edges);
         if (cancelled) return;
         layoutPositions = positions;
+        layoutEdgeRoutes = edgeRoutes;
         layoutStatus = 'ready';
       } catch (error) {
         if (cancelled) return;
@@ -234,6 +243,28 @@
     };
   }
 
+  // Loop-back edges keep their hand-drawn downward arc. Every other edge follows ELK's
+  // computed orthogonal route (once layout resolves) so it stays inside the region
+  // containers ELK routed it around; before layout, it falls back to smoothstep.
+  function edgeRoutePresentation(edge: TemporalGraphEdge): {
+    type: TemporalFlowEdge['type'];
+    routeData: Partial<TemporalFlowEdgeData>;
+  } {
+    if (edge.variant === 'loop-back') return { type: 'loopback', routeData: {} };
+
+    const route = layoutEdgeRoutes[edge.id];
+    if (!route) return { type: 'smoothstep', routeData: {} };
+
+    return {
+      type: 'routed',
+      routeData: {
+        routePoints: route.points,
+        routeLabelX: route.labelX,
+        routeLabelY: route.labelY,
+      },
+    };
+  }
+
   function createFlowEdge(edge: TemporalGraphEdge): TemporalFlowEdge {
     const active =
       edge.id === selectedEdgeId ||
@@ -241,10 +272,11 @@
     const muted =
       statusFilter !== 'all' &&
       (edge.state !== statusFilter || !graphProjection?.nodesById.has(edge.target));
+    const { type, routeData } = edgeRoutePresentation(edge);
 
     return {
       id: edge.id,
-      type: edge.variant === 'loop-back' ? 'loopback' : 'smoothstep',
+      type,
       source: edge.source,
       target: edge.target,
       label: edge.label,
@@ -256,6 +288,7 @@
         state: edge.state,
         eventSummary: compactEventSummary(edge.eventReferences),
         runtimeOperationIds: edge.runtimeOperationIds,
+        ...routeData,
       },
       class: active ? 'selected-flow-edge' : undefined,
       domAttributes: {
