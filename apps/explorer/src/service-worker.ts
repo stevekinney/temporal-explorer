@@ -40,9 +40,8 @@ worker.addEventListener('fetch', (event) => {
     (async () => {
       const url = new URL(event.request.url);
       const cache = await caches.open(cacheName);
-      const cachedAsset = assets.includes(url.pathname)
-        ? await cache.match(url.pathname)
-        : undefined;
+      const isStaticAsset = assets.includes(url.pathname);
+      const cachedAsset = isStaticAsset ? await cache.match(event.request) : undefined;
 
       if (cachedAsset) {
         return cachedAsset;
@@ -50,7 +49,7 @@ worker.addEventListener('fetch', (event) => {
 
       const response = await fetch(event.request);
 
-      if (response.ok) {
+      if (response.ok && isStaticAsset) {
         await cache.put(event.request, response.clone());
       }
 

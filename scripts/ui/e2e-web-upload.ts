@@ -1,4 +1,4 @@
-import { extname, join } from 'node:path';
+import { extname, join, normalize } from 'node:path';
 
 import { chromium, expect } from '@playwright/test';
 
@@ -25,7 +25,11 @@ function contentTypeFor(pathname: string): string {
 
 async function resolveStaticFile(pathname: string): Promise<string> {
   const decodedPath = decodeURIComponent(pathname);
-  const candidate = join(buildRoot, decodedPath === '/' ? 'index.html' : decodedPath);
+  const relativePath =
+    decodedPath === '/' ? 'index.html' : normalize(decodedPath.replace(/^\/+/, ''));
+  const candidate = relativePath.startsWith('..')
+    ? join(buildRoot, 'index.html')
+    : join(buildRoot, relativePath);
 
   if (await Bun.file(candidate).exists()) {
     return candidate;
