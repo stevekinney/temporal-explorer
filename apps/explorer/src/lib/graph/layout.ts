@@ -87,53 +87,102 @@ export async function layoutGraph(
   };
   const layout = await getElk().layout(graph);
   const positions: LayoutPositions = {};
+  // Absolute top-left of every node, needed to place edges: ELK returns node child
+  // coordinates relative to their parent, so absolute = parent absolute + local.
+  const absolute = new Map<string, LayoutPoint>();
 
-  const collect = (elkNode: ElkNode): void => {
-    positions[elkNode.id] = {
-      x: elkNode.x ?? 0,
-      y: elkNode.y ?? 0,
-      width: elkNode.width ?? 256,
-      height: elkNode.height ?? 132,
-    };
+  const collect = (elkNode: ElkNode, offsetX: number, offsetY: number): void => {
+    const x = elkNode.x ?? 0;
+    const y = elkNode.y ?? 0;
+    positions[elkNode.id] = { x, y, width: elkNode.width ?? 256, height: elkNode.height ?? 132 };
+    absolute.set(elkNode.id, { x: offsetX + x, y: offsetY + y });
 
     for (const child of elkNode.children ?? []) {
-      collect(child);
+      collect(child, offsetX + x, offsetY + y);
     }
   };
 
   for (const child of layout.children ?? []) {
-    collect(child);
+    collect(child, 0, 0);
   }
 
-  return { positions, edgeRoutes: extractEdgeRoutes(layout.edges) };
+  const parentOf = new Map(nodes.map((node) => [node.id, node.parentId]));
+  return { positions, edgeRoutes: extractEdgeRoutes(layout.edges, parentOf, absolute) };
 }
 
+type ParentMap = Map<string, string | undefined>;
+
 /**
- * Reads ELK's routing sections into {@link EdgeRoute}s. Edges are declared on the
- * root graph, so their sections come back in absolute flow coordinates — exactly
- * what Svelte Flow's edge renderer expects — and each label's center is derived
- * from its absolute top-left box.
+ * Reads ELK's routing sections into {@link EdgeRoute}s. ELK returns each edge's
+ * coordinates relative to the edge's container — the lowest common ancestor of its
+ * source and target — so a route inside a region container is offset by that
+ * container's absolute position to land in Svelte Flow's absolute coordinate space.
  */
-function extractEdgeRoutes(elkEdges: ElkNode['edges']): EdgeRoutes {
+function extractEdgeRoutes(
+  elkEdges: ElkNode['edges'],
+  parentOf: ParentMap,
+  absolute: Map<string, LayoutPoint>,
+): EdgeRoutes {
   const edgeRoutes: EdgeRoutes = {};
 
   for (const elkEdge of elkEdges ?? []) {
-    const section = elkEdge.sections?.[0];
-    if (!section) continue;
-
-    edgeRoutes[elkEdge.id] = {
-      points: [section.startPoint, ...(section.bendPoints ?? []), section.endPoint],
-      ...labelCenter(elkEdge.labels?.[0]),
-    };
+    const route = buildEdgeRoute(elkEdge, parentOf, absolute);
+    if (route) edgeRoutes[elkEdge.id] = route;
   }
 
   return edgeRoutes;
 }
 
-/** Center point of an ELK edge label, derived from its absolute top-left box. */
-function labelCenter(label: ElkLabel | undefined): Pick<EdgeRoute, 'labelX' | 'labelY'> {
+/** Builds one edge's route, shifting ELK's container-relative section into absolute space. */
+function buildEdgeRoute(
+  elkEdge: NonNullable<ElkNode['edges']>[number],
+  parentOf: ParentMap,
+  absolute: Map<string, LayoutPoint>,
+): EdgeRoute | undefined {
+  const section = elkEdge.sections?.[0];
+  if (!section) return undefined;
+
+  const container = edgeContainer(elkEdge.sources?.[0], elkEdge.targets?.[0], parentOf);
+  const origin = (container && absolute.get(container)) || { x: 0, y: 0 };
+  const shift = (point: LayoutPoint): LayoutPoint => ({
+    x: point.x + origin.x,
+    y: point.y + origin.y,
+  });
+
+  return {
+    points: [section.startPoint, ...(section.bendPoints ?? []), section.endPoint].map(shift),
+    ...labelCenter(elkEdge.labels?.[0], origin),
+  };
+}
+
+/** The lowest common ancestor container of an edge's endpoints, or undefined for the root. */
+function edgeContainer(
+  source: string | undefined,
+  target: string | undefined,
+  parentOf: ParentMap,
+): string | undefined {
+  if (!source || !target) return undefined;
+
+  const sourceAncestors = new Set<string>();
+  for (let node = parentOf.get(source); node; node = parentOf.get(node)) sourceAncestors.add(node);
+
+  for (let node = parentOf.get(target); node; node = parentOf.get(node)) {
+    if (sourceAncestors.has(node)) return node;
+  }
+
+  return undefined;
+}
+
+/** Center of an ELK edge label, shifted from its container-relative box into absolute space. */
+function labelCenter(
+  label: ElkLabel | undefined,
+  origin: LayoutPoint,
+): Pick<EdgeRoute, 'labelX' | 'labelY'> {
   if (label?.x === undefined || label.y === undefined) return {};
-  return { labelX: label.x + (label.width ?? 0) / 2, labelY: label.y + (label.height ?? 0) / 2 };
+  return {
+    labelX: origin.x + label.x + (label.width ?? 0) / 2,
+    labelY: origin.y + label.y + (label.height ?? 0) / 2,
+  };
 }
 
 export function terminateGraphLayoutWorker(): void {
