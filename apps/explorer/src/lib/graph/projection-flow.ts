@@ -7,7 +7,14 @@ import {
 } from '@temporal-explorer/schemas';
 
 import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } from './projection';
-import { createCommandGraphNode, isGraphCommand, type GraphCommand } from './projection-builders';
+import { isGraphCommand } from './projection-builders';
+import {
+  addStructural,
+  pushEdge,
+  walkCommand,
+  walkTerminal,
+  type FlowContext,
+} from './projection-flow-core';
 
 /**
  * Walks a Workflow's structured control-flow tree (`workflow.body.nodes`) into a
@@ -17,18 +24,10 @@ import { createCommandGraphNode, isGraphCommand, type GraphCommand } from './pro
  * draw the regions as boxes. The flow inside a region mirrors `renderWorkflowMermaid`:
  * a decision diamond fans out to labeled clause arms that converge on a join dot,
  * loops draw a `repeat` back-edge, and `continue-as-new` loops back to the entry.
+ *
+ * The shared context type and the non-recursive leaves (`walkCommand`/`walkTerminal`
+ * and the `addStructural`/`pushEdge` helpers) live in `projection-flow-core`.
  */
-type FlowContext = {
-  nodes: TemporalGraphNode[];
-  edges: TemporalGraphEdge[];
-  counter: { value: number };
-  startId: string;
-  commandsById: Map<string, GraphCommand>;
-  trace: RuntimeTraceDocument | undefined;
-  overlay: ExecutionOverlayDocument | undefined;
-  projection: ProjectionBuildContext;
-};
-
 export function buildControlFlowGraph(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument | undefined,
@@ -47,6 +46,7 @@ export function buildControlFlowGraph(
     trace,
     overlay,
     projection,
+    finallyTarget: undefined,
   };
 
   const exit = walkSequence(workflow.body.nodes, startId, undefined, context);
@@ -57,57 +57,6 @@ export function buildControlFlowGraph(
   }
 
   return { nodes: context.nodes, edges: context.edges };
-}
-
-function nextId(context: FlowContext, prefix: string): string {
-  context.counter.value += 1;
-  return `flow:${prefix}:${context.counter.value}`;
-}
-
-function addStructural(
-  context: FlowContext,
-  kind: TemporalGraphNode['kind'],
-  label: string,
-  parentId: string | undefined,
-  isContainer = false,
-): string {
-  const id = nextId(context, kind);
-  context.nodes.push({
-    id,
-    label,
-    kind,
-    state: 'observed',
-    source: undefined,
-    sourceText: '',
-    runtimeOperationIds: [],
-    eventReferences: [],
-    confidence: 'unknown',
-    fallbackPosition: { x: 280 + context.counter.value * 48, y: 120 },
-    parentId,
-    isContainer,
-  });
-  return id;
-}
-
-function pushEdge(
-  context: FlowContext,
-  source: string,
-  target: string,
-  label: string,
-  variant?: 'loop-back',
-): void {
-  context.counter.value += 1;
-  const targetNode = context.nodes.find((node) => node.id === target);
-  context.edges.push({
-    id: `edge:${context.counter.value}:${source}->${target}`,
-    source,
-    target,
-    label,
-    state: targetNode?.state ?? 'observed',
-    runtimeOperationIds: targetNode?.runtimeOperationIds ?? [],
-    eventReferences: targetNode?.eventReferences ?? [],
-    ...(variant ? { variant } : {}),
-  });
 }
 
 /** Walks a sequence of flow nodes from `entry`, returning the exit node id or undefined if a terminal ended the path. */
@@ -177,71 +126,6 @@ function walkNode(
     default:
       return entry;
   }
-}
-
-function walkCommand(
-  node: Extract<FlowNode, { type: 'command' }>,
-  entry: string,
-  parentId: string | undefined,
-  context: FlowContext,
-  label: string,
-): string {
-  const command = context.commandsById.get(node.commandId);
-
-  if (!command) {
-    return entry; // Not a flow-relevant command (e.g. a branch test); keep the cursor.
-  }
-
-  const graphNode = createCommandGraphNode(
-    command,
-    { x: 280 + context.counter.value * 48, y: 120 },
-    context.trace,
-    context.overlay,
-    context.projection,
-  );
-  graphNode.parentId = parentId;
-  context.nodes.push(graphNode);
-  pushEdge(context, entry, command.id, label);
-
-  return command.id;
-}
-
-function walkTerminal(
-  node: Extract<FlowNode, { type: 'terminal' }>,
-  entry: string,
-  parentId: string | undefined,
-  context: FlowContext,
-  label: string,
-): undefined {
-  if (node.terminalKind === 'continue-as-new') {
-    const command = node.commandId ? context.commandsById.get(node.commandId) : undefined;
-
-    // Keep the continue-as-new command's id and runtime state so the overlay/timeline
-    // still resolve to a visible node, while adding the `loop` back-edge to the entry.
-    if (command) {
-      const graphNode = createCommandGraphNode(
-        command,
-        { x: 280 + context.counter.value * 48, y: 120 },
-        context.trace,
-        context.overlay,
-        context.projection,
-      );
-      graphNode.parentId = parentId;
-      context.nodes.push(graphNode);
-      pushEdge(context, entry, command.id, label);
-      pushEdge(context, command.id, context.startId, 'loop', 'loop-back');
-      return undefined;
-    }
-
-    const id = addStructural(context, 'terminal', 'continue as new', parentId);
-    pushEdge(context, entry, id, label);
-    pushEdge(context, id, context.startId, 'loop', 'loop-back');
-    return undefined;
-  }
-
-  const id = addStructural(context, 'terminal', node.terminalKind, parentId);
-  pushEdge(context, entry, id, label);
-  return undefined;
 }
 
 function walkBranch(
@@ -338,8 +222,18 @@ function walkTry(
   label: string,
 ): string | undefined {
   const container = addStructural(context, 'try-region', 'try', parentId, true);
-  const bodyExit = walkSequence(node.body, entry, container, context, label);
   const converge = addStructural(context, 'join', '', container);
+  const finalizer = node.finalizer && node.finalizer.length > 0 ? node.finalizer : undefined;
+
+  // While a `finally` block exists, terminals inside the try/catch (return/throw/…)
+  // must route through `converge` so the finalizer runs on every exit. Save/restore
+  // makes this nesting-safe for a try nested inside another try's finalizer scope.
+  const previousFinallyTarget = context.finallyTarget;
+  if (finalizer) {
+    context.finallyTarget = converge;
+  }
+
+  const bodyExit = walkSequence(node.body, entry, container, context, label);
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, converge, '');
@@ -353,8 +247,10 @@ function walkTry(
     }
   }
 
-  if (node.finalizer && node.finalizer.length > 0) {
-    return walkSequence(node.finalizer, converge, container, context, 'finally');
+  context.finallyTarget = previousFinallyTarget;
+
+  if (finalizer) {
+    return walkSequence(finalizer, converge, container, context, 'finally');
   }
 
   return converge;

@@ -1,11 +1,12 @@
 flowchart TD
   start(["chargeWorkflow"])
+  n1(( ))
   flow_chargeWorkflow_2["chargeAccount"]
   flow_chargeWorkflow_3(["return"])
-  n1(( ))
   flow_chargeWorkflow_4["releaseLock"]
   complete(["complete"])
   start --> flow_chargeWorkflow_2
   flow_chargeWorkflow_2 --> flow_chargeWorkflow_3
+  flow_chargeWorkflow_3 --> n1
   n1 -->|"finally"| flow_chargeWorkflow_4
   flow_chargeWorkflow_4 --> complete

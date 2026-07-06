@@ -229,6 +229,37 @@ describe('nested control-flow projection per FlowNode type', () => {
     expect(projection.edges.find((edge) => edge.target === 'a:3')?.label).toBe('finally');
   });
 
+  it('routes a terminal inside a try/finally through the finalizer instead of dead-ending it', () => {
+    // Regression: `return` in a try body used to dead-end, leaving the finalizer
+    // (and everything after it) unreachable. `finally` runs on every exit, so the
+    // terminal must connect to the finalizer's converge join.
+    const projection = project(
+      [
+        {
+          type: 'try',
+          id: 't',
+          body: [
+            { type: 'command', id: 'c1', commandId: 'a:1' },
+            { type: 'terminal', id: 'r', terminalKind: 'return' },
+          ],
+          finalizer: [{ type: 'command', id: 'c3', commandId: 'a:3' }],
+        },
+      ],
+      [activityCommand('a:1', 'work', 0), activityCommand('a:3', 'cleanup', 1)],
+    );
+
+    const terminal = projection.nodes.find(
+      (node) => node.kind === 'terminal' && node.label === 'return',
+    );
+    const converge = projection.edges.find((edge) => edge.target === 'a:3')?.source;
+    expect(converge).toBeDefined();
+    // The `return` reaches the finalizer converge, so `cleanup` is reachable from start.
+    expect(
+      projection.edges.some((edge) => edge.source === terminal?.id && edge.target === converge),
+    ).toBe(true);
+    expect(projection.edges.find((edge) => edge.target === 'a:3')?.label).toBe('finally');
+  });
+
   it('projects a continue-as-new terminal that loops back to the workflow entry', () => {
     const projection = project(
       [

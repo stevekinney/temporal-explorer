@@ -124,6 +124,37 @@ describe('documentation renderers', () => {
     expect(mermaid).not.toMatch(/newCharge.*-->.*oldCharge/);
   });
 
+  it('keeps a try/finally finalizer reachable when the try body returns', async () => {
+    const analysis = temporalAnalysisDocumentSchema.parse(
+      await Bun.file(
+        new URL('../../../fixtures/try-finally/.temporal-explorer/analysis.json', import.meta.url),
+      ).json(),
+    );
+    const mermaid = renderWorkflowMermaid(analysis, 'chargeWorkflow');
+
+    // Regression: `return` in the try body used to dead-end, leaving the `finally`
+    // block (releaseLock) unreachable from `start`. Walk edges to prove reachability.
+    const edges = [...mermaid.matchAll(/^ {2}(\S+) -->(?:\|[^|]*\|)? (\S+)$/gm)].map(
+      (match) => [match[1], match[2]] as [string, string],
+    );
+    const releaseLock = mermaid.match(/^ {2}(\S+)\["releaseLock"\]$/m)?.[1];
+    expect(releaseLock).toBeDefined();
+
+    const reachable = new Set(['start']);
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const [from, to] of edges) {
+        if (reachable.has(from) && !reachable.has(to)) {
+          reachable.add(to);
+          changed = true;
+        }
+      }
+    }
+
+    expect(reachable.has(releaseLock as string)).toBe(true);
+    expect(mermaid).toContain('|"finally"|');
+  });
+
   it('renders continueAsNew as a loop-back terminal, not a chain into complete', async () => {
     const analysis = temporalAnalysisDocumentSchema.parse(
       await Bun.file(

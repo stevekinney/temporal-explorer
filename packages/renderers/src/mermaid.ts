@@ -70,6 +70,8 @@ type RenderContext = {
   counter: { value: number };
   startId: string;
   commandsById: Map<string, TemporalCommand>;
+  // Converge join of the nearest enclosing `try` with a `finally`; terminals route here.
+  finallyTarget: string | undefined;
 };
 
 function nextNodeId(context: RenderContext): string {
@@ -162,15 +164,14 @@ function renderTerminalNode(
     return undefined;
   }
 
-  const terminalLabels: Record<string, string> = {
-    return: 'return',
-    throw: 'throw',
-    break: 'break',
-    continue: 'continue',
-  };
-
-  context.nodes.push(`  ${id}(["${terminalLabels[node.terminalKind] ?? node.terminalKind}"])`);
+  // return / throw / break / continue all render as their own keyword.
+  context.nodes.push(`  ${id}(["${node.terminalKind}"])`);
   pushEdge(context, entry, id, label);
+
+  // A `finally` runs on abrupt exits too, so route the terminal into it, not a dead end.
+  if (context.finallyTarget !== undefined) {
+    pushEdge(context, id, context.finallyTarget);
+  }
 
   return undefined;
 }
@@ -251,9 +252,17 @@ function renderTryNode(
   context: RenderContext,
   label: string | undefined,
 ): string | undefined {
-  const bodyExit = renderSequence(node.body, entry, context, label);
   const converge = nextNodeId(context);
   context.nodes.push(`  ${converge}(( ))`);
+  const finalizer = node.finalizer && node.finalizer.length > 0 ? node.finalizer : undefined;
+
+  // Route terminals through `converge` while a finalizer exists; save/restore nests safely.
+  const previousFinallyTarget = context.finallyTarget;
+  if (finalizer) {
+    context.finallyTarget = converge;
+  }
+
+  const bodyExit = renderSequence(node.body, entry, context, label);
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, converge);
@@ -266,8 +275,10 @@ function renderTryNode(
     }
   }
 
-  if (node.finalizer && node.finalizer.length > 0) {
-    return renderSequence(node.finalizer, converge, context, 'finally');
+  context.finallyTarget = previousFinallyTarget;
+
+  if (finalizer) {
+    return renderSequence(finalizer, converge, context, 'finally');
   }
 
   return converge;
@@ -343,6 +354,7 @@ export function renderWorkflowMermaid(
     counter: { value: 0 },
     startId,
     commandsById,
+    finallyTarget: undefined,
   };
 
   const exit = renderSequence(workflow.body.nodes, context.startId, context);
