@@ -14,6 +14,8 @@
  * full stage — useful for README/doc images. Without it, the whole `.flow-stage` is
  * captured, which is what the visual gate wants.
  */
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
