@@ -1,5 +1,6 @@
 import type { PayloadReference } from '@temporal-explorer/schemas';
 
+import { decodeBase64Utf8, utf8ByteLength } from './base64';
 import {
   isRecord,
   readArrayField,
@@ -21,14 +22,10 @@ export type PayloadPreviewConfiguration = {
   maxPreviewBytes?: number;
 };
 
-function decodeBase64(value: string): string {
-  return Buffer.from(value, 'base64').toString('utf8');
-}
-
 function getPayloadEncoding(payload: Record<string, unknown>): string | undefined {
   const metadata = readRecordField(payload, 'metadata');
   const encoded = readStringField(metadata, 'encoding');
-  return encoded ? decodeBase64(encoded) : undefined;
+  return encoded ? decodeBase64Utf8(encoded) : undefined;
 }
 
 type PayloadPreviewResult =
@@ -100,9 +97,9 @@ function decodeJsonPayload(
     return { decoded: false };
   }
 
-  const decoded = decodeBase64(data);
+  const decoded = decodeBase64Utf8(data);
 
-  if (maxPreviewBytes <= 0 || Buffer.byteLength(decoded) > maxPreviewBytes) {
+  if (maxPreviewBytes <= 0 || utf8ByteLength(decoded) > maxPreviewBytes) {
     return { decoded: false };
   }
 

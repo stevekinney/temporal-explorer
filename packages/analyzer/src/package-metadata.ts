@@ -1,4 +1,5 @@
-import { resolve } from 'node:path';
+import type { FileSource } from './file-source';
+import { resolveProjectPath } from './paths';
 
 export type PackageJsonMetadata = {
   packageManager?: string;
@@ -22,14 +23,23 @@ function readStringRecord(value: unknown): Record<string, string> | undefined {
 }
 
 export async function readPackageJson(root: string): Promise<PackageJsonMetadata> {
-  const packagePath = resolve(root, 'package.json');
-  const file = Bun.file(packagePath);
+  return await readPackageJsonFromFileSource({
+    exists: async (path) => await Bun.file(path).exists(),
+    read: async (path) => await Bun.file(path).text(),
+    root,
+  });
+}
 
-  if (!(await file.exists())) {
+export async function readPackageJsonFromFileSource(
+  source: Pick<FileSource, 'root' | 'exists' | 'read'>,
+): Promise<PackageJsonMetadata> {
+  const packagePath = resolveProjectPath(source.root, 'package.json');
+
+  if (!(await source.exists(packagePath))) {
     return {};
   }
 
-  const value: unknown = await file.json();
+  const value: unknown = JSON.parse(await source.read(packagePath));
 
   if (!isRecord(value)) {
     return {};

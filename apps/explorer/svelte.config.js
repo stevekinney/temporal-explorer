@@ -1,5 +1,5 @@
 import adapterNode from '@sveltejs/adapter-node';
-import adapterVercel from '@sveltejs/adapter-vercel';
+import adapterStatic from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { fileURLToPath } from 'node:url';
 
@@ -8,10 +8,10 @@ const cinderComponentDirectory = fileURLToPath(
 );
 
 // The local `temporal-explorer open` command runs the adapter-node server bundle
-// (`build/index.js`), so that stays the default. On Vercel (which sets `VERCEL=1`)
-// we build the public fixtures showcase instead, where the page prerenders to static
-// output — adapter-vercel serves that from the CDN with no serverless function.
-const adapter = process.env['VERCEL'] ? adapterVercel() : adapterNode();
+// (`build/index.js`), so node stays the default. Vercel builds the fully
+// client-side directory-upload app as static files.
+const isWebTarget = process.env['EXPLORER_TARGET'] === 'web' || Boolean(process.env['VERCEL']);
+const adapter = isWebTarget ? adapterStatic() : adapterNode();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

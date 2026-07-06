@@ -562,3 +562,17 @@ Recorded remainders (also in the progress table and the vault note): the Explore
 Re-ran the full acceptance battery fresh (all green), then exercised the packed tarball as a real user would: `npm pack` (prepack builds dist), installed into a brand-new flat-convention project outside the repository, and ran list/show/check/docs/types plus library imports (`analyzeProject`, `renderWorkflowMermaidFromArtifacts`) from the installed package.
 
 That end-to-end pass caught a real extraction gap: destructured `proxyActivities` bindings (`const { reserveInventory } = proxyActivities<...>()`) — the dominant real-world pattern — produced no Activity commands. Fixed in the analyzer (`findDestructuredActivityBindings`, including renamed bindings and destructuring from existing proxy variables), with a regression test in `packages/analyzer/src/destructured-activities.test.ts`. Committed fixture artifacts were unaffected; the compatibility corpus re-run stayed 51/51 and its results now reflect far richer command extraction plus real diagnostics surfaced across the samples. The reinstalled tarball shows correct Activities, docs, and typed declarations on the consumer project.
+
+## 2026-07-06: Client-Side Web Explorer for Vercel
+
+- `bun test packages/analyzer` — pass; 82 tests, including `InMemoryFileSource` unit coverage and 29 per-fixture in-memory parity tests against committed `analysis.json` artifacts.
+- `bun test packages/api` — pass; 15 tests, including static-only and history-enhanced `createExplorerBundle` paths.
+- `bun run --cwd apps/explorer build && bun test packages/cli` — pass; adapter-node build still produces the server entry required by `temporal-explorer open`, then CLI tests report 36 pass, 2 live skips, 0 fail.
+- `bun test apps/explorer` — pass; 33 tests, 0 fail.
+- `bun run explorer:web:build` — pass with `@sveltejs/adapter-static`; output written to `apps/explorer/build`, including the lazy analysis worker chunk. Vite reports the existing TypeScript package `perf_hooks` browser-externalization warning, but the browser E2E below proves the worker path runs.
+- `bun run ui:e2e:web` — pass; Playwright serves the static build, selects `fixtures/basic-order` through the directory input, waits for the static graph, uploads `histories/success.json`, observes runtime status, removes history, and returns to static analysis state.
+- `bun run --cwd apps/explorer build` — pass with default `@sveltejs/adapter-node`, preserving the local CLI viewer build.
+- `bun run ui:e2e`, `bun run ui:e2e:graph`, `bun run ui:server-lifecycle`, `bun run ui:accessibility` — pass against the adapter-node build.
+- `bun test --coverage --coverage-reporter=lcov --coverage-dir=coverage` — pass; 212 pass, 3 live skips, 0 fail. Added `bunfig.toml` `test.pathIgnorePatterns = ["test-corpora/**"]` so bare Bun test discovery does not execute the gitignored external compatibility corpus.
+- LCOV audit of `coverage/lcov.info` — not exact 100%: 8198/8975 lines (91.34261838440112%) and 857/911 functions (94.07244785949506%).
+- `bun run validate` — pass end to end: typecheck, package lint/test/build, script lint, and format check.

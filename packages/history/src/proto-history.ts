@@ -1,5 +1,4 @@
-import { Buffer } from 'node:buffer';
-
+import { uint8ArrayToBase64 } from './base64';
 import { isRecord } from './history-json';
 
 type LongLike = { low: number; high: number; unsigned: boolean; toString(): string };
@@ -53,7 +52,7 @@ function convertRecord(value: Record<string, unknown>, key?: string): unknown {
 
 function convertValue(value: unknown, key?: string): unknown {
   if (value instanceof Uint8Array) {
-    return Buffer.from(value).toString('base64');
+    return uint8ArrayToBase64(value);
   }
 
   if (value && typeof value === 'object' && isLongLike(value)) {

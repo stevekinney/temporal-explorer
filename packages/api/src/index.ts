@@ -68,6 +68,14 @@ export {
 
 export { findWorkflow, getWorkflow, workflowSlug } from '@temporal-explorer/renderers';
 export {
+  createExplorerBundle,
+  InMemoryFileSource,
+  type BrowserFileEntry,
+  type CreateExplorerBundleOptions,
+  type ExplorerArtifacts,
+  type FileSource,
+} from './browser';
+export {
   renderMarkdown,
   renderTypeDeclarations,
   renderWorkflowJson,

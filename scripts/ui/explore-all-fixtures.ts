@@ -2,8 +2,8 @@
  * Dev tool: serve the explorer UI with *every* fixture loaded at once, for
  * manual visual inspection of the flow-graph rendering.
  *
- * The aggregate project is built by the shared `buildAggregate` helper (also
- * used by the Vercel showcase build); this script layers a local server on top.
+ * The aggregate project is built by the shared `buildAggregate` helper; this
+ * script layers a local server on top.
  *
  * Usage:
  *   bun run scripts/ui/explore-all-fixtures.ts [--port <n>]

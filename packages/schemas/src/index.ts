@@ -1,4 +1,5 @@
 import type { ZodIssue, ZodType } from 'zod';
+import { z } from 'zod';
 
 import { temporalAnalysisDocumentSchema } from './temporal-analysis';
 import { executionOverlayDocumentSchema } from './temporal-overlay';
@@ -9,6 +10,18 @@ export const artifactSchemaVersions = {
   trace: 'temporal-trace/v1',
   overlay: 'temporal-overlay/v1',
 } as const;
+
+export const explorerBundleSchema = z
+  .object({
+    projectName: z.string().min(1),
+    artifactDirectory: z.string().min(1),
+    analysis: temporalAnalysisDocumentSchema,
+    traces: z.array(runtimeTraceDocumentSchema),
+    overlays: z.array(executionOverlayDocumentSchema),
+  })
+  .strict();
+
+export type ExplorerArtifacts = z.infer<typeof explorerBundleSchema>;
 
 export type ArtifactSchemaVersion =
   (typeof artifactSchemaVersions)[keyof typeof artifactSchemaVersions];
