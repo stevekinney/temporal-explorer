@@ -8,7 +8,11 @@
  * `scripts/ui/graph-geometry.ts`.
  *
  * Usage:
- *   bun run scripts/ui/screenshot-fixtures.ts --out <dir> [--fixtures a,b,c]
+ *   bun run scripts/ui/screenshot-fixtures.ts --out <dir> [--fixtures a,b,c] [--fit]
+ *
+ * `--fit` clips each capture to the graph's bounding box (with padding) instead of the
+ * full stage — useful for README/doc images. Without it, the whole `.flow-stage` is
+ * captured, which is what the visual gate wants.
  */
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
@@ -33,6 +37,39 @@ function firstHistoryFor(fixture: string): string | undefined {
 
 const outputDirectory = getFlagValue('--out') ?? join(process.cwd(), 'scripts/ui/.screenshots');
 const fixtureFilter = getFlagValue('--fixtures');
+const fitToContent = Bun.argv.includes('--fit');
+
+/** Union bounding box of the rendered graph nodes/markers/containers, padded, or null if empty. */
+async function graphClip(
+  page: import('@playwright/test').Page,
+): Promise<{ x: number; y: number; width: number; height: number } | null> {
+  const bounds = await page.evaluate(() => {
+    const nodes = document.querySelectorAll('.temporal-flow-node, .flow-marker, .region-container');
+    if (nodes.length === 0) return null;
+    let left = Infinity;
+    let top = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+    for (const node of nodes) {
+      const rect = node.getBoundingClientRect();
+      left = Math.min(left, rect.left);
+      top = Math.min(top, rect.top);
+      right = Math.max(right, rect.right);
+      bottom = Math.max(bottom, rect.bottom);
+    }
+    return { left, top, right, bottom };
+  });
+
+  if (!bounds) return null;
+
+  const padding = 28;
+  return {
+    x: Math.max(0, bounds.left - padding),
+    y: Math.max(0, bounds.top - padding),
+    width: bounds.right - bounds.left + padding * 2,
+    height: bounds.bottom - bounds.top + padding * 2,
+  };
+}
 const requestedFixtures = fixtureFilter
   ? fixtureFilter.split(',').map((name) => name.trim())
   : [...new Set(fixtureHistories.map((definition) => definition.fixture))].toSorted();
@@ -71,7 +108,14 @@ try {
       await page.waitForTimeout(600);
 
       const screenshotPath = join(outputDirectory, `${fixture}.png`);
-      await page.locator('.flow-stage').screenshot({ path: screenshotPath });
+      const clip = fitToContent ? await graphClip(page) : null;
+
+      if (clip) {
+        await page.screenshot({ path: screenshotPath, clip });
+      } else {
+        await page.locator('.flow-stage').screenshot({ path: screenshotPath });
+      }
+
       console.log(`Wrote ${screenshotPath}`);
 
       try {
