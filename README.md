@@ -65,6 +65,40 @@ bunx temporal-explorer open
   artifacts: workflow overviews, message surfaces, an interactive Svelte
   Flow + ELK graph, semantic timelines, and a source-aware trace inspector.
 
+## What It Looks Like
+
+The interactive graph overlays runtime evidence on the static control-flow
+structure: each node is colored by what actually happened—`completed`, `failed`,
+`not taken`—so one picture answers both _what can this Workflow do?_ and _what
+did this execution do?_ Run `bun run explorer:fixtures` to browse every example
+Workflow below in the local UI, or `temporal-explorer open` against your own
+project.
+
+![A Workflow with a loop containing a branch, a Promise.all region, and a try/catch, rendered as nested regions](https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/nested-orchestration.png)
+
+_One Workflow exercising a loop, a branch, a `Promise.all` region, and a
+`try`/`catch`—drawn as nested regions with per-node runtime state._
+
+<table>
+  <tr>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/switch-routing.png" alt="A switch statement routing to fulfillment activities"><br><sub><b><code>switch</code></b>: a decision fans out to clause arms that converge on a join.</sub></td>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/while-loop.png" alt="A while loop with a repeat back-edge"><br><sub><b>loop</b>: a <code>repeat</code> back-edge closes the loop region.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/try-catch-finally.png" alt="A try/catch/finally with a failed activity routing to the handler"><br><sub><b><code>try</code>/<code>catch</code>/<code>finally</code></b>: a failed Activity routes through the handler, then the finalizer runs on the way out.</sub></td>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/race.png" alt="A Promise.race between an activity and a timer"><br><sub><b><code>Promise.race</code></b>: parallel branches fork from the region and meet at a join.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/dynamic-parallel.png" alt="A dynamic fan-out over a list of items"><br><sub><b>dynamic fan-out</b>: one template branch stands in for the <code>&times;N</code> runtime executions.</sub></td>
+    <td width="50%"><img src="https://raw.githubusercontent.com/stevekinney/temporal-explorer/main/docs/screenshots/continue-as-new.png" alt="A continue-as-new terminal looping back to the workflow entry"><br><sub><b><code>continueAsNew</code></b>: the terminal loops back to the Workflow entry instead of completing.</sub></td>
+  </tr>
+</table>
+
+> [!TIP]
+> These images are generated from the committed fixture artifacts with
+> `bun run ui:screenshot-fixtures --out docs/screenshots --fit`, so they stay in
+> sync with the renderer.
+
 ## Configuration (optional)
 
 Conventional projects need no configuration. When defaults are wrong, create

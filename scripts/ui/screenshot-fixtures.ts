@@ -8,8 +8,14 @@
  * `scripts/ui/graph-geometry.ts`.
  *
  * Usage:
- *   bun run scripts/ui/screenshot-fixtures.ts --out <dir> [--fixtures a,b,c]
+ *   bun run scripts/ui/screenshot-fixtures.ts --out <dir> [--fixtures a,b,c] [--fit]
+ *
+ * `--fit` clips each capture to the graph's bounding box (with padding) instead of the
+ * full stage — useful for README/doc images. Without it, the whole `.flow-stage` is
+ * captured, which is what the visual gate wants.
  */
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -33,6 +39,49 @@ function firstHistoryFor(fixture: string): string | undefined {
 
 const outputDirectory = getFlagValue('--out') ?? join(process.cwd(), 'scripts/ui/.screenshots');
 const fixtureFilter = getFlagValue('--fixtures');
+const fitToContent = Bun.argv.includes('--fit');
+
+/** Union bounding box of the rendered graph nodes/markers/containers, padded, or null if empty. */
+async function graphClip(
+  page: import('@playwright/test').Page,
+): Promise<{ x: number; y: number; width: number; height: number } | null> {
+  const bounds = await page.evaluate(() => {
+    const nodes = document.querySelectorAll('.temporal-flow-node, .flow-marker, .region-container');
+    if (nodes.length === 0) return null;
+    let left = Infinity;
+    let top = Infinity;
+    let right = -Infinity;
+    let bottom = -Infinity;
+    for (const node of nodes) {
+      const rect = node.getBoundingClientRect();
+      left = Math.min(left, rect.left);
+      top = Math.min(top, rect.top);
+      right = Math.max(right, rect.right);
+      bottom = Math.max(bottom, rect.bottom);
+    }
+    // getBoundingClientRect is viewport-relative; page.screenshot({ clip }) is page-relative,
+    // so add scroll offsets. Expose the page size to clamp the padded box within bounds.
+    return {
+      left: left + window.scrollX,
+      top: top + window.scrollY,
+      right: right + window.scrollX,
+      bottom: bottom + window.scrollY,
+      pageWidth: document.documentElement.scrollWidth,
+      pageHeight: document.documentElement.scrollHeight,
+    };
+  });
+
+  if (!bounds) return null;
+
+  // Clamp every edge independently so width/height always match the padded box actually
+  // captured — never a fixed padded span bolted onto a clamped origin.
+  const padding = 28;
+  const x = Math.max(0, bounds.left - padding);
+  const y = Math.max(0, bounds.top - padding);
+  const right = Math.min(bounds.pageWidth, bounds.right + padding);
+  const bottom = Math.min(bounds.pageHeight, bounds.bottom + padding);
+  return { x, y, width: right - x, height: bottom - y };
+}
 const requestedFixtures = fixtureFilter
   ? fixtureFilter.split(',').map((name) => name.trim())
   : [...new Set(fixtureHistories.map((definition) => definition.fixture))].toSorted();
@@ -71,7 +120,14 @@ try {
       await page.waitForTimeout(600);
 
       const screenshotPath = join(outputDirectory, `${fixture}.png`);
-      await page.locator('.flow-stage').screenshot({ path: screenshotPath });
+      const clip = fitToContent ? await graphClip(page) : null;
+
+      if (clip) {
+        await page.screenshot({ path: screenshotPath, clip });
+      } else {
+        await page.locator('.flow-stage').screenshot({ path: screenshotPath });
+      }
+
       console.log(`Wrote ${screenshotPath}`);
 
       try {
