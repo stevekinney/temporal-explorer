@@ -47,7 +47,7 @@
     "lint:scripts": "oxlint scripts/",
     "package:check": "npm pack --dry-run --ignore-scripts",
     "prepack": "bun run scripts/release/build-dist.ts",
-    "prepare": "lefthook install",
+    "prepare": "lefthook install || true",
     "release:dry-run": "bun run scripts/release/dry-run.ts",
     "replay:spike": "bun run scripts/replay/spike.ts",
     "schema:emit-json-schema": "bun run scripts/schema/emit-json-schema.ts",

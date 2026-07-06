@@ -16,7 +16,8 @@
  * Usage:
  *   bun run scripts/ui/build-fixtures-showcase.ts
  */
-import { join } from 'node:path';
+import { mkdir, rename, rm } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 
 import { buildAggregate } from '../fixtures/aggregate';
 
@@ -48,4 +49,13 @@ if ((await build.exited) !== 0) {
   throw new Error('Explorer showcase build failed.');
 }
 
-console.log('\nFixtures showcase built to apps/explorer/.vercel/output (adapter-vercel).');
+// adapter-vercel writes `.vercel/output` next to svelte.config (apps/explorer). The
+// Vercel project's Root Directory is the repo root, so relocate the Build Output API
+// directory there for Vercel (and `vercel deploy --prebuilt`) to find it.
+const adapterOutput = join(explorerDirectory, '.vercel', 'output');
+const repoOutput = join(repoRoot, '.vercel', 'output');
+await rm(repoOutput, { recursive: true, force: true });
+await mkdir(dirname(repoOutput), { recursive: true });
+await rename(adapterOutput, repoOutput);
+
+console.log('\nFixtures showcase built to .vercel/output (Build Output API).');

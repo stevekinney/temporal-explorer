@@ -70,3 +70,4 @@ test-corpora/
 # Vercel fixtures-showcase build (aggregate project + adapter-vercel output)
 apps/explorer/.explorer-showcase/
 .vercel/
+.vercel
