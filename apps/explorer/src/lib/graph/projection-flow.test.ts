@@ -141,6 +141,42 @@ describe('nested control-flow projection per FlowNode type', () => {
     ).toBe(true);
   });
 
+  it('projects a do-while so the exit condition follows the body, never a zero-iteration path', () => {
+    const projection = project(
+      [
+        {
+          type: 'loop',
+          id: 'l',
+          loopKind: 'do-while',
+          body: [{ type: 'command', id: 'c', commandId: 'a:1' }],
+        },
+      ],
+      [activityCommand('a:1', 'pollStatus', 0)],
+    );
+
+    // Regression: the body (pollStatus) must run before the condition header. Removing the
+    // body from the edge set must make `complete` unreachable from the workflow entry —
+    // there is no direct header→complete zero-iteration path.
+    const complete = projection.nodes.find((node) => node.label === 'complete')?.id;
+    const edges = projection.edges
+      .filter((edge) => edge.source !== 'a:1' && edge.target !== 'a:1')
+      .map((edge) => [edge.source, edge.target] as const);
+
+    const reachable = new Set(['workflow:w']);
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const [from, to] of edges) {
+        if (reachable.has(from) && !reachable.has(to)) {
+          reachable.add(to);
+          changed = true;
+        }
+      }
+    }
+
+    expect(complete).toBeDefined();
+    expect(reachable.has(complete as string)).toBe(false);
+  });
+
   it('projects a parallel region forking to and joining fixed branches', () => {
     const projection = project(
       [

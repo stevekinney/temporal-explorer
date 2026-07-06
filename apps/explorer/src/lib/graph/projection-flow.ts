@@ -168,6 +168,23 @@ function walkLoop(
     true,
   );
   const header = addStructural(context, 'decision', `loop (${node.loopKind})`, container);
+
+  if (node.loopKind === 'do-while') {
+    // A do-while runs its body before the exit condition, so the loop exit must not be
+    // reachable without an iteration. Anchor the body entry inside the region and place
+    // the condition (header) after the body: entry → body → header → (repeat) body.
+    const bodyEntry = addStructural(context, 'join', '', container);
+    pushEdge(context, entry, bodyEntry, label);
+    const doBodyExit = walkSequence(node.body, bodyEntry, container, context);
+
+    if (doBodyExit !== undefined) {
+      pushEdge(context, doBodyExit, header, '');
+    }
+
+    pushEdge(context, header, bodyEntry, 'repeat', 'loop-back');
+    return header;
+  }
+
   pushEdge(context, entry, header, label);
 
   // The forward edge into the body carries no label: the container header

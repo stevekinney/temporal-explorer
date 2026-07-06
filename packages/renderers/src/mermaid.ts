@@ -53,11 +53,7 @@ function shapeForKind(kind: TemporalCommand['kind'], id: string, label: string):
     return `  ${id}[["${label}"]]`;
   }
 
-  if (kind === 'nexus-operation') {
-    return `  ${id}[/"${label}"/]`;
-  }
-
-  if (kind === 'dynamic') {
+  if (kind === 'nexus-operation' || kind === 'dynamic') {
     return `  ${id}[/"${label}"/]`;
   }
 
@@ -211,12 +207,17 @@ function renderLoopNode(
 ): string {
   const loop = toMermaidId(node.id);
   context.nodes.push(`  ${loop}{"loop (${node.loopKind})"}`);
-  pushEdge(context, entry, loop, label);
 
-  const bodyExit = renderSequence(node.body, loop, context, 'each');
-  if (bodyExit !== undefined) {
-    pushEdge(context, bodyExit, loop, 'repeat');
-  }
+  // A do-while runs its body before the exit condition, so anchor the body entry and
+  // place the condition after it — the loop exit is never reachable without an iteration.
+  const doWhile = node.loopKind === 'do-while';
+  const bodyEntry = doWhile ? nextNodeId(context) : loop;
+  if (doWhile) context.nodes.push(`  ${bodyEntry}(( ))`);
+
+  pushEdge(context, entry, bodyEntry, label);
+  const bodyExit = renderSequence(node.body, bodyEntry, context, 'each');
+  if (bodyExit !== undefined) pushEdge(context, bodyExit, loop, doWhile ? undefined : 'repeat');
+  if (doWhile) pushEdge(context, loop, bodyEntry, 'repeat');
 
   return loop;
 }
