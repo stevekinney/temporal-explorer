@@ -15,8 +15,10 @@
     status,
     uploadStatusText,
     canImportHistory,
+    canViewUploadedArtifacts,
     hasImportedHistory,
     onSelectExample,
+    onViewUploadedArtifacts,
     onAnalyzeFiles,
     onAnalyzeHistory,
     onClearHistory,
@@ -27,8 +29,10 @@
     status: 'idle' | 'loading' | 'ready' | 'error';
     uploadStatusText: string;
     canImportHistory: boolean;
+    canViewUploadedArtifacts: boolean;
     hasImportedHistory: boolean;
     onSelectExample: (exampleId: string) => void;
+    onViewUploadedArtifacts: () => void;
     onAnalyzeFiles: (files: FileList | null) => void;
     onAnalyzeHistory: (files: FileList | null) => void;
     onClearHistory: () => void;
@@ -103,6 +107,13 @@
         onchange={(event) => onAnalyzeHistory(event.currentTarget.files)}
       />
     </label>
+
+    {#if canViewUploadedArtifacts}
+      <button class="clear-history" type="button" onclick={onViewUploadedArtifacts}>
+        <FolderOpen size={16} aria-hidden="true" />
+        View uploaded project
+      </button>
+    {/if}
 
     {#if hasImportedHistory}
       <button class="clear-history" type="button" onclick={onClearHistory}>

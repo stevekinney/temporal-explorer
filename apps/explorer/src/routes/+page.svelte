@@ -71,8 +71,9 @@
   });
   const isWebWorkbench = $derived(data.examples.length > 0);
   const canImportHistory = $derived(
-    sourceMode === 'upload' && fileEntries.length > 0 && Boolean(artifacts),
+    sourceMode === 'upload' && status !== 'loading' && fileEntries.length > 0 && Boolean(artifacts),
   );
+  const canViewUploadedArtifacts = $derived(sourceMode !== 'upload' && Boolean(artifacts));
   const uploadStatusText = $derived.by(() => {
     if (status === 'loading') return 'Analyzing uploaded files in your browser...';
     if (status === 'ready') return `${projectName} is loaded.`;
@@ -164,6 +165,12 @@
     void loadExampleArtifacts(exampleId);
   }
 
+  function viewUploadedArtifacts(): void {
+    if (artifacts) {
+      sourceMode = 'upload';
+    }
+  }
+
   function hasExampleArtifacts(exampleId: string): boolean {
     return Boolean(
       (loadedExampleId === exampleId && loadedExampleArtifacts) ||
@@ -185,7 +192,17 @@
   }
 
   async function loadExampleArtifacts(exampleId: string): Promise<void> {
-    if (!exampleId || hasExampleArtifacts(exampleId)) {
+    if (!exampleId) {
+      exampleRequestId += 1;
+      exampleStatus = 'idle';
+      exampleErrorMessage = '';
+      return;
+    }
+
+    if (hasExampleArtifacts(exampleId)) {
+      exampleRequestId += 1;
+      exampleStatus = 'idle';
+      exampleErrorMessage = '';
       return;
     }
 
@@ -312,8 +329,10 @@
       {status}
       {uploadStatusText}
       {canImportHistory}
+      {canViewUploadedArtifacts}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
+      onViewUploadedArtifacts={viewUploadedArtifacts}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
       onClearHistory={clearHistory}
@@ -370,8 +389,10 @@
       {status}
       {uploadStatusText}
       {canImportHistory}
+      {canViewUploadedArtifacts}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
+      onViewUploadedArtifacts={viewUploadedArtifacts}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
       onClearHistory={clearHistory}
