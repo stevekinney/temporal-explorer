@@ -21,6 +21,8 @@ function loopScopes(node: FlowNode, insideLoop: boolean): LoopScope[] {
       return withScope([...(node.branches ?? []), node.templateBranch], insideLoop);
     case 'try':
       return withScope([node.body, node.handler?.body, node.finalizer], insideLoop);
+    case 'region':
+      return withScope([node.body], insideLoop);
     default:
       return [];
   }

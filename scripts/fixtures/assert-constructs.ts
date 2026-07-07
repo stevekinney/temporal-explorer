@@ -32,8 +32,10 @@ const expectedConstructs: Record<string, string[]> = {
 /** The signature(s) a branch node contributes, independent of its children. */
 function branchSignatures(node: Extract<FlowNode, { type: 'branch' }>): string[] {
   const signatures = [`branch:${node.branchKind}`];
+  const hasNestedOtherwiseBranch =
+    node.otherwise?.some((child) => child.type === 'branch') ?? false;
   // "multi" marks a real fan-out: an if/else-if/else chain or a switch with a default.
-  if (node.clauses.length + (node.otherwise ? 1 : 0) >= 3) {
+  if (node.clauses.length + (node.otherwise ? 1 : 0) >= 3 || hasNestedOtherwiseBranch) {
     signatures.push('branch:multi');
   }
   return signatures;
