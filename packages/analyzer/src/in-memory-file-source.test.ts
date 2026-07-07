@@ -3,6 +3,7 @@ import { existsSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'bun:test';
 
 import { InMemoryFileSource, analyzeProject, loadTemporalExplorerProject } from './index';
+import { isAbsoluteProjectPath, resolveProjectPath } from './paths';
 
 const fixturesRoot = new URL('../../../fixtures/', import.meta.url).pathname;
 const analysisFixtureNames = readdirSync(fixturesRoot, { withFileTypes: true })
@@ -45,7 +46,14 @@ describe('in-memory file source', () => {
     ).toBeDefined();
   });
 
-  it('parses uploaded JSONC tsconfig compiler options', async () => {
+  it('treats Windows drive roots as absolute project paths', () => {
+    expect(isAbsoluteProjectPath('C:/repo')).toBe(true);
+    expect(resolveProjectPath('C:/repo', 'C:/repo/src/workflows.ts')).toBe(
+      'C:/repo/src/workflows.ts',
+    );
+  });
+
+  it('parses uploaded JSONC tsconfig compiler options from extended configs', async () => {
     const fileSource = new InMemoryFileSource(
       [
         [
@@ -55,7 +63,11 @@ describe('in-memory file source', () => {
         ['/project/src/shared/helper.ts', 'export function helper(): void {}\n'],
         [
           '/project/tsconfig.json',
-          '{\n  // Browser uploads preserve normal tsconfig JSONC.\n  "compilerOptions": {\n    "baseUrl": "src",\n    "paths": { "@shared/*": ["shared/*"] },\n  },\n}\n',
+          '{\n  // Browser uploads preserve normal tsconfig JSONC.\n  "extends": "./tsconfig.base.json",\n  "compilerOptions": { "strict": true },\n}\n',
+        ],
+        [
+          '/project/tsconfig.base.json',
+          '{\n  "compilerOptions": {\n    "baseUrl": "src",\n    "paths": { "@shared/*": ["shared/*"] },\n  },\n}\n',
         ],
       ],
       '/project',

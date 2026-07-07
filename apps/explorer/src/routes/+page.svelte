@@ -30,6 +30,7 @@
   let projectName = $state('Uploaded Project');
   let status = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
   let errorMessage = $state('');
+  let analysisRequestId = 0;
 
   const displayArtifacts = $derived(artifacts ?? data.artifacts);
   const ignoredUploadSegments = new Set([
@@ -120,17 +121,30 @@
 
     status = 'loading';
     errorMessage = '';
-    projectName = getProjectName(files);
+    const selectedProjectName = getProjectName(files);
+    projectName = selectedProjectName;
+    const requestId = (analysisRequestId += 1);
 
     try {
-      fileEntries = await readFileEntries(files);
-      artifacts = await postToWorker({
+      const nextFileEntries = await readFileEntries(files);
+      const nextArtifacts = await postToWorker({
         type: 'analyze',
-        files: fileEntries,
-        projectName,
+        files: nextFileEntries,
+        projectName: selectedProjectName,
       });
+
+      if (requestId !== analysisRequestId) {
+        return;
+      }
+
+      fileEntries = nextFileEntries;
+      artifacts = nextArtifacts;
       status = 'ready';
     } catch (error) {
+      if (requestId !== analysisRequestId) {
+        return;
+      }
+
       artifacts = undefined;
       status = 'error';
       errorMessage = error instanceof Error ? error.message : String(error);
@@ -146,16 +160,28 @@
 
     status = 'loading';
     errorMessage = '';
+    const selectedProjectName = projectName;
+    const requestId = (analysisRequestId += 1);
 
     try {
-      artifacts = await postToWorker({
+      const nextArtifacts = await postToWorker({
         type: 'analyzeWithHistory',
         files: fileEntries,
         history: JSON.parse(await file.text()) as unknown,
-        projectName,
+        projectName: selectedProjectName,
       });
+
+      if (requestId !== analysisRequestId) {
+        return;
+      }
+
+      artifacts = nextArtifacts;
       status = 'ready';
     } catch (error) {
+      if (requestId !== analysisRequestId) {
+        return;
+      }
+
       status = 'error';
       errorMessage = error instanceof Error ? error.message : String(error);
     }
@@ -166,6 +192,7 @@
       return;
     }
 
+    analysisRequestId += 1;
     artifacts = {
       ...artifacts,
       traces: [],

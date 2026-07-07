@@ -58,7 +58,73 @@ function matchesGlob(relativePath: string, glob: string): boolean {
   return matchSegments(glob.split('/'), relativePath.split('/'));
 }
 
-function parseCompilerOptions(tsconfigText: string | undefined, root: string): CompilerOptions {
+function dirname(path: string): string {
+  const normalizedPath = normalizeProjectPath(path);
+  const index = normalizedPath.lastIndexOf('/');
+
+  return index <= 0 ? '/' : normalizedPath.slice(0, index);
+}
+
+function collapseDotSegments(path: string): string {
+  const normalizedPath = normalizeProjectPath(path);
+  const prefix = normalizedPath.startsWith('/') ? '/' : '';
+  const segments: string[] = [];
+
+  for (const segment of normalizedPath.split('/')) {
+    if (!segment || segment === '.') {
+      continue;
+    }
+
+    if (segment === '..') {
+      segments.pop();
+      continue;
+    }
+
+    segments.push(segment);
+  }
+
+  return normalizeProjectPath(`${prefix}${segments.join('/')}`);
+}
+
+function resolveExtendedTsconfigPath(tsconfigPath: string, extendedPath: string): string {
+  const resolvedPath = collapseDotSegments(resolveProjectPath(dirname(tsconfigPath), extendedPath));
+
+  return /\.[cm]?json$/u.test(resolvedPath) ? resolvedPath : `${resolvedPath}.json`;
+}
+
+function parseJsonConfig(path: string, text: string): Record<string, unknown> | undefined {
+  const parsed = ts.parseConfigFileTextToJson(path, text);
+
+  return !parsed.error && parsed.config && typeof parsed.config === 'object'
+    ? (parsed.config as Record<string, unknown>)
+    : undefined;
+}
+
+function getCompilerOptionsValue(config: Record<string, unknown>): Record<string, unknown> {
+  const compilerOptions = config['compilerOptions'];
+
+  return compilerOptions && typeof compilerOptions === 'object'
+    ? (compilerOptions as Record<string, unknown>)
+    : {};
+}
+
+function getExtendsValues(config: Record<string, unknown>): string[] {
+  const extendedConfig = config['extends'];
+
+  if (typeof extendedConfig === 'string') {
+    return [extendedConfig];
+  }
+
+  return Array.isArray(extendedConfig)
+    ? extendedConfig.filter((value): value is string => typeof value === 'string')
+    : [];
+}
+
+function parseCompilerOptions(
+  tsconfigPath: string | undefined,
+  tsconfigText: string | undefined,
+  readFile?: (path: string) => string | undefined,
+): CompilerOptions {
   const defaults: CompilerOptions = {
     target: 99,
     module: 99,
@@ -68,32 +134,50 @@ function parseCompilerOptions(tsconfigText: string | undefined, root: string): C
     esModuleInterop: true,
   };
 
-  if (!tsconfigText) {
+  if (!tsconfigPath || !tsconfigText) {
     return defaults;
   }
 
-  try {
-    const parsed = ts.parseConfigFileTextToJson(
-      resolveProjectPath(root, 'tsconfig.json'),
-      tsconfigText,
-    );
+  const readConfig = (path: string, text: string, seen = new Set<string>()): CompilerOptions => {
+    const normalizedPath = normalizeProjectPath(path);
 
-    if (parsed.error || !parsed.config || typeof parsed.config !== 'object') {
-      return defaults;
+    if (seen.has(normalizedPath)) {
+      return {};
     }
 
-    const compilerOptions =
-      'compilerOptions' in parsed.config &&
-      parsed.config.compilerOptions &&
-      typeof parsed.config.compilerOptions === 'object'
-        ? parsed.config.compilerOptions
-        : {};
-    const converted = ts.convertCompilerOptionsFromJson(compilerOptions, root);
+    seen.add(normalizedPath);
 
-    return { ...defaults, ...converted.options };
-  } catch {
-    return defaults;
-  }
+    const config = parseJsonConfig(normalizedPath, text);
+
+    if (!config) {
+      return {};
+    }
+
+    const inheritedOptions = getExtendsValues(config).reduce<CompilerOptions>(
+      (options, extendedPath) => {
+        const resolvedPath = resolveExtendedTsconfigPath(normalizedPath, extendedPath);
+        const inheritedText = readFile?.(resolvedPath);
+
+        if (!inheritedText) {
+          return options;
+        }
+
+        return {
+          ...options,
+          ...readConfig(resolvedPath, inheritedText, seen),
+        };
+      },
+      {},
+    );
+    const converted = ts.convertCompilerOptionsFromJson(
+      getCompilerOptionsValue(config),
+      dirname(normalizedPath),
+    );
+
+    return { ...inheritedOptions, ...converted.options };
+  };
+
+  return { ...defaults, ...readConfig(tsconfigPath, tsconfigText) };
 }
 
 async function sha256Hex(text: string): Promise<string> {
@@ -144,7 +228,7 @@ export class BunFileSource implements FileSource {
     const project = new Project(
       tsconfigPath
         ? { tsConfigFilePath: tsconfigPath }
-        : { compilerOptions: parseCompilerOptions(undefined, this.root) },
+        : { compilerOptions: parseCompilerOptions(undefined, undefined) },
     );
 
     for (const file of files) {
@@ -206,7 +290,9 @@ export class InMemoryFileSource implements FileSource {
       tsconfigPath && (await this.exists(tsconfigPath)) ? await this.read(tsconfigPath) : undefined;
     const project = new Project({
       useInMemoryFileSystem: true,
-      compilerOptions: parseCompilerOptions(tsconfigText, this.root),
+      compilerOptions: parseCompilerOptions(tsconfigPath, tsconfigText, (path) =>
+        this.files.get(normalizeProjectPath(path)),
+      ),
     });
 
     for (const [path, contents] of this.files) {

@@ -20,7 +20,12 @@ import {
   type FileSource,
 } from './file-source';
 import { getPackageManager, readPackageJsonFromFileSource } from './package-metadata';
-import { normalizeProjectPath, resolveProjectPath, toProjectPath } from './paths';
+import {
+  isAbsoluteProjectPath,
+  normalizeProjectPath,
+  resolveProjectPath,
+  toProjectPath,
+} from './paths';
 import type {
   AnalyzeWorkflowFilesOptions,
   LoadTemporalExplorerProjectOptions,
@@ -122,7 +127,7 @@ function resolveProjectPaths(
 function resolveProjectRoot(root: string, fileSource: FileSource | undefined): string {
   const normalizedRoot = normalizeProjectPath(root);
 
-  if (normalizedRoot.startsWith('/') || fileSource) {
+  if (isAbsoluteProjectPath(normalizedRoot) || fileSource) {
     return normalizedRoot;
   }
 
@@ -131,7 +136,7 @@ function resolveProjectRoot(root: string, fileSource: FileSource | undefined): s
 
 function collapseDotSegments(path: string): string {
   const normalizedPath = normalizeProjectPath(path);
-  const absolute = normalizedPath.startsWith('/');
+  const absolute = isAbsoluteProjectPath(normalizedPath);
   const segments: string[] = [];
 
   for (const segment of normalizedPath.split('/')) {
@@ -147,7 +152,8 @@ function collapseDotSegments(path: string): string {
     segments.push(segment);
   }
 
-  return normalizeProjectPath(`${absolute ? '/' : ''}${segments.join('/')}`);
+  const prefix = absolute && normalizedPath.startsWith('/') ? '/' : '';
+  return normalizeProjectPath(`${prefix}${segments.join('/')}`);
 }
 
 export async function loadTemporalExplorerProject(

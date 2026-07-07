@@ -40,7 +40,7 @@ function getWorkflowName(
 export async function createExplorerBundle(
   options: CreateExplorerBundleOptions = {},
 ): Promise<TemporalExplorerResult<ExplorerArtifacts>> {
-  const root = options.root ?? '/project';
+  const root = options.root ?? options.fileSource?.root ?? '/project';
   const fileSource =
     options.fileSource ??
     new InMemoryFileSource(

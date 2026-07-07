@@ -7,17 +7,25 @@ export function normalizeProjectPath(path: string): string {
   return normalized.length > 1 ? normalized.replace(/\/$/u, '') : normalized;
 }
 
+export function isAbsoluteProjectPath(path: string): boolean {
+  return path.startsWith('/') || /^[a-z]:\//iu.test(path);
+}
+
 export function joinProjectPath(...parts: string[]): string {
   const [first = '', ...rest] = parts;
   const joined = [first, ...rest]
     .filter((part) => part.length > 0)
     .join('/')
     .replace(/\/+/gu, '/');
-  return normalizeProjectPath(first.startsWith('/') ? `/${joined.replace(/^\/+/u, '')}` : joined);
+  return normalizeProjectPath(
+    isAbsoluteProjectPath(first) && first.startsWith('/')
+      ? `/${joined.replace(/^\/+/u, '')}`
+      : joined,
+  );
 }
 
 export function resolveProjectPath(root: string, path: string): string {
-  if (path.startsWith('/')) {
+  if (isAbsoluteProjectPath(path)) {
     return normalizeProjectPath(path);
   }
 

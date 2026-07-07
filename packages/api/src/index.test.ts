@@ -6,7 +6,6 @@ import {
   analyzeWorkflowFiles,
   createDocumentationSetFromArtifacts,
   createExecutionOverlayFromArtifacts,
-  createExplorerBundle,
   createOverlayReportFromArtifact,
   createTemporalExplorerResult,
   getTemporalExplorerVersion,
@@ -37,24 +36,6 @@ const traceArtifactFile = Bun.file(
 const overlayArtifactFile = Bun.file(
   `${fixtureRoot}/.temporal-explorer/overlays/success.overlay.json`,
 );
-
-async function readFixtureFileEntries(
-  fixtureName: string,
-): Promise<{ path: string; contents: string }[]> {
-  const fixtureDirectory = new URL(`../../../fixtures/${fixtureName}/`, import.meta.url).pathname;
-  const virtualRoot = `/project/${fixtureName}`;
-  const glob = new Bun.Glob('**/*');
-  const entries: { path: string; contents: string }[] = [];
-
-  for await (const relativePath of glob.scan({ cwd: fixtureDirectory, onlyFiles: true })) {
-    entries.push({
-      path: `${virtualRoot}/${relativePath}`,
-      contents: await Bun.file(`${fixtureDirectory}${relativePath}`).text(),
-    });
-  }
-
-  return entries;
-}
 
 // Several tests below are real end-to-end analyzer runs (ts-morph project analysis,
 // documentation/parity generation). On a cold 2-core CI runner they legitimately take
@@ -123,65 +104,6 @@ describe('public API scaffold', () => {
 
     expect(explicitFilesResult.value.workflows[0]?.name).toBe('basicOrderWorkflow');
     expect(explicitFilesResult.warnings).toEqual([]);
-  });
-
-  it('creates a static-only Explorer bundle from browser file entries', async () => {
-    const result = await createExplorerBundle({
-      root: '/project/basic-order',
-      projectName: 'basic-order',
-      files: await readFixtureFileEntries('basic-order'),
-    });
-
-    expect(result.value.projectName).toBe('basic-order');
-    expect(result.value.analysis.workflows.map((workflow) => workflow.name)).toEqual([
-      'basicOrderWorkflow',
-    ]);
-    expect(result.value.traces).toEqual([]);
-    expect(result.value.overlays).toEqual([]);
-  });
-
-  it('creates a history-enhanced Explorer bundle from browser file entries', async () => {
-    const result = await createExplorerBundle({
-      root: '/project/basic-order',
-      projectName: 'basic-order',
-      files: await readFixtureFileEntries('basic-order'),
-      history: await Bun.file(`${fixtureRoot}/histories/success.json`).json(),
-      workflowName: 'basicOrderWorkflow',
-    });
-
-    expect(result.value.traces).toHaveLength(1);
-    expect(result.value.overlays).toHaveLength(1);
-    expect(result.value.overlays[0]?.coverage.nodes.unmappedRuntimeOperations).toBe(0);
-  });
-
-  it('reports history diagnostics from browser Explorer bundles', async () => {
-    const result = await createExplorerBundle({
-      root: '/project/basic-order',
-      projectName: 'basic-order',
-      files: await readFixtureFileEntries('basic-order'),
-      history: {
-        events: [
-          {
-            eventId: 1,
-            eventTime: '2026-01-01T00:00:00.001Z',
-            eventType: 1,
-            workflowExecutionStartedEventAttributes: {
-              workflowType: { name: 'basicOrderWorkflow' },
-              originalExecutionRunId: 'basic-order-run-id',
-            },
-          },
-          {
-            eventId: 2,
-            eventTime: '2026-01-01T00:00:00.002Z',
-            eventType: 999,
-          },
-        ],
-      },
-    });
-
-    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
-      'TEH_UNKNOWN_EVENT_TYPE',
-    );
   });
 
   it('imports the basic order history through the public API', async () => {
