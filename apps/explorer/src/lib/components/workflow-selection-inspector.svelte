@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge } from '$cinder-components/badge';
+  import { Badge } from '@lostgradient/cinder/badge';
 
   import { formatEventReferences, type RuntimeOverlayState } from '$lib/graph/projection';
   import { formatTimestamp, statusBadgeVariant } from '$lib/graph/runtime-display';

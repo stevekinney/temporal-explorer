@@ -2,9 +2,6 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  optimizeDeps: {
-    exclude: ['@lostgradient/cinder'],
-  },
   plugins: [sveltekit()],
   ssr: {
     noExternal: true,

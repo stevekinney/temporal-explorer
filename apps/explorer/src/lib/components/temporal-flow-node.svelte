@@ -34,7 +34,7 @@
 </script>
 
 <script lang="ts">
-  import { Badge } from '$cinder-components/badge';
+  import { Badge } from '@lostgradient/cinder/badge';
   import { Handle, Position, type NodeProps } from '@xyflow/svelte';
 
   import { runtimeStateToken } from '$lib/graph/projection';

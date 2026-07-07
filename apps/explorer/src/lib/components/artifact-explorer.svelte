@@ -9,23 +9,25 @@
     operationKindLabel,
     statusBadgeVariant,
   } from '$lib/graph/runtime-display';
-  import { Badge } from '$cinder-components/badge';
-  import { Card } from '$cinder-components/card';
-  import { DescriptionList } from '$cinder-components/description-list';
-  import { EmptyState } from '$cinder-components/empty-state';
-  import { SideNavigation } from '$cinder-components/side-navigation';
-  import { SideNavigationItem } from '$cinder-components/side-navigation-item';
-  import { Sidebar } from '$cinder-components/sidebar';
-  import { Tab } from '$cinder-components/tab';
-  import { TabList } from '$cinder-components/tab-list';
-  import { TabPanel } from '$cinder-components/tab-panel';
-  import { Table } from '$cinder-components/table';
-  import { TableBody } from '$cinder-components/table-body';
-  import { TableCell } from '$cinder-components/table-cell';
-  import { TableHeader } from '$cinder-components/table-header';
-  import { TableHeaderCell } from '$cinder-components/table-header-cell';
-  import { TableRow } from '$cinder-components/table-row';
-  import { Tabs } from '$cinder-components/tabs';
+  import { Badge } from '@lostgradient/cinder/badge';
+  import { Card } from '@lostgradient/cinder/card';
+  import { DescriptionList } from '@lostgradient/cinder/description-list';
+  import { EmptyState } from '@lostgradient/cinder/empty-state';
+  import { SideNavigation } from '@lostgradient/cinder/side-navigation';
+  import { SideNavigationItem } from '@lostgradient/cinder/side-navigation-item';
+  import { Sidebar } from '@lostgradient/cinder/sidebar';
+  import { Stat } from '@lostgradient/cinder/stat';
+  import { StatGroup } from '@lostgradient/cinder/stat-group';
+  import { Tab } from '@lostgradient/cinder/tab';
+  import { TabList } from '@lostgradient/cinder/tab-list';
+  import { TabPanel } from '@lostgradient/cinder/tab-panel';
+  import { Table } from '@lostgradient/cinder/table';
+  import { TableBody } from '@lostgradient/cinder/table-body';
+  import { TableCell } from '@lostgradient/cinder/table-cell';
+  import { TableHeader } from '@lostgradient/cinder/table-header';
+  import { TableHeaderCell } from '@lostgradient/cinder/table-header-cell';
+  import { TableRow } from '@lostgradient/cinder/table-row';
+  import { Tabs } from '@lostgradient/cinder/tabs';
   import {
     Activity,
     AlertTriangle,
@@ -283,30 +285,20 @@
         {/if}
       </section>
 
-      <section class="signal-strip" aria-label="Artifact summary">
-        <div>
-          <span>Activities</span>
-          <strong>{activityCommands.length}</strong>
-        </div>
-        <div>
-          <span>Messages</span>
-          <strong>{messageSurfaceCount}</strong>
-        </div>
+      <StatGroup
+        label="Artifact summary"
+        columns="auto"
+        variant="shared-borders"
+        class="artifact-summary"
+      >
+        <Stat label="Activities" value={activityCommands.length} />
+        <Stat label="Messages" value={messageSurfaceCount} />
         {#if selectedTrace}
-          <div>
-            <span>Observed</span>
-            <strong>{selectedOverlay?.coverage.activities.observed ?? 0}</strong>
-          </div>
-          <div>
-            <span>Runtime status</span>
-            <strong>{selectedTrace.execution.status}</strong>
-          </div>
+          <Stat label="Observed" value={selectedOverlay?.coverage.activities.observed ?? 0} />
+          <Stat label="Runtime status" value={selectedTrace.execution.status} />
         {/if}
-        <div>
-          <span>Diagnostics</span>
-          <strong>{diagnostics.length}</strong>
-        </div>
-      </section>
+        <Stat label="Diagnostics" value={diagnostics.length} />
+      </StatGroup>
 
       <Tabs bind:value={activeTab} class="detail-tabs">
         <TabList label="Workflow detail views">
@@ -633,14 +625,12 @@
 
   .brand-lockup div span,
   .artifact-footer span,
-  .eyebrow,
-  .signal-strip span {
+  .eyebrow {
     color: #5d6b75;
     font-size: 0.8125rem;
   }
 
-  .workflow-nav-item,
-  .signal-strip strong {
+  .workflow-nav-item {
     overflow-wrap: anywhere;
   }
 
@@ -661,7 +651,6 @@
   }
 
   .workflow-header,
-  .signal-strip,
   .panel-grid {
     display: grid;
     gap: 1rem;
@@ -748,55 +737,18 @@
     color: #64717a;
   }
 
-  .signal-strip {
-    position: relative;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    align-items: stretch;
-    padding: 0.875rem 1rem;
+  :global(.artifact-summary) {
     margin-bottom: 1rem;
-    border: 1px solid #cbd7df;
-    border-radius: 0.5rem;
-    background: #ffffff;
-    box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
+    min-width: 0;
   }
 
-  .embedded .signal-strip {
-    display: flex;
-    gap: 0.75rem;
+  :global(.embedded .artifact-summary) {
     align-items: center;
-    padding: 0;
     margin-bottom: 0.35rem;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .embedded .signal-strip strong {
-    font-size: 0.82rem;
   }
 
   .embedded :global(.detail-tabs [role='tablist']) {
     margin-bottom: 0.35rem;
-  }
-
-  .signal-strip div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 0;
-  }
-
-  .embedded .signal-strip div {
-    flex-direction: row;
-    gap: 0.3rem;
-    align-items: baseline;
-  }
-
-  .signal-strip strong {
-    color: #172026;
-    font-size: 1.25rem;
-    line-height: 1.1;
   }
 
   :global(.detail-tabs) {
@@ -842,9 +794,8 @@
       min-width: 0;
     }
 
-    .signal-strip {
-      grid-auto-flow: row;
-      grid-auto-columns: auto;
+    :global(.artifact-summary.cinder-stat-group[data-cinder-columns='auto']) {
+      grid-template-columns: 1fr;
     }
   }
 </style>

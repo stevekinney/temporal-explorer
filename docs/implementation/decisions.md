@@ -160,7 +160,19 @@ Alternatives considered: Use the root page as the server readiness endpoint or r
 
 Verification impact: `bunx temporal-explorer open --project fixtures/basic-order` verifies startup and shutdown. `bun run ui:e2e`, `bun run ui:accessibility`, and `bun run ui:server-lifecycle` verify the rendered artifact UI and local process lifecycle.
 
+## 2026-07-07: Consume Cinder Through Public Package Entrypoints
+
+Context: `@lostgradient/cinder@0.7.0` publishes server-safe public component subpaths for the Explorer shell components, including segmented controls and stat groups. The prior `$cinder-components` source alias was a temporary workaround for package-shape failures tracked upstream as stevekinney/cinder#580.
+
+Decision: Import Cinder components through documented `@lostgradient/cinder/*` public subpaths and remove the downstream SvelteKit alias, TypeScript `allowImportingTsExtensions`, Vite `optimizeDeps.exclude`, and SSR `noExternal` workarounds. Keep the application on the package contract Cinder publishes rather than depending on its private source tree.
+
+Alternatives considered: Keep the source alias after the upgrade or switch to the Cinder root barrel. Keeping the alias would preserve a workaround whose upstream blocker is closed. The root barrel would broaden the imported surface area without providing a benefit over the public component subpaths used by this app.
+
+Verification impact: `bun run --cwd apps/explorer typecheck`, `bun test apps/explorer`, the Explorer build, and the UI Playwright gates verify that published Cinder package entrypoints work in SvelteKit SSR and browser hydration.
+
 ## 2026-06-30: Use Targeted Cinder Source Component Imports for the Explorer Shell
+
+Superseded by the 2026-07-07 public-entrypoint decision above.
 
 Context: Stage 6 requires `@lostgradient/cinder` for the local explorer UI. In this SvelteKit app, importing from the Cinder root package caused SSR snippet rendering failures through the published server build. Forcing the root source barrel pulled in unrelated editor and markdown surfaces and produced a slow, noisy first SSR compile.
 

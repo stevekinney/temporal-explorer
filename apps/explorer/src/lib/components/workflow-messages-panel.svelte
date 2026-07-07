@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { Badge } from '$cinder-components/badge';
-  import { Card } from '$cinder-components/card';
-  import { EmptyState } from '$cinder-components/empty-state';
-  import { Table } from '$cinder-components/table';
-  import { TableBody } from '$cinder-components/table-body';
-  import { TableCell } from '$cinder-components/table-cell';
-  import { TableHeader } from '$cinder-components/table-header';
-  import { TableHeaderCell } from '$cinder-components/table-header-cell';
-  import { TableRow } from '$cinder-components/table-row';
+  import { Badge } from '@lostgradient/cinder/badge';
+  import { Card } from '@lostgradient/cinder/card';
+  import { EmptyState } from '@lostgradient/cinder/empty-state';
+  import { Table } from '@lostgradient/cinder/table';
+  import { TableBody } from '@lostgradient/cinder/table-body';
+  import { TableCell } from '@lostgradient/cinder/table-cell';
+  import { TableHeader } from '@lostgradient/cinder/table-header';
+  import { TableHeaderCell } from '@lostgradient/cinder/table-header-cell';
+  import { TableRow } from '@lostgradient/cinder/table-row';
 
   import type { GraphProjection } from '$lib/graph/projection';
   import { sourceText } from '$lib/graph/projection';

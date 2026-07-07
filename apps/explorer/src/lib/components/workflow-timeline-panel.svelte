@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Badge } from '$cinder-components/badge';
-  import { EmptyState } from '$cinder-components/empty-state';
+  import { Badge } from '@lostgradient/cinder/badge';
+  import { EmptyState } from '@lostgradient/cinder/empty-state';
 
   import { runtimeStateToken, type TimelineRow } from '$lib/graph/projection';
   import { compactEventSummary, formatTimestamp } from '$lib/graph/runtime-display';
@@ -25,6 +25,7 @@
         type="button"
         class="timeline-item"
         data-active={row.entry.operationId === selectedRuntimeOperationId ? 'true' : undefined}
+        aria-current={row.entry.operationId === selectedRuntimeOperationId ? 'true' : undefined}
         data-state={runtimeStateToken(row.state)}
         onclick={() => selectTimelineRow(row)}
       >
