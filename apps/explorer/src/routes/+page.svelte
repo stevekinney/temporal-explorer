@@ -327,7 +327,7 @@
           requestedTrace={data.requestedTrace}
           siteUrl={data.siteUrl}
         />
-      {:else if selectedExampleArtifacts}
+      {:else if sourceMode === 'examples' && selectedExampleArtifacts}
         <ArtifactExplorer
           artifacts={selectedExampleArtifacts}
           embedded
