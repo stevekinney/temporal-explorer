@@ -18,17 +18,33 @@ export function renderSequence(
 ): string | undefined {
   let cursor: string | undefined = entry;
   let pendingLabel = entryLabel;
+  let unreachableRegionEndOffset: number | undefined;
 
   for (const node of nodes) {
     if (cursor === undefined) {
+      if (node.type === 'command' && commandSourceStartsInside(node, unreachableRegionEndOffset)) {
+        renderUnlinkedCommandNode(node, context);
+        continue;
+      }
+
       break;
     }
 
     cursor = renderNode(node, cursor, context, pendingLabel);
+    unreachableRegionEndOffset = cursor === undefined ? node.source?.end.offset : undefined;
     pendingLabel = undefined;
   }
 
   return cursor;
+}
+
+function commandSourceStartsInside(
+  node: Extract<FlowNode, { type: 'command' }>,
+  endOffset: number | undefined,
+): boolean {
+  return (
+    endOffset !== undefined && (node.source?.start.offset ?? Number.POSITIVE_INFINITY) <= endOffset
+  );
 }
 
 function renderArmInto(
@@ -37,17 +53,20 @@ function renderArmInto(
   join: string,
   label: string | undefined,
   context: RenderContext,
-): void {
+): boolean {
   if (body.length === 0) {
     pushEdge(context, entry, join, label);
-    return;
+    return true;
   }
 
   const exit = renderSequence(body, entry, context, label);
 
   if (exit !== undefined) {
     pushEdge(context, exit, join);
+    return true;
   }
+
+  return false;
 }
 
 function renderCommandNode(
@@ -56,6 +75,16 @@ function renderCommandNode(
   context: RenderContext,
   label: string | undefined,
 ): string {
+  const id = renderUnlinkedCommandNode(node, context);
+  pushEdge(context, entry, id, label);
+
+  return id;
+}
+
+function renderUnlinkedCommandNode(
+  node: Extract<FlowNode, { type: 'command' }>,
+  context: RenderContext,
+): string {
   const command = context.commandsById.get(node.commandId);
   const id = toMermaidId(`${node.id}${context.nodeIdSuffix}`);
   const kind = command?.kind ?? 'activity';
@@ -63,7 +92,6 @@ function renderCommandNode(
   const suffix = command?.cardinality === 'fan-out' ? ' ×N' : '';
 
   context.nodes.push(shapeForKind(kind, id, `${name}${suffix}`));
-  pushEdge(context, entry, id, label);
 
   return id;
 }
@@ -105,7 +133,7 @@ function renderBranchNode(
   entry: string,
   context: RenderContext,
   label: string | undefined,
-): string {
+): string | undefined {
   const decision = toMermaidId(`${node.id}${context.nodeIdSuffix}`);
   const testCommand = node.testCommandId ? context.commandsById.get(node.testCommandId) : undefined;
   const decisionLabel = testCommand?.name ?? (node.branchKind === 'switch' ? 'switch' : 'if');
@@ -114,26 +142,49 @@ function renderBranchNode(
 
   const join = nextNodeId(context);
   context.nodes.push(`  ${join}(( ))`);
+  const isSwitch = node.branchKind === 'switch';
 
-  for (const clause of node.clauses) {
-    renderArmInto(
-      switchClauseBody(clause.body, node.branchKind),
-      decision,
-      join,
-      clause.label,
-      context,
-    );
+  if (isSwitch) {
+    context.switchTargets.push({ breakTarget: join });
   }
 
-  renderArmInto(
-    switchClauseBody(node.otherwise ?? [], node.branchKind),
-    decision,
-    join,
-    'else',
-    context,
-  );
+  const hasNormalExit = renderBranchArms(node, decision, join, context);
 
-  return join;
+  if (isSwitch) {
+    context.switchTargets.pop();
+  }
+
+  return hasNormalExit ? join : undefined;
+}
+
+function renderBranchArms(
+  node: Extract<FlowNode, { type: 'branch' }>,
+  decision: string,
+  join: string,
+  context: RenderContext,
+): boolean {
+  let hasNormalExit = false;
+
+  for (const clause of node.clauses) {
+    hasNormalExit =
+      renderArmInto(
+        switchClauseBody(clause.body, node.branchKind),
+        decision,
+        join,
+        clause.label,
+        context,
+      ) || hasNormalExit;
+  }
+
+  return (
+    renderArmInto(
+      switchClauseBody(node.otherwise ?? [], node.branchKind),
+      decision,
+      join,
+      'else',
+      context,
+    ) || hasNormalExit
+  );
 }
 
 function renderLoopNode(
@@ -235,9 +286,8 @@ function renderTryNode(
     pushEdge(context, bodyExit, converge);
   }
 
-  const handlerEntry = bodyExit ?? entry;
   const handlerHasNormalExit = withFinallyFrame(finalizer, context, () =>
-    renderTryHandler(node, handlerEntry, converge, context),
+    renderTryHandler(node, entry, converge, context),
   );
   const hasNormalExit = bodyExit !== undefined || handlerHasNormalExit;
 

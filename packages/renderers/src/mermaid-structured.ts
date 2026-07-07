@@ -16,8 +16,10 @@ export function renderStructuredWorkflowMermaid(
     startId,
     commandsById: new Map(workflow.temporalCommands.map((command) => [command.id, command])),
     loopTargets: [],
+    switchTargets: [],
     finallyStack: [],
     nodeIdSuffix: '',
+    abruptPathCounter: { value: 0 },
   };
   const exit = renderSequence(workflow.body.nodes, context.startId, context);
   const lines = [

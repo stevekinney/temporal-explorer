@@ -8,7 +8,13 @@ import {
 
 import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } from './projection';
 import { isGraphCommand } from './projection-builders';
-import { addStructural, pushEdge, walkCommand, type FlowContext } from './projection-flow-core';
+import {
+  addStructural,
+  addUnlinkedCommand,
+  pushEdge,
+  walkCommand,
+  type FlowContext,
+} from './projection-flow-core';
 import { walkTerminalNode } from './projection-flow-terminal';
 
 export function buildControlFlowGraph(
@@ -30,8 +36,11 @@ export function buildControlFlowGraph(
     overlay,
     projection,
     loopTargets: [],
+    switchTargets: [],
     finallyStack: [],
     duplicateCommandNodes: false,
+    duplicateCommandPath: undefined,
+    abruptPathCounter: { value: 0 },
   };
 
   const exit = walkSequence(workflow.body.nodes, startId, undefined, context);
@@ -53,17 +62,33 @@ function walkSequence(
 ): string | undefined {
   let cursor: string | undefined = entry;
   let label = entryLabel;
+  let unreachableRegionEndOffset: number | undefined;
 
   for (const node of nodes) {
     if (cursor === undefined) {
+      if (node.type === 'command' && commandSourceStartsInside(node, unreachableRegionEndOffset)) {
+        addUnlinkedCommand(node, parentId, context);
+        continue;
+      }
+
       break; // Unreachable: a terminal ended this path.
     }
 
     cursor = walkNode(node, cursor, parentId, context, label);
+    unreachableRegionEndOffset = cursor === undefined ? node.source?.end.offset : undefined;
     label = '';
   }
 
   return cursor;
+}
+
+function commandSourceStartsInside(
+  node: Extract<FlowNode, { type: 'command' }>,
+  endOffset: number | undefined,
+): boolean {
+  return (
+    endOffset !== undefined && (node.source?.start.offset ?? Number.POSITIVE_INFINITY) <= endOffset
+  );
 }
 
 function walkArm(
@@ -73,17 +98,20 @@ function walkArm(
   label: string,
   parentId: string | undefined,
   context: FlowContext,
-): void {
+): boolean {
   if (body.length === 0) {
     pushEdge(context, entry, join, label);
-    return;
+    return true;
   }
 
   const exit = walkSequence(body, entry, parentId, context, label);
 
   if (exit !== undefined) {
     pushEdge(context, exit, join, '');
+    return true;
   }
+
+  return false;
 }
 
 function walkNode(
@@ -119,23 +147,45 @@ function walkBranch(
   parentId: string | undefined,
   context: FlowContext,
   label: string,
-): string {
+): string | undefined {
   const container = addStructural(context, 'branch-region', node.branchKind, parentId, true);
   const test = node.testCommandId ? context.commandsById.get(node.testCommandId) : undefined;
   const decision = addStructural(context, 'decision', test?.name ?? node.branchKind, container);
   pushEdge(context, entry, decision, label);
 
   const join = addStructural(context, 'join', '', container);
+  const isSwitch = node.branchKind === 'switch';
+
+  if (isSwitch) {
+    context.switchTargets.push({ breakTarget: join });
+  }
+
+  const hasNormalExit = walkBranchArms(node, decision, join, container, context);
+
+  if (isSwitch) {
+    context.switchTargets.pop();
+  }
+
+  return hasNormalExit ? join : undefined;
+}
+
+function walkBranchArms(
+  node: Extract<FlowNode, { type: 'branch' }>,
+  decision: string,
+  join: string,
+  container: string,
+  context: FlowContext,
+): boolean {
+  let hasNormalExit = false;
 
   for (const clause of node.clauses) {
     const body = switchClauseBody(clause.body, node.branchKind);
-    walkArm(body, decision, join, clause.label, container, context);
+    hasNormalExit =
+      walkArm(body, decision, join, clause.label, container, context) || hasNormalExit;
   }
 
   const otherwise = switchClauseBody(node.otherwise ?? [], node.branchKind);
-  walkArm(otherwise, decision, join, 'else', container, context);
-
-  return join;
+  return walkArm(otherwise, decision, join, 'else', container, context) || hasNormalExit;
 }
 
 function walkLoop(
@@ -282,9 +332,8 @@ function walkTry(
     pushEdge(context, bodyExit, converge, '');
   }
 
-  const handlerEntry = bodyExit ?? entry;
   const handlerHasNormalExit = withFinallyFrame(finalizer, container, context, () =>
-    walkTryHandler(node, handlerEntry, converge, container, context),
+    walkTryHandler(node, entry, converge, container, context),
   );
   const hasNormalExit = bodyExit !== undefined || handlerHasNormalExit;
 

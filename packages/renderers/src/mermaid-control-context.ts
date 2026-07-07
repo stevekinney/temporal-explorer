@@ -8,6 +8,10 @@ export type LoopTarget = {
   continueTarget: string;
 };
 
+export type SwitchTarget = {
+  breakTarget: string;
+};
+
 export type RenderContext = {
   nodes: string[];
   edges: string[];
@@ -15,8 +19,10 @@ export type RenderContext = {
   startId: string;
   commandsById: Map<string, TemporalCommand>;
   loopTargets: LoopTarget[];
+  switchTargets: SwitchTarget[];
   finallyStack: { finalizer: FlowNode[] }[];
   nodeIdSuffix: string;
+  abruptPathCounter: { value: number };
 };
 
 export function nextNodeId(context: RenderContext): string {
@@ -44,6 +50,12 @@ export function terminalTarget(
   context: RenderContext,
 ): string | undefined {
   if (node.terminalKind === 'break') {
+    if (node.label === undefined) {
+      return (
+        context.switchTargets.at(-1)?.breakTarget ?? matchingLoopTarget(node, context)?.breakTarget
+      );
+    }
+
     return matchingLoopTarget(node, context)?.breakTarget;
   }
 
@@ -72,8 +84,9 @@ export function routeAbruptExit(
 
     const previousFinallyStack = context.finallyStack;
     const previousNodeIdSuffix = context.nodeIdSuffix;
+    context.abruptPathCounter.value += 1;
     context.finallyStack = previousFinallyStack.slice(0, index);
-    context.nodeIdSuffix = `${previousNodeIdSuffix}_finally_${index}`;
+    context.nodeIdSuffix = `${previousNodeIdSuffix}_finally_${index}_${context.abruptPathCounter.value}`;
     cursor = renderFinalizer(frame.finalizer, cursor);
     context.finallyStack = previousFinallyStack;
     context.nodeIdSuffix = previousNodeIdSuffix;

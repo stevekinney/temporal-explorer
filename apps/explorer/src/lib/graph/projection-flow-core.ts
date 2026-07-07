@@ -13,6 +13,10 @@ export type LoopTarget = {
   continueTarget: string;
 };
 
+export type SwitchTarget = {
+  breakTarget: string;
+};
+
 export type FinallyFrame = {
   finalizer: FlowNode[];
   parentId: string | undefined;
@@ -34,8 +38,11 @@ export type FlowContext = {
   overlay: ExecutionOverlayDocument | undefined;
   projection: ProjectionBuildContext;
   loopTargets: LoopTarget[];
+  switchTargets: SwitchTarget[];
   finallyStack: FinallyFrame[];
   duplicateCommandNodes: boolean;
+  duplicateCommandPath: string | undefined;
+  abruptPathCounter: { value: number };
 };
 
 function nextId(context: FlowContext, prefix: string): string {
@@ -91,18 +98,15 @@ export function pushEdge(
   });
 }
 
-/** Renders a command leaf, linking it from `entry`; returns the command id, or `entry` if not flow-relevant. */
-export function walkCommand(
+function commandGraphNode(
   node: Extract<FlowNode, { type: 'command' }>,
-  entry: string,
   parentId: string | undefined,
   context: FlowContext,
-  label: string,
-): string {
+): TemporalGraphNode | undefined {
   const command = context.commandsById.get(node.commandId);
 
   if (!command) {
-    return entry; // Not a flow-relevant command (e.g. a branch test); keep the cursor.
+    return undefined;
   }
 
   const graphNode = createCommandGraphNode(
@@ -113,9 +117,46 @@ export function walkCommand(
     context.projection,
   );
   graphNode.parentId = parentId;
-  if (context.duplicateCommandNodes) {
-    graphNode.id = `${command.id}:flow:${context.counter.value + 1}`;
+  if (
+    context.duplicateCommandNodes &&
+    context.nodes.some((existing) => existing.id === command.id)
+  ) {
+    graphNode.id = `${command.id}:flow:${context.duplicateCommandPath ?? context.counter.value + 1}`;
   }
+
+  return graphNode;
+}
+
+/** Materializes a command node without linking it into the current control-flow path. */
+export function addUnlinkedCommand(
+  node: Extract<FlowNode, { type: 'command' }>,
+  parentId: string | undefined,
+  context: FlowContext,
+): string | undefined {
+  const graphNode = commandGraphNode(node, parentId, context);
+
+  if (!graphNode || context.nodes.some((existing) => existing.id === graphNode.id)) {
+    return undefined;
+  }
+
+  context.nodes.push(graphNode);
+  return graphNode.id;
+}
+
+/** Renders a command leaf, linking it from `entry`; returns the command id, or `entry` if not flow-relevant. */
+export function walkCommand(
+  node: Extract<FlowNode, { type: 'command' }>,
+  entry: string,
+  parentId: string | undefined,
+  context: FlowContext,
+  label: string,
+): string {
+  const graphNode = commandGraphNode(node, parentId, context);
+
+  if (!graphNode) {
+    return entry; // Not a flow-relevant command (e.g. a branch test); keep the cursor.
+  }
+
   context.nodes.push(graphNode);
   pushEdge(context, entry, graphNode.id, label);
 

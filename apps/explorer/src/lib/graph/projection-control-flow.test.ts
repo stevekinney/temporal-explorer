@@ -47,6 +47,10 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
       { kind: 'join', label: '', state: 'observed' },
       { kind: 'terminal', label: 'throw', state: 'observed' },
       { kind: 'terminal', label: 'throw', state: 'observed' },
+      { kind: 'activity', label: 'reserveResources', state: 'completed' },
+      { kind: 'timer', label: "'30 days'", state: 'canceled' },
+      { kind: 'activity', label: 'useResources', state: 'not taken' },
+      { kind: 'activity', label: 'releaseResources', state: 'completed' },
       { kind: 'cancellation-scope', label: 'cancellable', state: 'observed' },
       { kind: 'cancellation-scope', label: 'nonCancellable', state: 'observed' },
     ]);

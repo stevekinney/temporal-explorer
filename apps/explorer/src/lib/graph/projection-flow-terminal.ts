@@ -23,6 +23,12 @@ function terminalTarget(
   context: FlowContext,
 ): string | undefined {
   if (node.terminalKind === 'break') {
+    if (node.label === undefined) {
+      return (
+        context.switchTargets.at(-1)?.breakTarget ?? matchingLoopTarget(node, context)?.breakTarget
+      );
+    }
+
     return matchingLoopTarget(node, context)?.breakTarget;
   }
 
@@ -51,11 +57,15 @@ function routeAbruptExit(
 
     const previousFinallyStack = context.finallyStack;
     const previousDuplicateCommandNodes = context.duplicateCommandNodes;
+    const previousDuplicateCommandPath = context.duplicateCommandPath;
+    context.abruptPathCounter.value += 1;
     context.finallyStack = previousFinallyStack.slice(0, index);
     context.duplicateCommandNodes = true;
+    context.duplicateCommandPath = `finally-${index}-${context.abruptPathCounter.value}`;
     cursor = renderFinalizer(frame, cursor);
     context.finallyStack = previousFinallyStack;
     context.duplicateCommandNodes = previousDuplicateCommandNodes;
+    context.duplicateCommandPath = previousDuplicateCommandPath;
   }
 
   if (cursor !== undefined && target !== undefined) {
