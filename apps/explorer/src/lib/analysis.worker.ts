@@ -22,7 +22,7 @@ function send(message: AnalysisWorkerResponse): void {
   postMessage(message);
 }
 
-self.onmessage = async (event: MessageEvent<AnalysisWorkerRequest>) => {
+self.addEventListener('message', async (event: MessageEvent<AnalysisWorkerRequest>) => {
   try {
     const result = await createExplorerBundle({
       root: '/project',
@@ -42,4 +42,4 @@ self.onmessage = async (event: MessageEvent<AnalysisWorkerRequest>) => {
       message: error instanceof Error ? error.message : String(error),
     });
   }
-};
+});

@@ -576,3 +576,14 @@ That end-to-end pass caught a real extraction gap: destructured `proxyActivities
 - `bun test --coverage --coverage-reporter=lcov --coverage-dir=coverage` — pass; 212 pass, 3 live skips, 0 fail. Added `bunfig.toml` `test.pathIgnorePatterns = ["test-corpora/**"]` so bare Bun test discovery does not execute the gitignored external compatibility corpus.
 - LCOV audit of `coverage/lcov.info` — not exact 100%: 8198/8975 lines (91.34261838440112%) and 857/911 functions (94.07244785949506%).
 - `bun run validate` — pass end to end: typecheck, package lint/test/build, script lint, and format check.
+
+## 2026-07-06: Web Workbench Examples and Upload Polish
+
+- Deployed web entry now opens as a single workbench: example Workflow catalog and local project upload share one source rail, and the artifact viewer runs embedded so the flow projection remains the main surface.
+- Local `temporal-explorer open` keeps the standalone adapter-node artifact viewer when no web example catalog is present.
+- `bun test apps/explorer` — pass; 34 tests, including the committed example catalog loader.
+- `bun run --cwd apps/explorer typecheck` — pass with 0 Svelte errors and 0 warnings.
+- `VERCEL=1 bun run explorer:web:build` — pass; configured command writes `apps/explorer/build` for `vercel.json` while clearing `VERCEL` inside the build process to avoid adapter-static zero-config output drift.
+- `bun run ui:e2e:web` — pass; static build serves examples, switches to Timer Race, uploads `fixtures/basic-order`, imports Event History JSON, and removes history back to static analysis.
+- `bun run --cwd apps/explorer lint` — pass with 0 warnings and 0 errors after converting the analysis worker listener, typing the service worker global, and using the Worker `postMessage` options overload.
+- `bun run validate` — pass end to end: typecheck, package lint/test/build, script lint, and format check. Explorer lint reports 0 warnings and 0 errors; CLI lint still reports the pre-existing warning-only findings.

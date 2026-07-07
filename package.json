@@ -34,7 +34,7 @@
     "dev": "turbo run dev",
     "examples:library": "bun run examples/analyze-workflow-files.ts && bun run examples/import-event-history.ts && bun run examples/analyze-project.ts",
     "explorer:fixtures": "bun run scripts/ui/explore-all-fixtures.ts",
-    "explorer:web:build": "EXPLORER_TARGET=web bun run --cwd apps/explorer build",
+    "explorer:web:build": "VERCEL= EXPLORER_TARGET=web bun run --cwd apps/explorer build",
     "fixtures:assert-constructs": "bun run scripts/fixtures/assert-constructs.ts",
     "fixtures:generate-histories": "bun run scripts/fixtures/generate-histories.ts",
     "fixtures:regenerate-artifacts": "bun run scripts/fixtures/regenerate-artifacts.ts",

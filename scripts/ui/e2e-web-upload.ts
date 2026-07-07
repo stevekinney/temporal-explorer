@@ -70,6 +70,10 @@ async function runWebUploadSmokeTest(): Promise<void> {
 
     await page.goto(server.url, { waitUntil: 'networkidle' });
     await expect(page.getByRole('heading', { name: 'Temporal Explorer' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Example workflows' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Basic Order/ })).toBeVisible();
+    await page.getByRole('button', { name: /Timer Race/ }).click();
+    await expect(page.getByRole('heading', { name: 'timerRaceWorkflow' })).toBeVisible();
 
     await page.locator('input[webkitdirectory]').setInputFiles(fixtureRoot);
     await page.getByRole('heading', { name: 'basicOrderWorkflow' }).waitFor({ timeout: 60_000 });

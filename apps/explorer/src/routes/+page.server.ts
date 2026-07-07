@@ -1,4 +1,4 @@
-import { loadExplorerArtifacts } from '$lib/server/artifacts';
+import { loadExampleArtifacts, loadExplorerArtifacts } from '$lib/server/artifacts';
 
 import type { PageServerLoad } from './$types';
 
@@ -23,6 +23,7 @@ export const load = (async ({ url }) => {
   if (isWebTarget) {
     return {
       artifacts: undefined,
+      examples: await loadExampleArtifacts(),
       requestedTrace: undefined,
       siteUrl: resolveSiteUrl(),
     };
@@ -33,6 +34,7 @@ export const load = (async ({ url }) => {
 
   return {
     artifacts: await loadExplorerArtifacts(project),
+    examples: [],
     requestedTrace,
     siteUrl: resolveSiteUrl(),
   };

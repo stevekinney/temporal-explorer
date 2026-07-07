@@ -1,5 +1,6 @@
+import { existsSync } from 'node:fs';
 import { readFile, readdir } from 'node:fs/promises';
-import { basename, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -11,6 +12,13 @@ import {
   type RuntimeTraceDocument,
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
+
+export type ExampleArtifacts = {
+  id: string;
+  title: string;
+  description: string;
+  artifacts: ExplorerArtifacts;
+};
 
 type ArtifactSchema<T> = {
   safeParse(value: unknown):
@@ -27,6 +35,26 @@ function isNoEntryError(error: unknown): boolean {
 
 function getDefaultProjectRoot(): string {
   return fileURLToPath(new URL('../../../../../fixtures/basic-order/', import.meta.url));
+}
+
+function getFixturesRoot(): string {
+  let currentDirectory = process.cwd();
+
+  while (true) {
+    const candidate = join(currentDirectory, 'fixtures');
+
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+
+    const parentDirectory = dirname(currentDirectory);
+
+    if (parentDirectory === currentDirectory) {
+      return fileURLToPath(new URL('../../../../../fixtures/', import.meta.url));
+    }
+
+    currentDirectory = parentDirectory;
+  }
 }
 
 function getProjectRoot(projectRoot: string | undefined): string {
@@ -113,4 +141,44 @@ export async function loadExplorerArtifacts(
     traces: await Promise.all(tracePaths.map(readTraceArtifact)),
     overlays: await Promise.all(overlayPaths.map(readOverlayArtifact)),
   };
+}
+
+function formatFixtureTitle(fixtureName: string): string {
+  return fixtureName
+    .split('-')
+    .map((word) => `${word[0]?.toUpperCase() ?? ''}${word.slice(1)}`)
+    .join(' ');
+}
+
+function summarizeArtifacts(artifacts: ExplorerArtifacts): string {
+  const workflowCount = artifacts.analysis.workflows.length;
+  const commandCount = artifacts.analysis.workflows.reduce(
+    (total, workflow) => total + workflow.temporalCommands.length,
+    0,
+  );
+  const traceCount = artifacts.traces.length;
+
+  return `${workflowCount} workflow${workflowCount === 1 ? '' : 's'}, ${commandCount} command${commandCount === 1 ? '' : 's'}, ${traceCount} trace${traceCount === 1 ? '' : 's'}`;
+}
+
+export async function loadExampleArtifacts(): Promise<ExampleArtifacts[]> {
+  const fixturesRoot = getFixturesRoot();
+  const entries = await readdir(fixturesRoot, { withFileTypes: true });
+  const fixtureNames = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .toSorted((left, right) => left.localeCompare(right));
+
+  return await Promise.all(
+    fixtureNames.map(async (fixtureName) => {
+      const artifacts = await loadExplorerArtifacts(join(fixturesRoot, fixtureName));
+
+      return {
+        id: fixtureName,
+        title: formatFixtureTitle(fixtureName),
+        description: summarizeArtifacts(artifacts),
+        artifacts,
+      };
+    }),
+  );
 }

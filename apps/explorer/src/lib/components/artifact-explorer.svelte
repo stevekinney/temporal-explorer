@@ -49,10 +49,12 @@
 
   let {
     artifacts,
+    embedded = false,
     requestedTrace,
     siteUrl,
   }: {
     artifacts: ExplorerArtifacts;
+    embedded?: boolean;
     requestedTrace?: string | undefined;
     siteUrl?: string | undefined;
   } = $props();
@@ -206,39 +208,41 @@
   {/if}
 </svelte:head>
 
-<div class="explorer-shell">
-  <Sidebar label="Workflow artifacts" class="workflow-sidebar">
-    {#snippet brand()}
-      <div class="brand-lockup">
-        <span class="brand-mark">TE</span>
-        <div>
-          <p>Temporal Explorer</p>
-          <span>{artifacts.projectName}</span>
+<div class="explorer-shell" class:embedded>
+  {#if !embedded}
+    <Sidebar label="Workflow artifacts" class="workflow-sidebar">
+      {#snippet brand()}
+        <div class="brand-lockup">
+          <span class="brand-mark">TE</span>
+          <div>
+            <p>Temporal Explorer</p>
+            <span>{artifacts.projectName}</span>
+          </div>
         </div>
-      </div>
-    {/snippet}
+      {/snippet}
 
-    {#snippet navigation()}
-      <SideNavigation ariaLabel="Workflow selection">
-        {#each artifacts.analysis.workflows as workflow (workflow.id)}
-          <SideNavigationItem
-            active={workflow.id === selectedWorkflow?.id}
-            current="true"
-            onclick={() => selectWorkflow(workflow.id)}
-          >
-            <span class="workflow-nav-item">{workflow.name}</span>
-          </SideNavigationItem>
-        {/each}
-      </SideNavigation>
-    {/snippet}
+      {#snippet navigation()}
+        <SideNavigation ariaLabel="Workflow selection">
+          {#each artifacts.analysis.workflows as workflow (workflow.id)}
+            <SideNavigationItem
+              active={workflow.id === selectedWorkflow?.id}
+              current="true"
+              onclick={() => selectWorkflow(workflow.id)}
+            >
+              <span class="workflow-nav-item">{workflow.name}</span>
+            </SideNavigationItem>
+          {/each}
+        </SideNavigation>
+      {/snippet}
 
-    {#snippet footer()}
-      <div class="artifact-footer">
-        <span>{artifacts.artifactDirectory}</span>
-        <Badge variant="info" size="sm">{artifacts.analysis.schemaVersion}</Badge>
-      </div>
-    {/snippet}
-  </Sidebar>
+      {#snippet footer()}
+        <div class="artifact-footer">
+          <span>{artifacts.artifactDirectory}</span>
+          <Badge variant="info" size="sm">{artifacts.analysis.schemaVersion}</Badge>
+        </div>
+      {/snippet}
+    </Sidebar>
+  {/if}
 
   <main class="workspace" aria-labelledby="workflow-title">
     {#if selectedWorkflow}
@@ -248,6 +252,19 @@
           <h1 id="workflow-title">{selectedWorkflow.name}</h1>
           <p class="signature">{workflowSignature(selectedWorkflow)}</p>
         </div>
+        {#if embedded && artifacts.analysis.workflows.length > 1}
+          <label class="workflow-switcher">
+            <span>Workflow</span>
+            <select
+              value={selectedWorkflowId}
+              onchange={(event) => selectWorkflow(event.currentTarget.value)}
+            >
+              {#each artifacts.analysis.workflows as workflow (workflow.id)}
+                <option value={workflow.id}>{workflow.name}</option>
+              {/each}
+            </select>
+          </label>
+        {/if}
       </section>
 
       <section class="signal-strip" aria-label="Artifact summary">
@@ -558,6 +575,11 @@
     grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
   }
 
+  .explorer-shell.embedded {
+    min-height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   :global(.workflow-sidebar) {
     border-right: 1px solid #cfd8df;
     background: rgba(255, 255, 255, 0.78);
@@ -618,6 +640,10 @@
     padding: clamp(1rem, 2vw, 2rem);
   }
 
+  .embedded .workspace {
+    padding: clamp(0.875rem, 1.6vw, 1.5rem);
+  }
+
   .workflow-header,
   .signal-strip,
   .panel-grid {
@@ -626,9 +652,34 @@
   }
 
   .workflow-header {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
     margin-bottom: 1rem;
+  }
+
+  .workflow-switcher {
+    display: grid;
+    gap: 0.35rem;
+    min-width: min(22rem, 34vw);
+  }
+
+  .workflow-switcher span {
+    color: #5d6b75;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .workflow-switcher select {
+    min-height: 2.45rem;
+    width: 100%;
+    border: 1px solid #c8d6dc;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    color: #172026;
+    font: inherit;
+    font-weight: 650;
+    padding: 0 2rem 0 0.75rem;
   }
 
   h1 {
@@ -709,6 +760,10 @@
     .workflow-header,
     .panel-grid {
       grid-template-columns: 1fr;
+    }
+
+    .workflow-switcher {
+      min-width: 0;
     }
 
     .signal-strip {

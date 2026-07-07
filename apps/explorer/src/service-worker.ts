@@ -5,7 +5,9 @@
 
 import { build, files, version } from '$service-worker';
 
-const worker = self as unknown as ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
+
+const worker = self;
 const cacheName = `temporal-explorer-${version}`;
 const assets = [...build, ...files];
 
