@@ -7,6 +7,12 @@ type ValidationSummary = {
   artifacts: number;
 };
 
+type HistoryEvent = {
+  eventId?: unknown;
+  eventType?: unknown;
+  [key: string]: unknown;
+};
+
 const fixturesRoot = new URL('../../fixtures/', import.meta.url);
 
 async function readJsonFile(url: URL): Promise<unknown> {
@@ -23,6 +29,90 @@ function assertHistoryShape(value: unknown, path: string): void {
   if (!Array.isArray(events) || events.length === 0) {
     throw new Error(`${path} must contain at least one Event History event.`);
   }
+
+  assertActivityCompletedStartedReferences(events as HistoryEvent[], path);
+}
+
+function readEventId(value: unknown): string | undefined {
+  return typeof value === 'string' || typeof value === 'number' ? String(value) : undefined;
+}
+
+function readAttributes(event: HistoryEvent, key: string): Record<string, unknown> | undefined {
+  const attributes = event[key];
+  return attributes && typeof attributes === 'object' && !Array.isArray(attributes)
+    ? (attributes as Record<string, unknown>)
+    : undefined;
+}
+
+function assertActivityCompletedStartedReferences(events: HistoryEvent[], path: string): void {
+  const eventsById = new Map<string, HistoryEvent>();
+
+  for (const event of events) {
+    const eventId = readEventId(event.eventId);
+
+    if (eventId) {
+      eventsById.set(eventId, event);
+    }
+  }
+
+  for (const event of events) {
+    if (Number(event.eventType) === 12) {
+      assertActivityCompletedStartedReference(event, eventsById, path);
+    }
+  }
+}
+
+function assertActivityCompletedStartedReference(
+  completedEvent: HistoryEvent,
+  eventsById: Map<string, HistoryEvent>,
+  path: string,
+): void {
+  const completedAttributes = readAttributes(
+    completedEvent,
+    'activityTaskCompletedEventAttributes',
+  );
+  const startedEventId = readEventId(completedAttributes?.['startedEventId']);
+
+  if (!startedEventId) {
+    return;
+  }
+
+  const startedEvent = eventsById.get(startedEventId);
+  if (!startedEvent || Number(startedEvent.eventType) !== 11) {
+    throw new Error(
+      `${path} ActivityTaskCompleted event ${String(
+        completedEvent.eventId,
+      )} references startedEventId ${startedEventId}, but that event is not ActivityTaskStarted.`,
+    );
+  }
+
+  assertMatchingActivitySchedule(completedEvent, completedAttributes, startedEvent, path);
+}
+
+function assertMatchingActivitySchedule(
+  completedEvent: HistoryEvent,
+  completedAttributes: Record<string, unknown> | undefined,
+  startedEvent: HistoryEvent,
+  path: string,
+): void {
+  const completedScheduledEventId = readEventId(completedAttributes?.['scheduledEventId']);
+  const startedScheduledEventId = readEventId(
+    readAttributes(startedEvent, 'activityTaskStartedEventAttributes')?.['scheduledEventId'],
+  );
+
+  if (completedScheduledEventId === startedScheduledEventId) {
+    return;
+  }
+
+  throw new Error(
+    `${path} ActivityTaskCompleted event ${String(
+      completedEvent.eventId,
+    )} references ActivityTaskStarted event ${String(
+      startedEvent.eventId,
+    )} for scheduledEventId ${String(
+      startedScheduledEventId,
+    )}, but the completion scheduledEventId is ${String(completedScheduledEventId)}.`,
+  );
 }
 
 function assertProvenanceShape(value: unknown, path: string): void {

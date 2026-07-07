@@ -60,7 +60,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "2",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+67dbee5dab2c2f17ff1cb04553fa61b25ac2cdb793b5422f0cedfed59da4edfe",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": {
           "coreUsedFlags": [1, 2, 3],
           "langUsedFlags": [],
@@ -101,7 +101,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "5",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+67dbee5dab2c2f17ff1cb04553fa61b25ac2cdb793b5422f0cedfed59da4edfe",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -190,7 +190,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "10",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+67dbee5dab2c2f17ff1cb04553fa61b25ac2cdb793b5422f0cedfed59da4edfe",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -226,7 +226,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "13",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+67dbee5dab2c2f17ff1cb04553fa61b25ac2cdb793b5422f0cedfed59da4edfe",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -275,7 +275,7 @@
           "failure": {
             "message": "exploded: kaboom",
             "source": "TypeScriptSDK",
-            "stackTrace": "ApplicationFailure: exploded: kaboom\n    at nonRetryable (<repository>/workflow-bundle-1a71dcbac2adae7b16c2.js:1840:24)\n    at <anonymous> (<repository>/workflow-bundle-1a71dcbac2adae7b16c2.js:9484:96)",
+            "stackTrace": "ApplicationFailure: exploded: kaboom\n    at nonRetryable (<repository>/workflow-bundle-0806cc929d8966c45dbc.js:1840:24)\n    at <anonymous> (<repository>/workflow-bundle-0806cc929d8966c45dbc.js:9484:96)",
             "applicationFailureInfo": { "type": "Error", "nonRetryable": true }
           }
         }
@@ -375,7 +375,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "21",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+67dbee5dab2c2f17ff1cb04553fa61b25ac2cdb793b5422f0cedfed59da4edfe",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }

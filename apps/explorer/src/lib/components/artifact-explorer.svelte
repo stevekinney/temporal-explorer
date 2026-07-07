@@ -1,6 +1,11 @@
 <script lang="ts">
   import WorkflowFlowPanel from '$lib/components/workflow-flow-panel.svelte';
   import WorkflowMessagesPanel from '$lib/components/workflow-messages-panel.svelte';
+  import {
+    defaultWorkflowId as selectDefaultWorkflowId,
+    overlaysForWorkflow,
+    traceMatchesRequest,
+  } from '$lib/components/artifact-selection';
   import { buildGraphProjection, formatEventReferences, sourceText } from '$lib/graph/projection';
   import {
     formatDuration,
@@ -66,27 +71,7 @@
   // Default to the workflow the requested trace actually ran, so a project with several
   // workflows (a parent plus its children) opens on the one being inspected rather than
   // whichever happens to be first — which can be a trivial child that renders as a lone node.
-  const defaultWorkflowId = $derived.by(() => {
-    if (requestedTrace) {
-      const matchedTrace = artifacts.traces.find(
-        (trace) =>
-          trace.artifactId.includes(`trace:${requestedTrace}:`) ||
-          trace.execution.workflowId === requestedTrace ||
-          trace.execution.runId === requestedTrace,
-      );
-      const traced = matchedTrace
-        ? artifacts.analysis.workflows.find(
-            (workflow) => workflow.name === matchedTrace.execution.workflowType,
-          )
-        : undefined;
-
-      if (traced) {
-        return traced.id;
-      }
-    }
-
-    return artifacts.analysis.workflows[0]?.id ?? '';
-  });
+  const defaultWorkflowId = $derived(selectDefaultWorkflowId(artifacts, requestedTrace));
   // Select by the unique workflow id, not the display name: versioned workflows
   // can share a registered name, so a name would not identify a single one.
   const selectedWorkflowId = $derived(selectedWorkflowOverride ?? defaultWorkflowId);
@@ -102,11 +87,8 @@
     );
 
     if (requestedTrace) {
-      const matchedTrace = workflowTraces.find(
-        (trace) =>
-          trace.artifactId.includes(`trace:${requestedTrace}:`) ||
-          trace.execution.workflowId === requestedTrace ||
-          trace.execution.runId === requestedTrace,
+      const matchedTrace = workflowTraces.find((trace) =>
+        traceMatchesRequest(trace, requestedTrace),
       );
 
       if (matchedTrace) {
@@ -117,9 +99,7 @@
     return workflowTraces[0];
   });
   const selectedOverlay = $derived.by(() => {
-    const workflowOverlays = artifacts.overlays.filter(
-      (overlay) => overlay.workflow === selectedWorkflow?.name,
-    );
+    const workflowOverlays = overlaysForWorkflow(artifacts, selectedWorkflow);
 
     if (selectedTrace) {
       return (

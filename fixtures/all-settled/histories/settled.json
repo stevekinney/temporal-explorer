@@ -60,7 +60,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "2",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+c14fbb925cdead7f6a770f1597724976ec2586b23937fb82a7ab7434e98133f3",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": {
           "coreUsedFlags": [1, 2, 3],
           "langUsedFlags": [],
@@ -228,7 +228,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "10",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+c14fbb925cdead7f6a770f1597724976ec2586b23937fb82a7ab7434e98133f3",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -260,7 +260,7 @@
           ]
         },
         "scheduledEventId": "6",
-        "startedEventId": "12",
+        "startedEventId": "13",
         "identity": "temporal-explorer-fixture-worker"
       }
     },
@@ -291,7 +291,7 @@
           ]
         },
         "scheduledEventId": "7",
-        "startedEventId": "12",
+        "startedEventId": "15",
         "identity": "temporal-explorer-fixture-worker"
       }
     },
@@ -326,7 +326,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "17",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+c14fbb925cdead7f6a770f1597724976ec2586b23937fb82a7ab7434e98133f3",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }

@@ -6,7 +6,7 @@
     "schemaVersion": "temporal-trace/v1",
     "inputs": {
       "projectRoot": "nested-orchestration",
-      "configHash": "d996279023a47f10c6b02eae8c7ab45d7a4d3c7ae849f5db102fccca5282e241",
+      "configHash": "fd60ea6e5b9b9ce8a0e6aad75177d9248cba9b0b573d84d57b940c8ee5fa4190",
       "sourceFileHashes": {},
       "temporalSdkVersions": {
         "@temporalio/workflow": "^1.18.1"
