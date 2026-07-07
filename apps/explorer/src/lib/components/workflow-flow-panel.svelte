@@ -527,13 +527,6 @@
     gap: 0.4rem;
   }
 
-  :global(.state-filters .filter-count) {
-    color: inherit;
-    font-size: 0.75rem;
-    font-weight: 700;
-    opacity: 0.78;
-  }
-
   :global(.state-filters [data-state]::before) {
     content: '';
     width: 0.5rem;
@@ -574,8 +567,10 @@
     border-radius: 999px;
     /* A hair darker than the chip so the count reads as its own badge, not floating text. */
     background: #e7edf2;
-    color: #172026;
+    color: inherit;
     font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.78;
   }
 
   .state-legend {
