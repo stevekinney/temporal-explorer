@@ -127,9 +127,9 @@ export function mapChildWorkflowOperation(
     operation,
     command,
     'exact',
-    `Child Workflow ${operation.workflowType} matched by Workflow type and command order.`,
+    `Child Workflow ${operation.workflowType} matched by Workflow type and repeat-aware occurrence.`,
     'child-workflow-type',
-    `Runtime child Workflow type ${operation.workflowType} matched static command ${command.id}.`,
+    `Runtime child Workflow occurrence ${occurrence + 1} matched static command ${command.id} through repeat-aware occurrence allocation.`,
   );
 }
 

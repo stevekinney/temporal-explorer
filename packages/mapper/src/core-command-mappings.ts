@@ -17,7 +17,7 @@ export function createActivityMapping(
     runtimeOperationId: operation.id,
     staticNodeId: command.id,
     confidence: 'exact',
-    reason: `Activity ${operation.activityType} matched by Activity type and command order.`,
+    reason: `Activity ${operation.activityType} matched by Activity type and repeat-aware occurrence.`,
     evidence: [
       {
         kind: 'activity-type',
@@ -27,7 +27,7 @@ export function createActivityMapping(
       },
       {
         kind: 'command-order',
-        description: `Runtime Activity occurrence ${occurrence + 1} matched static command order ${command.staticOrder}.`,
+        description: `Runtime Activity occurrence ${occurrence + 1} matched static command ${command.id} through repeat-aware occurrence allocation.`,
         eventIds: getEventIds(operation),
         staticNodeId: command.id,
       },
@@ -53,11 +53,11 @@ export function createTimerMapping(
     reason:
       confidence === 'exact'
         ? 'The only runtime timer matched the only static timer.'
-        : `Runtime timer occurrence ${occurrence + 1} matched static timer order ${command.staticOrder}.`,
+        : `Runtime timer occurrence ${occurrence + 1} matched static timer ${command.id} through repeat-aware occurrence allocation.`,
     evidence: [
       {
         kind: 'timer-order',
-        description: `Runtime timer ${operation.timerId} matched static timer command ${command.id} by start order.`,
+        description: `Runtime timer ${operation.timerId} matched static timer command ${command.id} through repeat-aware occurrence allocation.`,
         eventIds: getEventIds(operation),
         staticNodeId: command.id,
       },
