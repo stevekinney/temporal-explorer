@@ -7,17 +7,10 @@ import {
   runtimeTraceDocumentSchema,
   temporalAnalysisDocumentSchema,
   type ExecutionOverlayDocument,
+  type ExplorerArtifacts,
   type RuntimeTraceDocument,
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
-
-export type ExplorerArtifacts = {
-  projectName: string;
-  artifactDirectory: string;
-  analysis: TemporalAnalysisDocument;
-  traces: RuntimeTraceDocument[];
-  overlays: ExecutionOverlayDocument[];
-};
 
 type ArtifactSchema<T> = {
   safeParse(value: unknown):

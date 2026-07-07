@@ -1,6 +1,4 @@
-import { basename, resolve } from 'node:path';
-
-import { Project, type SourceFile } from 'ts-morph';
+import type { Project, SourceFile } from 'ts-morph';
 
 import type {
   ActivityDefinition,
@@ -9,11 +7,25 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
-import temporalExplorerPackageJson from '../../../package.json';
-
+import {
+  createAnalysisMetadata,
+  createProjectMetadata,
+  createSdkMetadata,
+  hashExistingTsconfig,
+} from './analysis-document';
 import { loadConfiguration } from './configuration';
-import { getPackageManager, readPackageJson } from './package-metadata';
-import { createSourceFileHashes, discoverFiles, hashFile, toProjectPath } from './paths';
+import {
+  BunFileSource,
+  createSourceFileHashes as createSourceFileHashesForSource,
+  type FileSource,
+} from './file-source';
+import { getPackageManager, readPackageJsonFromFileSource } from './package-metadata';
+import {
+  isAbsoluteProjectPath,
+  normalizeProjectPath,
+  resolveProjectPath,
+  toProjectPath,
+} from './paths';
 import type {
   AnalyzeWorkflowFilesOptions,
   LoadTemporalExplorerProjectOptions,
@@ -28,6 +40,7 @@ export {
   type TemporalConnectionProfile,
   type TemporalExplorerConfiguration,
 } from './configuration';
+export { BunFileSource, InMemoryFileSource, type FileSource } from './file-source';
 export { createSourceFileHashes, toProjectPath } from './paths';
 export type {
   AnalyzeWorkflowFilesOptions,
@@ -59,19 +72,24 @@ const excludedDirectorySegments = new Set(['dist', 'build', '.temporal-explorer'
  * non-conventional locations (a `cancellation-scopes.ts`, a flat root file, or
  * a monorepo `packages/workflows/*.ts`) are found instead of silently skipped.
  */
-async function discoverWorkflowModuleFiles(root: string): Promise<string[]> {
-  const candidates = await discoverFiles(root, ['**/*.ts']);
+function basename(path: string): string {
+  const segments = normalizeProjectPath(path).split('/');
+  return segments.at(-1) ?? path;
+}
+
+async function discoverWorkflowModuleFiles(source: FileSource): Promise<string[]> {
+  const candidates = await source.list(['**/*.ts']);
   const workflowModules = await Promise.all(
     candidates.map(async (file) => {
       if (
-        toProjectPath(root, file)
+        toProjectPath(source.root, file)
           .split('/')
           .some((segment) => excludedDirectorySegments.has(segment))
       ) {
         return undefined;
       }
 
-      return workflowValueImportPattern.test(await Bun.file(file).text()) ? file : undefined;
+      return workflowValueImportPattern.test(await source.read(file)) ? file : undefined;
     }),
   );
 
@@ -80,18 +98,16 @@ async function discoverWorkflowModuleFiles(root: string): Promise<string[]> {
 
 async function resolveWorkflowFiles(
   root: string,
+  source: FileSource,
   options: LoadTemporalExplorerProjectOptions,
   configuration: Awaited<ReturnType<typeof loadConfiguration>>,
 ): Promise<string[]> {
   if (options.workflowFiles) {
-    return options.workflowFiles.map((file) => resolve(root, file));
+    return options.workflowFiles.map((file) => resolveProjectPath(root, file));
   }
 
-  const globbed = await discoverFiles(
-    root,
-    configuration?.temporal?.workflowGlobs ?? workflowGlobs,
-  );
-  const byContent = await discoverWorkflowModuleFiles(root);
+  const globbed = await source.list(configuration?.temporal?.workflowGlobs ?? workflowGlobs);
+  const byContent = await discoverWorkflowModuleFiles(source);
 
   return [...new Set([...globbed, ...byContent])].toSorted((left, right) =>
     left.localeCompare(right),
@@ -108,38 +124,67 @@ function resolveProjectPaths(
   };
 }
 
+function resolveProjectRoot(root: string, fileSource: FileSource | undefined): string {
+  const normalizedRoot = normalizeProjectPath(root);
+
+  if (isAbsoluteProjectPath(normalizedRoot) || fileSource) {
+    return normalizedRoot;
+  }
+
+  return collapseDotSegments(resolveProjectPath(process.cwd(), normalizedRoot));
+}
+
+function collapseDotSegments(path: string): string {
+  const normalizedPath = normalizeProjectPath(path);
+  const absolute = isAbsoluteProjectPath(normalizedPath);
+  const segments: string[] = [];
+
+  for (const segment of normalizedPath.split('/')) {
+    if (!segment || segment === '.') {
+      continue;
+    }
+
+    if (segment === '..') {
+      segments.pop();
+      continue;
+    }
+
+    segments.push(segment);
+  }
+
+  const prefix = absolute && normalizedPath.startsWith('/') ? '/' : '';
+  return normalizeProjectPath(`${prefix}${segments.join('/')}`);
+}
+
 export async function loadTemporalExplorerProject(
   options: LoadTemporalExplorerProjectOptions = {},
 ): Promise<TemporalExplorerProject> {
-  const root = resolve(options.root ?? process.cwd());
-  const configuration = await loadConfiguration(resolve(root, 'temporal-explorer.config.ts'));
+  const root = resolveProjectRoot(options.root ?? process.cwd(), options.fileSource);
+  const fileSource = options.fileSource ?? new BunFileSource(root);
+  const configuration = options.fileSource
+    ? undefined
+    : await loadConfiguration(resolveProjectPath(root, 'temporal-explorer.config.ts'));
   const { tsconfigName, outputName } = resolveProjectPaths(options, configuration);
 
   return {
     root,
-    tsconfig: resolve(root, tsconfigName),
-    workflowFiles: await resolveWorkflowFiles(root, options, configuration),
-    outputDirectory: resolve(root, outputName),
+    tsconfig: resolveProjectPath(root, tsconfigName),
+    workflowFiles: await resolveWorkflowFiles(root, fileSource, options, configuration),
+    outputDirectory: resolveProjectPath(root, outputName),
+    fileSource,
     ...(configuration ? { configuration } : {}),
   };
 }
 
 async function createProjectWithSources(
-  root: string,
-  tsconfig: string,
+  source: FileSource,
+  tsconfig: string | undefined,
   workflowFiles: string[],
 ): Promise<Project> {
-  const project = new Project({ tsConfigFilePath: tsconfig });
-
-  for (const workflowFile of workflowFiles) {
-    project.addSourceFileAtPathIfExists(workflowFile);
-  }
-
-  for (const workerFile of await discoverFiles(root, workerGlobs)) {
-    project.addSourceFileAtPathIfExists(workerFile);
-  }
-
-  return project;
+  return await source.createProject(tsconfig, [
+    ...workflowFiles,
+    ...(await source.list(workerGlobs)),
+  ]);
 }
 
 /**
@@ -267,19 +312,20 @@ function noWorkflowsDiagnostic(workflows: WorkflowDefinition[], workers: unknown
 export async function analyzeWorkflowFiles(
   options: AnalyzeWorkflowFilesOptions,
 ): Promise<TemporalAnalysisDocument> {
-  const root = resolve(options.projectRoot);
-  const workflowFiles = options.workflowFiles.map((file) => resolve(root, file));
-  const tsconfig = resolve(root, options.tsconfig);
-  const project = await createProjectWithSources(root, tsconfig, workflowFiles);
+  const root = resolveProjectRoot(options.projectRoot, options.fileSource);
+  const source = options.fileSource ?? new BunFileSource(root);
+  const workflowFiles = options.workflowFiles.map((file) => resolveProjectPath(root, file));
+  const tsconfig = options.tsconfig ? resolveProjectPath(root, options.tsconfig) : undefined;
+  const project = await createProjectWithSources(source, tsconfig, workflowFiles);
   const collected = collectWorkflowAnalysis(project, root, workflowFiles);
   const workers = analyzeWorkerFiles(project, root);
   const diagnostics = [
     ...collected.diagnostics,
     ...noWorkflowsDiagnostic(collected.workflows, workers),
   ];
-  const packageJson = await readPackageJson(root);
-  const sourceFileHashes = await createSourceFileHashes(root, workflowFiles);
-  const configHash = await hashFile(tsconfig);
+  const packageJson = await readPackageJsonFromFileSource(source);
+  const sourceFileHashes = await createSourceFileHashesForSource(source, workflowFiles);
+  const configHash = await hashExistingTsconfig(source, tsconfig);
   const temporalTypeScriptVersion = packageJson.dependencies?.['@temporalio/workflow'];
   const packageManager = getPackageManager(packageJson);
 
@@ -290,30 +336,18 @@ export async function analyzeWorkflowFiles(
   return {
     schemaVersion: 'temporal-analysis/v1',
     artifactId: `analysis:${projectName}`,
-    metadata: {
-      temporalExplorerVersion: temporalExplorerPackageJson.version,
-      schemaVersion: 'temporal-analysis/v1',
-      inputs: {
-        projectRoot: projectName,
-        configHash,
-        tsconfigHash: configHash,
-        sourceFileHashes,
-        temporalSdkVersions: temporalTypeScriptVersion
-          ? {
-              '@temporalio/workflow': temporalTypeScriptVersion,
-            }
-          : {},
-      },
-    },
-    project: {
-      root: projectName,
-      tsconfig: toProjectPath(root, tsconfig),
-      ...(packageManager ? { packageManager } : {}),
-    },
-    sdk: {
-      ...(temporalTypeScriptVersion ? { temporalTypeScriptVersion } : {}),
-      detectedPackages: temporalTypeScriptVersion ? ['@temporalio/workflow'] : [],
-    },
+    metadata: createAnalysisMetadata({
+      projectName,
+      configHash,
+      sourceFileHashes,
+      temporalTypeScriptVersion,
+    }),
+    project: createProjectMetadata({
+      projectName,
+      tsconfigPath: tsconfig ? toProjectPath(root, tsconfig) : '',
+      packageManager,
+    }),
+    sdk: createSdkMetadata(temporalTypeScriptVersion),
     workers,
     workflows: collected.workflows,
     activities: collected.activities,
@@ -330,5 +364,6 @@ export async function analyzeProject(
     tsconfig: project.tsconfig,
     workflowFiles: project.workflowFiles,
     outputDirectory: project.outputDirectory,
+    ...(project.fileSource ? { fileSource: project.fileSource } : {}),
   });
 }

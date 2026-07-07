@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { relative } from 'node:path';
 
 import {
   analyzeProject,
@@ -77,6 +78,20 @@ describe('public API scaffold', () => {
     });
 
     expect(optionsResult.value.workflows[0]?.name).toBe('basicOrderWorkflow');
+  });
+
+  it('keeps relative project roots normalized before emitting project paths', async () => {
+    const result = await analyzeProject({
+      root: relative(process.cwd(), fixtureRoot),
+      workflowFiles: ['src/workflows/basic-order-workflow.ts'],
+    });
+
+    expect(Object.keys(result.value.metadata.inputs.sourceFileHashes)).toEqual([
+      'src/workflows/basic-order-workflow.ts',
+    ]);
+    expect(result.value.workflows[0]?.temporalCommands[0]?.source.path).toBe(
+      'src/workflows/basic-order-workflow.ts',
+    );
   });
 
   it('analyzes explicit workflow files through the public API', async () => {

@@ -3,3 +3,6 @@
 
 [run]
 bun = true
+
+[test]
+pathIgnorePatterns = ["test-corpora/**"]

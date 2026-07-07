@@ -20,9 +20,12 @@ async function runExplorerSmokeTest(): Promise<void> {
     const activityCommandsTable = page.getByRole('table', { name: 'Activity commands' });
     await activityCommandsTable.waitFor();
     await activityCommandsTable.getByRole('row', { name: /validateOrder/ }).waitFor();
-    await page.getByRole('button', { name: /Inspector/ }).click();
-    await page.getByRole('dialog', { name: 'Source and type inspector' }).waitFor();
-    await page.getByText('src/workflows/basic-order-workflow.ts:16').waitFor();
+    await page.getByRole('tab', { name: /Flow/ }).click();
+    await page.locator('.temporal-flow-node', { hasText: 'basicOrderWorkflow' }).click();
+    await page
+      .getByRole('complementary', { name: 'Selection inspector' })
+      .getByText('src/workflows/basic-order-workflow.ts:16')
+      .waitFor();
     assertNoBrowserErrors();
   } finally {
     await browser.close();

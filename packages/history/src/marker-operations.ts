@@ -1,5 +1,6 @@
 import type { RuntimeOperation } from '@temporal-explorer/schemas';
 
+import { decodeBase64Utf8 } from './base64';
 import { eventTypes } from './event-types';
 import {
   isRecord,
@@ -38,7 +39,7 @@ function readPatchDetails(
   }
 
   try {
-    const decoded: unknown = JSON.parse(Buffer.from(data, 'base64').toString('utf8'));
+    const decoded: unknown = JSON.parse(decodeBase64Utf8(data));
 
     if (isRecord(decoded) && typeof decoded['id'] === 'string') {
       return {

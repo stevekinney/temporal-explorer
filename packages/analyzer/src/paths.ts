@@ -1,11 +1,47 @@
-import { relative, resolve } from 'node:path';
-
 import { Node, type SourceFile } from 'ts-morph';
 
 import type { SourceLocation } from '@temporal-explorer/schemas';
 
+export function normalizeProjectPath(path: string): string {
+  const normalized = path.replaceAll('\\', '/').replace(/\/+/gu, '/');
+  return normalized.length > 1 ? normalized.replace(/\/$/u, '') : normalized;
+}
+
+export function isAbsoluteProjectPath(path: string): boolean {
+  return path.startsWith('/') || /^[a-z]:\//iu.test(path);
+}
+
+export function joinProjectPath(...parts: string[]): string {
+  const [first = '', ...rest] = parts;
+  const joined = [first, ...rest]
+    .filter((part) => part.length > 0)
+    .join('/')
+    .replace(/\/+/gu, '/');
+  return normalizeProjectPath(
+    isAbsoluteProjectPath(first) && first.startsWith('/')
+      ? `/${joined.replace(/^\/+/u, '')}`
+      : joined,
+  );
+}
+
+export function resolveProjectPath(root: string, path: string): string {
+  if (isAbsoluteProjectPath(path)) {
+    return normalizeProjectPath(path);
+  }
+
+  return joinProjectPath(root, path);
+}
+
 export function toProjectPath(root: string, path: string): string {
-  return relative(root, path).split('\\').join('/');
+  const normalizedRoot = normalizeProjectPath(root);
+  const normalizedPath = normalizeProjectPath(path);
+
+  if (normalizedPath === normalizedRoot) {
+    return '';
+  }
+
+  const prefix = `${normalizedRoot}/`;
+  return normalizedPath.startsWith(prefix) ? normalizedPath.slice(prefix.length) : normalizedPath;
 }
 
 export function createSourceLocation(
@@ -70,7 +106,7 @@ export async function discoverFiles(root: string, globs: string[]): Promise<stri
         !relativePath.endsWith('.spec.ts') &&
         !isDependencyPath(relativePath)
       ) {
-        discovered.add(resolve(root, relativePath));
+        discovered.add(resolveProjectPath(root, relativePath));
       }
     }
   }

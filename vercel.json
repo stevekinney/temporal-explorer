@@ -2,5 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "bun install",
-  "buildCommand": "bun run showcase:build"
+  "buildCommand": "bun run explorer:web:build",
+  "outputDirectory": "apps/explorer/build"
 }

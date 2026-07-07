@@ -10,8 +10,8 @@
  * name and trace id — not by filename, so every fixture renders correctly and
  * appears together in the sidebar.
  *
- * Both the local `explorer:fixtures` dev server and the Vercel showcase build
- * consume this so the aggregate is produced exactly one way.
+ * The local `explorer:fixtures` dev server consumes this so the aggregate is
+ * produced exactly one way.
  */
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
