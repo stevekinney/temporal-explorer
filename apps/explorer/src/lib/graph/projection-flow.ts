@@ -10,24 +10,14 @@ import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } fro
 import { isGraphCommand } from './projection-builders';
 import {
   addStructural,
+  addUnlinkedCommand,
   pushEdge,
   walkCommand,
-  walkTerminal,
   type FlowContext,
 } from './projection-flow-core';
+import { walkParallel, walkRegion } from './projection-flow-region';
+import { walkTerminalNode } from './projection-flow-terminal';
 
-/**
- * Walks a Workflow's structured control-flow tree (`workflow.body.nodes`) into a
- * graph of nested region containers. Each `branch`/`loop`/`parallel`/`try` becomes a
- * container node whose children (command leaves, decision/join/terminal markers, and
- * further nested containers) carry its id as `parentId`, so ELK and Svelte Flow can
- * draw the regions as boxes. The flow inside a region mirrors `renderWorkflowMermaid`:
- * a decision diamond fans out to labeled clause arms that converge on a join dot,
- * loops draw a `repeat` back-edge, and `continue-as-new` loops back to the entry.
- *
- * The shared context type and the non-recursive leaves (`walkCommand`/`walkTerminal`
- * and the `addStructural`/`pushEdge` helpers) live in `projection-flow-core`.
- */
 export function buildControlFlowGraph(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument | undefined,
@@ -46,7 +36,12 @@ export function buildControlFlowGraph(
     trace,
     overlay,
     projection,
-    finallyTarget: undefined,
+    loopTargets: [],
+    breakTargets: [],
+    finallyStack: [],
+    duplicateCommandNodes: false,
+    duplicateCommandPath: undefined,
+    abruptPathCounter: { value: 0 },
   };
 
   const exit = walkSequence(workflow.body.nodes, startId, undefined, context);
@@ -59,7 +54,6 @@ export function buildControlFlowGraph(
   return { nodes: context.nodes, edges: context.edges };
 }
 
-/** Walks a sequence of flow nodes from `entry`, returning the exit node id or undefined if a terminal ended the path. */
 function walkSequence(
   nodes: FlowNode[],
   entry: string,
@@ -69,20 +63,35 @@ function walkSequence(
 ): string | undefined {
   let cursor: string | undefined = entry;
   let label = entryLabel;
+  let unreachableRegionEndOffset: number | undefined;
 
   for (const node of nodes) {
     if (cursor === undefined) {
+      if (node.type === 'command' && commandSourceStartsInside(node, unreachableRegionEndOffset)) {
+        addUnlinkedCommand(node, parentId, context);
+        continue;
+      }
+
       break; // Unreachable: a terminal ended this path.
     }
 
     cursor = walkNode(node, cursor, parentId, context, label);
+    unreachableRegionEndOffset = cursor === undefined ? node.source?.end.offset : undefined;
     label = '';
   }
 
   return cursor;
 }
 
-/** Renders one clause/branch arm into `join`; an empty arm draws a labeled edge straight to the join. */
+function commandSourceStartsInside(
+  node: Extract<FlowNode, { type: 'command' }>,
+  endOffset: number | undefined,
+): boolean {
+  return (
+    endOffset !== undefined && (node.source?.start.offset ?? Number.POSITIVE_INFINITY) <= endOffset
+  );
+}
+
 function walkArm(
   body: FlowNode[],
   entry: string,
@@ -90,17 +99,20 @@ function walkArm(
   label: string,
   parentId: string | undefined,
   context: FlowContext,
-): void {
+): boolean {
   if (body.length === 0) {
     pushEdge(context, entry, join, label);
-    return;
+    return true;
   }
 
   const exit = walkSequence(body, entry, parentId, context, label);
 
   if (exit !== undefined) {
     pushEdge(context, exit, join, '');
+    return true;
   }
+
+  return false;
 }
 
 function walkNode(
@@ -114,15 +126,19 @@ function walkNode(
     case 'command':
       return walkCommand(node, entry, parentId, context, label);
     case 'terminal':
-      return walkTerminal(node, entry, parentId, context, label);
+      return walkTerminalNode(node, entry, parentId, context, label, (frame, finalizerEntry) =>
+        walkSequence(frame.finalizer, finalizerEntry, frame.parentId, context, 'finally'),
+      );
     case 'branch':
       return walkBranch(node, entry, parentId, context, label);
     case 'loop':
       return walkLoop(node, entry, parentId, context, label);
     case 'parallel':
-      return walkParallel(node, entry, parentId, context, label);
+      return walkParallel(node, entry, parentId, context, label, walkArm);
     case 'try':
       return walkTry(node, entry, parentId, context, label);
+    case 'region':
+      return walkRegion(node, entry, parentId, context, label, walkSequence);
     default:
       return entry;
   }
@@ -134,23 +150,49 @@ function walkBranch(
   parentId: string | undefined,
   context: FlowContext,
   label: string,
-): string {
+): string | undefined {
   const container = addStructural(context, 'branch-region', node.branchKind, parentId, true);
   const test = node.testCommandId ? context.commandsById.get(node.testCommandId) : undefined;
   const decision = addStructural(context, 'decision', test?.name ?? node.branchKind, container);
   pushEdge(context, entry, decision, label);
 
   const join = addStructural(context, 'join', '', container);
+  const isSwitch = node.branchKind === 'switch';
+
+  if (isSwitch) {
+    context.breakTargets.push({
+      label: undefined,
+      breakTarget: join,
+      finallyDepth: context.finallyStack.length,
+    });
+  }
+
+  const hasNormalExit = walkBranchArms(node, decision, join, container, context);
+
+  if (isSwitch) {
+    context.breakTargets.pop();
+  }
+
+  return hasNormalExit ? join : undefined;
+}
+
+function walkBranchArms(
+  node: Extract<FlowNode, { type: 'branch' }>,
+  decision: string,
+  join: string,
+  container: string,
+  context: FlowContext,
+): boolean {
+  let hasNormalExit = false;
 
   for (const clause of node.clauses) {
     const body = switchClauseBody(clause.body, node.branchKind);
-    walkArm(body, decision, join, clause.label, container, context);
+    hasNormalExit =
+      walkArm(body, decision, join, clause.label, container, context) || hasNormalExit;
   }
 
   const otherwise = switchClauseBody(node.otherwise ?? [], node.branchKind);
-  walkArm(otherwise, decision, join, 'else', container, context);
-
-  return join;
+  return walkArm(otherwise, decision, join, 'else', container, context) || hasNormalExit;
 }
 
 function walkLoop(
@@ -168,67 +210,98 @@ function walkLoop(
     true,
   );
   const header = addStructural(context, 'decision', `loop (${node.loopKind})`, container);
+  const exit = addStructural(context, 'join', '', container);
 
   if (node.loopKind === 'do-while') {
-    // A do-while runs its body before the exit condition, so the loop exit must not be
-    // reachable without an iteration. Anchor the body entry inside the region and place
-    // the condition (header) after the body: entry → body → header → (repeat) body.
     const bodyEntry = addStructural(context, 'join', '', container);
     pushEdge(context, entry, bodyEntry, label);
+    context.breakTargets.push({
+      label: node.label,
+      breakTarget: exit,
+      finallyDepth: context.finallyStack.length,
+    });
+    context.loopTargets.push({
+      label: node.label,
+      breakTarget: exit,
+      continueTarget: header,
+      finallyDepth: context.finallyStack.length,
+    });
     const doBodyExit = walkSequence(node.body, bodyEntry, container, context);
+    context.loopTargets.pop();
+    context.breakTargets.pop();
 
     if (doBodyExit !== undefined) {
       pushEdge(context, doBodyExit, header, '');
     }
 
     pushEdge(context, header, bodyEntry, 'repeat', 'loop-back');
-    return header;
+    pushEdge(context, header, exit, 'done');
+    return exit;
   }
 
   pushEdge(context, entry, header, label);
+  pushEdge(context, header, exit, 'done');
 
-  // The forward edge into the body carries no label: the container header
-  // already says "loop (...)", and for a single-node body the forward and
-  // `repeat` back-edges connect the same node pair, so a forward label would
-  // stack on top of `repeat` (the "eac repeat" overlap). Only the back-edge is labeled.
+  context.breakTargets.push({
+    label: node.label,
+    breakTarget: exit,
+    finallyDepth: context.finallyStack.length,
+  });
+  context.loopTargets.push({
+    label: node.label,
+    breakTarget: exit,
+    continueTarget: header,
+    finallyDepth: context.finallyStack.length,
+  });
   const bodyExit = walkSequence(node.body, header, container, context);
+  context.loopTargets.pop();
+  context.breakTargets.pop();
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, header, 'repeat', 'loop-back');
   }
 
-  return header;
+  return exit;
 }
 
-function walkParallel(
-  node: Extract<FlowNode, { type: 'parallel' }>,
-  entry: string,
-  parentId: string | undefined,
+function withFinallyFrame<T>(
+  finalizer: FlowNode[] | undefined,
+  parentId: string,
   context: FlowContext,
-  label: string,
-): string {
-  const container = addStructural(
-    context,
-    'parallel-region',
-    `Promise.${node.parallelKind}`,
-    parentId,
-    true,
-  );
-  const fork = addStructural(context, 'parallel-fork', `Promise.${node.parallelKind}`, container);
-  pushEdge(context, entry, fork, label);
-
-  const join = addStructural(context, 'join', '', container);
-
-  if (node.cardinality === 'dynamic') {
-    walkArm(node.templateBranch ?? [], fork, join, '×N', container, context);
-    return join;
+  callback: () => T,
+): T {
+  if (finalizer) {
+    context.finallyStack.push({ finalizer, parentId });
   }
 
-  for (const branch of node.branches ?? []) {
-    walkArm(branch, fork, join, '', container, context);
+  const result = callback();
+
+  if (finalizer) {
+    context.finallyStack.pop();
   }
 
-  return join;
+  return result;
+}
+
+function walkTryHandler(
+  node: Extract<FlowNode, { type: 'try' }>,
+  entry: string,
+  converge: string,
+  parentId: string,
+  context: FlowContext,
+): boolean {
+  if (!node.handler) {
+    return false;
+  }
+
+  const handlerExit = walkSequence(node.handler.body, entry, parentId, context, 'catch');
+
+  if (handlerExit === undefined) {
+    return false;
+  }
+
+  pushEdge(context, handlerExit, converge, '');
+  return true;
 }
 
 function walkTry(
@@ -241,34 +314,22 @@ function walkTry(
   const container = addStructural(context, 'try-region', 'try', parentId, true);
   const converge = addStructural(context, 'join', '', container);
   const finalizer = node.finalizer && node.finalizer.length > 0 ? node.finalizer : undefined;
-
-  // While a `finally` block exists, terminals inside the try/catch (return/throw/…)
-  // must route through `converge` so the finalizer runs on every exit. Save/restore
-  // makes this nesting-safe for a try nested inside another try's finalizer scope.
-  const previousFinallyTarget = context.finallyTarget;
-  if (finalizer) {
-    context.finallyTarget = converge;
-  }
-
-  const bodyExit = walkSequence(node.body, entry, container, context, label);
+  const bodyExit = withFinallyFrame(finalizer, container, context, () =>
+    walkSequence(node.body, entry, container, context, label),
+  );
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, converge, '');
   }
 
-  if (node.handler) {
-    const handlerExit = walkSequence(node.handler.body, entry, container, context, 'catch');
+  const handlerHasNormalExit = withFinallyFrame(finalizer, container, context, () =>
+    walkTryHandler(node, entry, converge, container, context),
+  );
+  const hasNormalExit = bodyExit !== undefined || handlerHasNormalExit;
 
-    if (handlerExit !== undefined) {
-      pushEdge(context, handlerExit, converge, '');
-    }
-  }
-
-  context.finallyTarget = previousFinallyTarget;
-
-  if (finalizer) {
+  if (finalizer && hasNormalExit) {
     return walkSequence(finalizer, converge, container, context, 'finally');
   }
 
-  return converge;
+  return hasNormalExit ? converge : undefined;
 }

@@ -109,7 +109,7 @@
         "nodes": [
           {
             "type": "branch",
-            "id": "flow:reviewWorkflow:4",
+            "id": "flow:reviewWorkflow:5",
             "branchKind": "if",
             "source": {
               "path": "src/workflows/review-workflow.ts",
@@ -150,59 +150,82 @@
                     }
                   }
                 ]
-              },
-              {
-                "label": "input.amount > 1_000",
-                "body": [
-                  {
-                    "type": "command",
-                    "id": "flow:reviewWorkflow:2",
-                    "commandId": "activity-call:reviewWorkflow:managerApproval:1",
-                    "source": {
-                      "path": "src/workflows/review-workflow.ts",
-                      "pathKind": "project-relative",
-                      "start": {
-                        "line": 23,
-                        "column": 22,
-                        "offset": 939
-                      },
-                      "end": {
-                        "line": 23,
-                        "column": 54,
-                        "offset": 971
-                      },
-                      "symbolName": "managerApproval"
-                    }
-                  }
-                ]
               }
             ],
             "otherwise": [
               {
-                "type": "command",
-                "id": "flow:reviewWorkflow:3",
-                "commandId": "activity-call:reviewWorkflow:autoApprove:2",
+                "type": "branch",
+                "id": "flow:reviewWorkflow:4",
+                "branchKind": "if",
                 "source": {
                   "path": "src/workflows/review-workflow.ts",
                   "pathKind": "project-relative",
                   "start": {
-                    "line": 25,
-                    "column": 22,
-                    "offset": 1005
+                    "line": 22,
+                    "column": 10,
+                    "offset": 890
                   },
                   "end": {
-                    "line": 25,
-                    "column": 50,
-                    "offset": 1033
-                  },
-                  "symbolName": "autoApprove"
-                }
+                    "line": 26,
+                    "column": 4,
+                    "offset": 1038
+                  }
+                },
+                "clauses": [
+                  {
+                    "label": "input.amount > 1_000",
+                    "body": [
+                      {
+                        "type": "command",
+                        "id": "flow:reviewWorkflow:2",
+                        "commandId": "activity-call:reviewWorkflow:managerApproval:1",
+                        "source": {
+                          "path": "src/workflows/review-workflow.ts",
+                          "pathKind": "project-relative",
+                          "start": {
+                            "line": 23,
+                            "column": 22,
+                            "offset": 939
+                          },
+                          "end": {
+                            "line": 23,
+                            "column": 54,
+                            "offset": 971
+                          },
+                          "symbolName": "managerApproval"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "otherwise": [
+                  {
+                    "type": "command",
+                    "id": "flow:reviewWorkflow:3",
+                    "commandId": "activity-call:reviewWorkflow:autoApprove:2",
+                    "source": {
+                      "path": "src/workflows/review-workflow.ts",
+                      "pathKind": "project-relative",
+                      "start": {
+                        "line": 25,
+                        "column": 22,
+                        "offset": 1005
+                      },
+                      "end": {
+                        "line": 25,
+                        "column": 50,
+                        "offset": 1033
+                      },
+                      "symbolName": "autoApprove"
+                    }
+                  }
+                ]
               }
             ]
           },
           {
             "type": "command",
-            "id": "flow:reviewWorkflow:5",
+            "id": "flow:reviewWorkflow:6",
             "commandId": "activity-call:reviewWorkflow:finalizeReview:3",
             "source": {
               "path": "src/workflows/review-workflow.ts",

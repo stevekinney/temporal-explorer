@@ -1,15 +1,18 @@
 flowchart TD
   start(["flagWorkflow"])
   flow_flagWorkflow_4{"loop (for-in)"}
-  flow_flagWorkflow_2{"if"}
   n1(( ))
+  flow_flagWorkflow_2{"if"}
+  n2(( ))
   flow_flagWorkflow_1(["continue"])
   flow_flagWorkflow_3["applyFlag"]
   complete(["complete"])
   start --> flow_flagWorkflow_4
   flow_flagWorkflow_4 -->|"each"| flow_flagWorkflow_2
   flow_flagWorkflow_2 -->|"!Object.prototype.hasOwnProperty.call(input.flags, flag)"| flow_flagWorkflow_1
-  flow_flagWorkflow_2 -->|"else"| n1
-  n1 --> flow_flagWorkflow_3
+  flow_flagWorkflow_1 --> flow_flagWorkflow_4
+  flow_flagWorkflow_2 -->|"else"| n2
+  n2 --> flow_flagWorkflow_3
   flow_flagWorkflow_3 -->|"repeat"| flow_flagWorkflow_4
-  flow_flagWorkflow_4 --> complete
+  flow_flagWorkflow_4 -->|"done"| n1
+  n1 --> complete

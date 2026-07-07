@@ -7,7 +7,7 @@ flowchart TD
   complete(["complete"])
   start --> flow_bookingWorkflow_2
   flow_bookingWorkflow_2 --> n1
-  start -->|"catch"| flow_bookingWorkflow_3
+  flow_bookingWorkflow_2 -->|"catch"| flow_bookingWorkflow_3
   flow_bookingWorkflow_3 --> n1
   n1 -->|"finally"| flow_bookingWorkflow_4
   flow_bookingWorkflow_4 --> complete
