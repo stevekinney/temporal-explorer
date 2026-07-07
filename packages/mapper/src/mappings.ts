@@ -7,6 +7,7 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import { commandForRuntimeOccurrence, countOperationsByName } from './command-occurrences';
 import {
   createUnmappedMapping,
   mapCancelRequestOperation,
@@ -17,6 +18,7 @@ import {
   mapMarkerOperation,
   mapUpdateOperation,
 } from './construct-mappings';
+import { createActivityMapping, createTimerMapping } from './core-command-mappings';
 import { collectLoopCommandIds } from './loop-command-ids';
 
 function getEventIds(operation: RuntimeOperation): number[] {
@@ -58,38 +60,6 @@ function createWorkflowMapping(
   };
 }
 
-function createActivityMapping(
-  operation: Extract<RuntimeOperation, { kind: 'activity' }>,
-  command: TemporalCommand,
-  occurrence: number,
-): RuntimeNodeMapping {
-  return {
-    runtimeOperationId: operation.id,
-    staticNodeId: command.id,
-    confidence: 'exact',
-    reason: `Activity ${operation.activityType} matched by Activity type and command order.`,
-    evidence: [
-      {
-        kind: 'activity-type',
-        description: `Runtime Activity type ${operation.activityType} matched static Activity command ${command.name}.`,
-        eventIds: getEventIds(operation),
-        staticNodeId: command.id,
-      },
-      {
-        kind: 'command-order',
-        description: `Runtime Activity occurrence ${occurrence + 1} matched static command order ${command.staticOrder}.`,
-        eventIds: getEventIds(operation),
-        staticNodeId: command.id,
-      },
-      {
-        kind: 'source-location',
-        description: `Static Activity source is ${command.source.path}:${command.source.start.line}.`,
-        staticNodeId: command.id,
-      },
-    ],
-  };
-}
-
 function createSignalMapping(
   operation: Extract<RuntimeOperation, { kind: 'signal' }>,
   signal: SignalDefinition,
@@ -115,41 +85,12 @@ function createSignalMapping(
   };
 }
 
-function createTimerMapping(
-  operation: Extract<RuntimeOperation, { kind: 'timer' }>,
-  command: TemporalCommand,
-  occurrence: number,
-  confidence: 'exact' | 'inferred',
-): RuntimeNodeMapping {
-  return {
-    runtimeOperationId: operation.id,
-    staticNodeId: command.id,
-    confidence,
-    reason:
-      confidence === 'exact'
-        ? 'The only runtime timer matched the only static timer.'
-        : `Runtime timer occurrence ${occurrence + 1} matched static timer order ${command.staticOrder}.`,
-    evidence: [
-      {
-        kind: 'timer-order',
-        description: `Runtime timer ${operation.timerId} matched static timer command ${command.id} by start order.`,
-        eventIds: getEventIds(operation),
-        staticNodeId: command.id,
-      },
-      {
-        kind: 'source-location',
-        description: `Static timer source is ${command.source.path}:${command.source.start.line}.`,
-        staticNodeId: command.id,
-      },
-    ],
-  };
-}
-
 function mapActivityOperation(
   operation: Extract<RuntimeOperation, { kind: 'activity' }>,
   activityCommands: TemporalCommand[],
   dynamicCommands: TemporalCommand[],
   occurrences: Map<string, number>,
+  runtimeCounts: Map<string, number>,
   loopCommandIds: Set<string>,
 ): RuntimeNodeMapping {
   const occurrence = occurrences.get(operation.activityType) ?? 0;
@@ -157,15 +98,12 @@ function mapActivityOperation(
   const matching = activityCommands.filter(
     (candidate) => candidate.name === operation.activityType,
   );
-  // A command that repeats — a fan-out template (`Promise.all(items.map(...))`) or any
-  // command inside a loop body — is a single static node standing in for N runtime
-  // executions, so every occurrence past the last static command maps back to it instead
-  // of falling off the end into an unmapped, disconnected orphan node.
-  const command =
-    matching[occurrence] ??
-    matching.find(
-      (candidate) => candidate.cardinality === 'fan-out' || loopCommandIds.has(candidate.id),
-    );
+  const command = commandForRuntimeOccurrence(
+    matching,
+    occurrence,
+    runtimeCounts.get(operation.activityType) ?? 0,
+    loopCommandIds,
+  );
 
   if (command) {
     return createActivityMapping(operation, command, occurrence);
@@ -199,8 +137,14 @@ function mapTimerOperation(
   timerCommands: TemporalCommand[],
   occurrence: number,
   runtimeTimerCount: number,
+  loopCommandIds: Set<string>,
 ): RuntimeNodeMapping {
-  const command = timerCommands[occurrence];
+  const command = commandForRuntimeOccurrence(
+    timerCommands,
+    occurrence,
+    runtimeTimerCount,
+    loopCommandIds,
+  );
 
   if (!command) {
     return createUnmappedMapping(
@@ -224,8 +168,11 @@ type MappingContext = {
   patchCommands: TemporalCommand[];
   continueAsNewCommands: TemporalCommand[];
   activityOccurrences: Map<string, number>;
+  activityRuntimeCounts: Map<string, number>;
   childOccurrences: Map<string, number>;
+  childRuntimeCounts: Map<string, number>;
   externalOccurrences: Map<string, number>;
+  externalRuntimeCounts: Map<string, number>;
   runtimeTimerCount: number;
   timerOccurrence: number;
   loopCommandIds: Set<string>;
@@ -244,6 +191,7 @@ function mapCoreOperation(
         context.activityCommands,
         context.dynamicCommands,
         context.activityOccurrences,
+        context.activityRuntimeCounts,
         context.loopCommandIds,
       );
     case 'signal':
@@ -254,6 +202,7 @@ function mapCoreOperation(
         context.timerCommands,
         context.timerOccurrence,
         context.runtimeTimerCount,
+        context.loopCommandIds,
       );
       context.timerOccurrence += 1;
       return mapping;
@@ -271,12 +220,20 @@ function mapExtendedOperation(
     case 'update':
       return mapUpdateOperation(operation, context.workflow.messageSurface.updates);
     case 'child-workflow':
-      return mapChildWorkflowOperation(operation, context.childCommands, context.childOccurrences);
+      return mapChildWorkflowOperation(
+        operation,
+        context.childCommands,
+        context.childOccurrences,
+        context.childRuntimeCounts,
+        context.loopCommandIds,
+      );
     case 'external-signal':
       return mapExternalSignalOperation(
         operation,
         context.externalCommands,
         context.externalOccurrences,
+        context.externalRuntimeCounts,
+        context.loopCommandIds,
       );
     case 'marker':
       return mapMarkerOperation(operation, context.patchCommands);
@@ -312,8 +269,17 @@ export function createMappings(
     patchCommands: getCommandsOfKind(workflow, 'patch'),
     continueAsNewCommands: getCommandsOfKind(workflow, 'continue-as-new'),
     activityOccurrences: new Map(),
+    activityRuntimeCounts: countOperationsByName(trace.operations, (operation) =>
+      operation.kind === 'activity' ? operation.activityType : undefined,
+    ),
     childOccurrences: new Map(),
+    childRuntimeCounts: countOperationsByName(trace.operations, (operation) =>
+      operation.kind === 'child-workflow' ? operation.workflowType : undefined,
+    ),
     externalOccurrences: new Map(),
+    externalRuntimeCounts: countOperationsByName(trace.operations, (operation) =>
+      operation.kind === 'external-signal' ? operation.signalName : undefined,
+    ),
     runtimeTimerCount: trace.operations.filter((operation) => operation.kind === 'timer').length,
     timerOccurrence: 0,
     loopCommandIds: collectLoopCommandIds(workflow.body.nodes),

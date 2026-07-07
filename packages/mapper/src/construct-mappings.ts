@@ -6,6 +6,8 @@ import type {
   WorkflowDefinition,
 } from '@temporal-explorer/schemas';
 
+import { commandForRuntimeOccurrence } from './command-occurrences';
+
 function getEventIds(operation: RuntimeOperation): number[] {
   return operation.eventReferences.map((reference) => reference.eventId);
 }
@@ -101,12 +103,18 @@ export function mapChildWorkflowOperation(
   operation: Extract<RuntimeOperation, { kind: 'child-workflow' }>,
   childCommands: TemporalCommand[],
   occurrences: Map<string, number>,
+  runtimeCounts: Map<string, number>,
+  loopCommandIds: Set<string>,
 ): RuntimeNodeMapping {
   const occurrence = occurrences.get(operation.workflowType) ?? 0;
   occurrences.set(operation.workflowType, occurrence + 1);
-  const command = childCommands.filter((candidate) => candidate.name === operation.workflowType)[
-    occurrence
-  ];
+  const matching = childCommands.filter((candidate) => candidate.name === operation.workflowType);
+  const command = commandForRuntimeOccurrence(
+    matching,
+    occurrence,
+    runtimeCounts.get(operation.workflowType) ?? 0,
+    loopCommandIds,
+  );
 
   if (!command) {
     return createUnmappedMapping(
@@ -119,9 +127,9 @@ export function mapChildWorkflowOperation(
     operation,
     command,
     'exact',
-    `Child Workflow ${operation.workflowType} matched by Workflow type and command order.`,
+    `Child Workflow ${operation.workflowType} matched by Workflow type and repeat-aware occurrence.`,
     'child-workflow-type',
-    `Runtime child Workflow type ${operation.workflowType} matched static command ${command.id}.`,
+    `Runtime child Workflow occurrence ${occurrence + 1} matched static command ${command.id} through repeat-aware occurrence allocation.`,
   );
 }
 
@@ -129,12 +137,18 @@ export function mapExternalSignalOperation(
   operation: Extract<RuntimeOperation, { kind: 'external-signal' }>,
   externalCommands: TemporalCommand[],
   occurrences: Map<string, number>,
+  runtimeCounts: Map<string, number>,
+  loopCommandIds: Set<string>,
 ): RuntimeNodeMapping {
   const occurrence = occurrences.get(operation.signalName) ?? 0;
   occurrences.set(operation.signalName, occurrence + 1);
-  const command = externalCommands.filter((candidate) => candidate.name === operation.signalName)[
-    occurrence
-  ];
+  const matching = externalCommands.filter((candidate) => candidate.name === operation.signalName);
+  const command = commandForRuntimeOccurrence(
+    matching,
+    occurrence,
+    runtimeCounts.get(operation.signalName) ?? 0,
+    loopCommandIds,
+  );
 
   if (!command) {
     return createUnmappedMapping(
