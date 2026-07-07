@@ -6,7 +6,7 @@
     "schemaVersion": "temporal-trace/v1",
     "inputs": {
       "projectRoot": "basic-order",
-      "configHash": "b6763d8a6a0b3df0d4a23ff34ea7090e788b342f9a64270cd6008c2c08221c37",
+      "configHash": "07a5642546497e6706edbd4748fe11080b141546adf03c0196f00b749891c170",
       "sourceFileHashes": {},
       "temporalSdkVersions": {
         "@temporalio/workflow": "^1.18.1"
