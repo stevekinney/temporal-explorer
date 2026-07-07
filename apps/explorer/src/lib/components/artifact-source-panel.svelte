@@ -122,7 +122,7 @@
     box-sizing: border-box;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: 0.75rem;
+    gap: 0.6rem;
     padding: 0.75rem;
     border-right: 1px solid #c8d6dc;
     background: rgba(248, 251, 252, 0.92);
@@ -164,8 +164,8 @@
   .upload-section p,
   .example-list span {
     color: #5f6f78;
-    font-size: 0.8rem;
-    line-height: 1.35;
+    font-size: 0.72rem;
+    line-height: 1.2;
   }
 
   .section-heading,
@@ -201,17 +201,17 @@
   .example-list {
     min-height: 0;
     display: grid;
-    gap: 0.4rem;
+    gap: 0.15rem;
     overflow: auto;
     padding-right: 0.25rem;
   }
 
   .example-list button {
     display: grid;
-    gap: 0.2rem;
-    padding: 0.58rem 0.65rem;
+    gap: 0.1rem;
+    padding: 0.35rem 0.55rem;
     border: 1px solid transparent;
-    border-radius: 0.5rem;
+    border-radius: 0.4rem;
     background: transparent;
     color: #172026;
     text-align: left;
@@ -225,8 +225,8 @@
   }
 
   .example-list strong {
-    font-size: 0.86rem;
-    line-height: 1.15;
+    font-size: 0.8rem;
+    line-height: 1.1;
   }
 
   .upload-section {

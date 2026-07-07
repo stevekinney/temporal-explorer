@@ -398,7 +398,7 @@
   .workbench {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
+    grid-template-columns: minmax(14rem, 16.5rem) minmax(0, 1fr);
     color: #172026;
   }
 
