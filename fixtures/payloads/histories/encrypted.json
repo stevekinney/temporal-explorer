@@ -63,7 +63,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "2",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+470e26fda05d86082af9c2c40c2eac1337b77bd03aa437b6362e5ae5caa0b5f8",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": {
           "coreUsedFlags": [1, 2, 3],
           "langUsedFlags": [],
@@ -173,7 +173,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "8",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+470e26fda05d86082af9c2c40c2eac1337b77bd03aa437b6362e5ae5caa0b5f8",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }

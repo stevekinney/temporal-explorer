@@ -19,6 +19,7 @@ export const normalizedIdentity = 'temporal-explorer-fixture-worker';
 const repositoryRoot = new URL('../../', import.meta.url);
 const baseEventTime = Date.UTC(2026, 0, 1, 0, 0, 0, 0);
 const uuidSubstringPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/giu;
+const binaryChecksumPattern = /\+[0-9a-f]{32,}$/iu;
 
 /** Formats a JSON value with Prettier so committed fixtures match format:check. */
 export async function createStableJson(value: unknown): Promise<string> {
@@ -68,6 +69,7 @@ export class RunIdNormalizer {
 }
 
 type LongLike = { low: number; high: number; unsigned: boolean; toString(): string };
+type HistoryEventRecord = TemporalHistoryEvent & Record<string, unknown>;
 
 function isLongLike(value: object): value is LongLike {
   const constructorName = (value as { constructor?: { name?: unknown } }).constructor?.name;
@@ -130,6 +132,13 @@ function normalizeByKey(
     return { handled: true, value: normalizeStackTrace(value) };
   }
 
+  if (key === 'binaryChecksum' && typeof value === 'string') {
+    return {
+      handled: true,
+      value: value.replace(binaryChecksumPattern, '+fixture-binary-checksum'),
+    };
+  }
+
   if ((key === 'coreUsedFlags' || key === 'langUsedFlags') && Array.isArray(value)) {
     return {
       handled: true,
@@ -175,6 +184,55 @@ function normalizeValue(value: unknown, runIds: RunIdNormalizer, key?: string): 
   return value;
 }
 
+function readEventId(value: unknown): string | undefined {
+  return typeof value === 'string' || typeof value === 'number' ? String(value) : undefined;
+}
+
+function readAttributes(
+  event: HistoryEventRecord,
+  key: string,
+): Record<string, unknown> | undefined {
+  const attributes = event[key];
+  return attributes && typeof attributes === 'object' && !Array.isArray(attributes)
+    ? (attributes as Record<string, unknown>)
+    : undefined;
+}
+
+function collectActivityStartedEventIds(events: HistoryEventRecord[]): Map<string, string> {
+  const activityStartedByScheduledEventId = new Map<string, string>();
+
+  for (const event of events) {
+    if (Number(event.eventType) === 11) {
+      const eventId = readEventId(event.eventId);
+      const scheduledEventId = readEventId(
+        readAttributes(event, 'activityTaskStartedEventAttributes')?.['scheduledEventId'],
+      );
+
+      if (eventId && scheduledEventId) {
+        activityStartedByScheduledEventId.set(scheduledEventId, eventId);
+      }
+    }
+  }
+
+  return activityStartedByScheduledEventId;
+}
+
+function rewriteActivityStartedReferences(events: HistoryEventRecord[]): void {
+  const activityStartedByScheduledEventId = collectActivityStartedEventIds(events);
+
+  for (const event of events) {
+    const attributes = readAttributes(event, 'activityTaskCompletedEventAttributes');
+    const scheduledEventId = readEventId(attributes?.['scheduledEventId']);
+    const startedEventId = scheduledEventId
+      ? activityStartedByScheduledEventId.get(scheduledEventId)
+      : undefined;
+
+    if (attributes && startedEventId) {
+      attributes['startedEventId'] = startedEventId;
+    }
+  }
+}
+
 /** Reports whether a JSON value has the top-level Event History object shape. */
 export function isHistoryJson(value: unknown): value is TemporalHistoryJson {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -192,6 +250,8 @@ export function normalizeHistory(
   }
 
   const events = normalized.events ?? [];
+
+  rewriteActivityStartedReferences(events);
 
   for (const event of events) {
     const eventId = Number(event.eventId ?? 0);

@@ -13,6 +13,7 @@
     "replacement": "temporal-explorer-fixture-worker"
   },
   "timestampNormalization": "eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.",
+  "binaryChecksumNormalization": "workflowTaskCompletedEventAttributes.binaryChecksum hash suffixes are replaced with fixture-binary-checksum.",
   "eventCount": 17,
   "eventTypes": {
     "1": 1,
@@ -25,5 +26,5 @@
     "12": 1,
     "13": 1
   },
-  "contentSha256": "1878d1973aec45603e40629d71d21ed0fd7eaf3cc864df76d8e4a223fe1605de"
+  "contentSha256": "ae30da19eecb089ec292f86cbe2fe37d8c2cb59adfb76cdfbf5fede8eb979324"
 }

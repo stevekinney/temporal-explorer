@@ -60,7 +60,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "2",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+3dc7fec81854d04f2c730f8dd16eb394353868d49716da11408553f5f230d55e",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": {
           "coreUsedFlags": [1, 2, 3],
           "langUsedFlags": [],
@@ -143,7 +143,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "7",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+3dc7fec81854d04f2c730f8dd16eb394353868d49716da11408553f5f230d55e",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -204,7 +204,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "11",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+3dc7fec81854d04f2c730f8dd16eb394353868d49716da11408553f5f230d55e",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -282,7 +282,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "16",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+3dc7fec81854d04f2c730f8dd16eb394353868d49716da11408553f5f230d55e",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }
@@ -343,7 +343,7 @@
       "workflowTaskCompletedEventAttributes": {
         "scheduledEventId": "20",
         "identity": "temporal-explorer-fixture-worker",
-        "binaryChecksum": "@temporalio/worker@1.18.1+3dc7fec81854d04f2c730f8dd16eb394353868d49716da11408553f5f230d55e",
+        "binaryChecksum": "@temporalio/worker@1.18.1+fixture-binary-checksum",
         "sdkMetadata": { "coreUsedFlags": [], "langUsedFlags": [] },
         "meteringMetadata": {}
       }

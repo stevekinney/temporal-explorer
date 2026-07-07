@@ -159,6 +159,8 @@ async function generateHistory(
     },
     timestampNormalization:
       'eventTime values are set to 2026-01-01T00:00:00.000Z plus eventId milliseconds.',
+    binaryChecksumNormalization:
+      'workflowTaskCompletedEventAttributes.binaryChecksum hash suffixes are replaced with fixture-binary-checksum.',
     eventCount: normalizedHistory.events?.length ?? 0,
     eventTypes,
     contentSha256: createContentHash(historyText),
