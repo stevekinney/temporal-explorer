@@ -13,10 +13,13 @@ import {
   type TemporalAnalysisDocument,
 } from '@temporal-explorer/schemas';
 
-export type ExampleArtifacts = {
+export type ExampleSummary = {
   id: string;
   title: string;
   description: string;
+};
+
+export type ExampleArtifacts = ExampleSummary & {
   artifacts: ExplorerArtifacts;
 };
 
@@ -161,24 +164,40 @@ function summarizeArtifacts(artifacts: ExplorerArtifacts): string {
   return `${workflowCount} workflow${workflowCount === 1 ? '' : 's'}, ${commandCount} command${commandCount === 1 ? '' : 's'}, ${traceCount} trace${traceCount === 1 ? '' : 's'}`;
 }
 
-export async function loadExampleArtifacts(): Promise<ExampleArtifacts[]> {
+async function listFixtureNames(): Promise<string[]> {
   const fixturesRoot = getFixturesRoot();
   const entries = await readdir(fixturesRoot, { withFileTypes: true });
-  const fixtureNames = entries
+
+  return entries
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
     .toSorted((left, right) => left.localeCompare(right));
+}
+
+export async function loadExampleArtifact(fixtureName: string): Promise<ExampleArtifacts> {
+  const fixturesRoot = getFixturesRoot();
+  const artifacts = await loadExplorerArtifacts(join(fixturesRoot, fixtureName));
+
+  return {
+    id: fixtureName,
+    title: formatFixtureTitle(fixtureName),
+    description: summarizeArtifacts(artifacts),
+    artifacts,
+  };
+}
+
+export async function loadExampleSummaries(): Promise<ExampleSummary[]> {
+  const fixtureNames = await listFixtureNames();
 
   return await Promise.all(
     fixtureNames.map(async (fixtureName) => {
-      const artifacts = await loadExplorerArtifacts(join(fixturesRoot, fixtureName));
-
-      return {
-        id: fixtureName,
-        title: formatFixtureTitle(fixtureName),
-        description: summarizeArtifacts(artifacts),
-        artifacts,
-      };
+      const { artifacts: _artifacts, ...summary } = await loadExampleArtifact(fixtureName);
+      return summary;
     }),
   );
+}
+
+export async function loadExampleArtifacts(): Promise<ExampleArtifacts[]> {
+  const fixtureNames = await listFixtureNames();
+  return await Promise.all(fixtureNames.map(loadExampleArtifact));
 }

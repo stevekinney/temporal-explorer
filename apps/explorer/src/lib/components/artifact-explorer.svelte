@@ -641,7 +641,7 @@
   }
 
   .embedded .workspace {
-    padding: clamp(0.875rem, 1.6vw, 1.5rem);
+    padding: clamp(0.7rem, 1.2vw, 1rem);
   }
 
   .workflow-header,
@@ -655,6 +655,10 @@
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
     margin-bottom: 1rem;
+  }
+
+  .embedded .workflow-header {
+    margin-bottom: 0.65rem;
   }
 
   .workflow-switcher {
@@ -689,12 +693,21 @@
     letter-spacing: 0;
   }
 
+  .embedded h1 {
+    font-size: clamp(1.35rem, 1.7vw, 1.85rem);
+  }
+
   .signature {
     margin: 0.65rem 0 0;
     color: #34434f;
     font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
     font-size: 0.9375rem;
     overflow-wrap: anywhere;
+  }
+
+  .embedded .signature {
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
   }
 
   .signal-strip {
@@ -708,6 +721,19 @@
     border-radius: 0.5rem;
     background: #ffffff;
     box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
+  }
+
+  .embedded .signal-strip {
+    padding: 0.55rem 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .embedded .signal-strip strong {
+    font-size: 1rem;
+  }
+
+  .embedded :global(.detail-tabs [role='tablist']) {
+    margin-bottom: 0.55rem;
   }
 
   .signal-strip div {

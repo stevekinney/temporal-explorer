@@ -1,4 +1,4 @@
-import { cp, mkdtemp } from 'node:fs/promises';
+import { copyFile, cp, mkdir, mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -121,9 +121,6 @@ describe('temporal-explorer CLI scaffold', () => {
   });
 
   it('applies configured diagnostic severities to check', async () => {
-    const { mkdtemp, mkdir } = await import('node:fs/promises');
-    const { tmpdir } = await import('node:os');
-    const { join } = await import('node:path');
     const workflowSource = `
 import { proxyActivities } from '@temporalio/workflow';
 
@@ -158,9 +155,6 @@ export async function configuredWorkflow(step: string): Promise<string> {
   });
 
   it('warns before writing decoded payload previews and applies key redaction', async () => {
-    const { mkdtemp, mkdir, copyFile } = await import('node:fs/promises');
-    const { tmpdir } = await import('node:os');
-    const { join } = await import('node:path');
     const root = await mkdtemp(join(tmpdir(), 'temporal-explorer-payload-config-'));
     await mkdir(join(root, 'histories'), { recursive: true });
     await Bun.write(join(root, 'tsconfig.json'), JSON.stringify({ include: ['src/**/*.ts'] }));

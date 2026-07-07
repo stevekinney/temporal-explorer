@@ -54,11 +54,10 @@
     </div>
   </section>
 
-  <div class="mode-switch" role="tablist" aria-label="Explorer source">
+  <div class="mode-switch" aria-label="Explorer source">
     <button
       type="button"
-      role="tab"
-      aria-selected={sourceMode === 'examples'}
+      aria-pressed={sourceMode === 'examples'}
       class:active={sourceMode === 'examples'}
       onclick={() => onSelectExample(selectedExampleId || examples[0]?.id || '')}
     >
@@ -67,8 +66,7 @@
     </button>
     <button
       type="button"
-      role="tab"
-      aria-selected={sourceMode === 'upload'}
+      aria-pressed={sourceMode === 'upload'}
       class:active={sourceMode === 'upload'}
       onclick={onShowUpload}
     >
@@ -156,8 +154,8 @@
     box-sizing: border-box;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 0.85rem;
+    padding: 0.85rem;
     border-right: 1px solid #c8d6dc;
     background: rgba(248, 251, 252, 0.92);
     backdrop-filter: blur(16px);
@@ -190,7 +188,7 @@
   }
 
   h1 {
-    font-size: 1.45rem;
+    font-size: 1.2rem;
     line-height: 1.05;
   }
 
@@ -204,7 +202,7 @@
   .upload-section p,
   .example-list span {
     color: #5f6f78;
-    font-size: 0.86rem;
+    font-size: 0.8rem;
     line-height: 1.35;
   }
 
@@ -278,7 +276,7 @@
   .example-list button {
     display: grid;
     gap: 0.2rem;
-    padding: 0.7rem 0.75rem;
+    padding: 0.58rem 0.65rem;
     border: 1px solid transparent;
     border-radius: 0.5rem;
     background: transparent;
@@ -294,12 +292,12 @@
   }
 
   .example-list strong {
-    font-size: 0.92rem;
+    font-size: 0.86rem;
     line-height: 1.15;
   }
 
   .upload-section {
-    padding: 0.85rem;
+    padding: 0.72rem;
     border: 1px solid #c8d6dc;
     border-radius: 0.625rem;
     background: #ffffff;
@@ -307,7 +305,7 @@
 
   .file-action,
   .clear-history {
-    min-height: 2.5rem;
+    min-height: 2.35rem;
     justify-content: center;
     gap: 0.5rem;
     padding: 0 0.75rem;

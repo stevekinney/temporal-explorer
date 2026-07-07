@@ -26,14 +26,19 @@
     { type: 'success'; artifacts: ExplorerArtifacts } | { type: 'error'; message: string };
 
   let { data }: PageProps = $props();
-  let artifacts = $state<ExplorerArtifacts | undefined>();
+  let artifacts = $state.raw<ExplorerArtifacts | undefined>();
+  let loadedExampleArtifacts = $state.raw<ExplorerArtifacts | undefined>();
   let fileEntries = $state.raw<{ path: string; contents: string }[]>([]);
   let projectName = $state('Uploaded project');
   let sourceMode = $state<SourceMode>('examples');
   let selectedExampleId = $state('');
+  let loadedExampleId = $state('');
   let status = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  let exampleStatus = $state<'idle' | 'loading' | 'error'>('idle');
   let errorMessage = $state('');
+  let exampleErrorMessage = $state('');
   let analysisRequestId = 0;
+  let exampleRequestId = 0;
 
   const ignoredUploadSegments = new Set([
     '.git',
@@ -48,6 +53,22 @@
   const selectedExample = $derived(
     data.examples.find((example) => example.id === selectedExampleId) ?? data.examples[0],
   );
+  const defaultExampleId = $derived(data.examples[0]?.id ?? '');
+  const selectedExampleArtifacts = $derived.by(() => {
+    if (!selectedExample) {
+      return undefined;
+    }
+
+    if (selectedExample.id === loadedExampleId) {
+      return loadedExampleArtifacts;
+    }
+
+    if (selectedExample.id === defaultExampleId) {
+      return data.exampleArtifacts;
+    }
+
+    return undefined;
+  });
   const isWebWorkbench = $derived(data.examples.length > 0);
   const canImportHistory = $derived(
     sourceMode === 'upload' && fileEntries.length > 0 && Boolean(artifacts),
@@ -140,10 +161,61 @@
   function selectExample(exampleId: string): void {
     selectedExampleId = exampleId;
     sourceMode = 'examples';
+    void loadExampleArtifacts(exampleId);
   }
 
   function showUpload(): void {
     sourceMode = 'upload';
+  }
+
+  function hasExampleArtifacts(exampleId: string): boolean {
+    return Boolean(
+      (loadedExampleId === exampleId && loadedExampleArtifacts) ||
+      (exampleId === defaultExampleId && data.exampleArtifacts),
+    );
+  }
+
+  function isCurrentExampleRequest(requestId: number): boolean {
+    return requestId === exampleRequestId;
+  }
+
+  function recordExampleLoadError(requestId: number, error: unknown): void {
+    if (!isCurrentExampleRequest(requestId)) {
+      return;
+    }
+
+    exampleStatus = 'error';
+    exampleErrorMessage = error instanceof Error ? error.message : String(error);
+  }
+
+  async function loadExampleArtifacts(exampleId: string): Promise<void> {
+    if (!exampleId || hasExampleArtifacts(exampleId)) {
+      return;
+    }
+
+    exampleStatus = 'loading';
+    exampleErrorMessage = '';
+    const requestId = (exampleRequestId += 1);
+
+    try {
+      const response = await fetch(`/examples/${encodeURIComponent(exampleId)}.json`);
+
+      if (!response.ok) {
+        throw new Error(`Example ${exampleId} failed to load (${response.status}).`);
+      }
+
+      const nextArtifacts = (await response.json()) as ExplorerArtifacts;
+
+      if (!isCurrentExampleRequest(requestId)) {
+        return;
+      }
+
+      loadedExampleArtifacts = nextArtifacts;
+      loadedExampleId = exampleId;
+      exampleStatus = 'idle';
+    } catch (error) {
+      recordExampleLoadError(requestId, error);
+    }
   }
 
   async function analyzeFiles(files: FileList | null): Promise<void> {
@@ -260,13 +332,25 @@
           requestedTrace={data.requestedTrace}
           siteUrl={data.siteUrl}
         />
-      {:else if selectedExample?.artifacts}
+      {:else if selectedExampleArtifacts}
         <ArtifactExplorer
-          artifacts={selectedExample.artifacts}
+          artifacts={selectedExampleArtifacts}
           embedded
           requestedTrace={data.requestedTrace}
           siteUrl={data.siteUrl}
         />
+      {:else if sourceMode === 'examples' && exampleStatus === 'loading'}
+        <section class="empty-view">
+          <Upload size={32} aria-hidden="true" />
+          <h2>Loading example workflow</h2>
+          <p>The selected example graph is loading.</p>
+        </section>
+      {:else if sourceMode === 'examples' && exampleStatus === 'error'}
+        <section class="empty-view">
+          <Upload size={32} aria-hidden="true" />
+          <h2>Example failed to load</h2>
+          <p>{exampleErrorMessage}</p>
+        </section>
       {:else}
         <section class="empty-view">
           <Upload size={32} aria-hidden="true" />
@@ -320,7 +404,7 @@
   .workbench {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+    grid-template-columns: minmax(14.5rem, 17rem) minmax(0, 1fr);
     color: #172026;
   }
 

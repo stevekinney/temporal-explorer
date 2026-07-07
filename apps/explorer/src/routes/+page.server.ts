@@ -1,4 +1,8 @@
-import { loadExampleArtifacts, loadExplorerArtifacts } from '$lib/server/artifacts';
+import {
+  loadExampleArtifact,
+  loadExampleSummaries,
+  loadExplorerArtifacts,
+} from '$lib/server/artifacts';
 
 import type { PageServerLoad } from './$types';
 
@@ -21,9 +25,13 @@ function resolveSiteUrl(): string {
 
 export const load = (async ({ url }) => {
   if (isWebTarget) {
+    const examples = await loadExampleSummaries();
+    const defaultExample = examples[0] ? await loadExampleArtifact(examples[0].id) : undefined;
+
     return {
       artifacts: undefined,
-      examples: await loadExampleArtifacts(),
+      exampleArtifacts: defaultExample?.artifacts,
+      examples,
       requestedTrace: undefined,
       siteUrl: resolveSiteUrl(),
     };
@@ -34,6 +42,7 @@ export const load = (async ({ url }) => {
 
   return {
     artifacts: await loadExplorerArtifacts(project),
+    exampleArtifacts: undefined,
     examples: [],
     requestedTrace,
     siteUrl: resolveSiteUrl(),

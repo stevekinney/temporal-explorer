@@ -25,6 +25,26 @@ const activities = {
 const committedFixture = new URL('../../../fixtures/basic-order', import.meta.url).pathname;
 const workflowsPath = join(committedFixture, 'src', 'workflows', 'basic-order-workflow.ts');
 
+type ImportedTrace = {
+  execution: { status: string };
+  payloads: { decoded: boolean; redacted: boolean }[];
+};
+
+function isImportedTrace(value: unknown): value is ImportedTrace {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const execution: unknown = Reflect.get(value, 'execution');
+  const payloads: unknown = Reflect.get(value, 'payloads');
+
+  if (typeof execution !== 'object' || execution === null || !Array.isArray(payloads)) {
+    return false;
+  }
+
+  return typeof Reflect.get(execution, 'status') === 'string';
+}
+
 async function runCommand(
   args: string[],
 ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
@@ -157,10 +177,14 @@ export default configuration;
       const artifactPathMatch = fetchRun.stdout.match(/Wrote (.+trace\.json)/u);
       expect(artifactPathMatch).not.toBeNull();
 
-      const trace = (await Bun.file(artifactPathMatch?.[1] ?? '').json()) as {
-        execution: { status: string };
-        payloads: { decoded: boolean; redacted: boolean }[];
-      };
+      const traceJson: unknown = await Bun.file(artifactPathMatch?.[1] ?? '').json();
+      expect(isImportedTrace(traceJson)).toBe(true);
+
+      if (!isImportedTrace(traceJson)) {
+        throw new Error('Imported trace artifact did not match the expected shape.');
+      }
+
+      const trace = traceJson;
       expect(trace.execution.status).toBe('completed');
       expect(trace.payloads.every((payload) => !payload.decoded && payload.redacted)).toBe(true);
     } finally {

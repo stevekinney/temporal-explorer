@@ -64,11 +64,13 @@ describe('explorer artifact loader', () => {
   it('loads a committed example catalog for the static web app', async () => {
     const examples = await loadExampleArtifacts();
     const basicOrder = examples.find((example) => example.id === 'basic-order');
+    const timerRace = examples.find((example) => example.id === 'timer-race');
 
-    expect(examples.length).toBeGreaterThan(20);
     expect(basicOrder?.title).toBe('Basic Order');
     expect(basicOrder?.description).toContain('1 workflow');
     expect(basicOrder?.artifacts.analysis.workflows[0]?.name).toBe('basicOrderWorkflow');
+    expect(timerRace?.title).toBe('Timer Race');
+    expect(timerRace?.artifacts.analysis.workflows[0]?.name).toBe('timerRaceWorkflow');
   });
 
   it('loads the module-relative default fixture project', async () => {

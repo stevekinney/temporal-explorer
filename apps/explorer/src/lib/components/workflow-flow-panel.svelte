@@ -660,6 +660,19 @@
     border-radius: 0 0 0.5rem 0.5rem;
   }
 
+  :global(.explorer-shell.embedded) .flow-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :global(.explorer-shell.embedded) .flow-stage {
+    height: clamp(40rem, calc(100vh - 14rem), 58rem);
+    min-height: 36rem;
+  }
+
+  :global(.explorer-shell.embedded) .flow-sidecar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .flow-placeholder {
     display: flex;
     align-items: center;
@@ -746,8 +759,17 @@
       grid-template-columns: 1fr;
     }
 
+    :global(.explorer-shell.embedded) .flow-sidecar {
+      grid-template-columns: 1fr;
+    }
+
     .flow-stage {
       height: 32rem;
+    }
+
+    :global(.explorer-shell.embedded) .flow-stage {
+      height: 34rem;
+      min-height: 28rem;
     }
   }
 </style>
