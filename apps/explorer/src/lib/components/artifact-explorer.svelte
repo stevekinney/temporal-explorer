@@ -49,10 +49,12 @@
 
   let {
     artifacts,
+    embedded = false,
     requestedTrace,
     siteUrl,
   }: {
     artifacts: ExplorerArtifacts;
+    embedded?: boolean;
     requestedTrace?: string | undefined;
     siteUrl?: string | undefined;
   } = $props();
@@ -178,6 +180,10 @@
     return `${workflow.name}(${args}): ${workflow.signature.result.display}`;
   }
 
+  function workflowSignatureArguments(workflow: Workflow): Workflow['signature']['args'] {
+    return workflow.signature.args;
+  }
+
   function selectWorkflow(workflowId: string): void {
     selectedWorkflowOverride = workflowId;
     activeTab = 'flow';
@@ -206,39 +212,41 @@
   {/if}
 </svelte:head>
 
-<div class="explorer-shell">
-  <Sidebar label="Workflow artifacts" class="workflow-sidebar">
-    {#snippet brand()}
-      <div class="brand-lockup">
-        <span class="brand-mark">TE</span>
-        <div>
-          <p>Temporal Explorer</p>
-          <span>{artifacts.projectName}</span>
+<div class="explorer-shell" class:embedded>
+  {#if !embedded}
+    <Sidebar label="Workflow artifacts" class="workflow-sidebar">
+      {#snippet brand()}
+        <div class="brand-lockup">
+          <span class="brand-mark">TE</span>
+          <div>
+            <p>Temporal Explorer</p>
+            <span>{artifacts.projectName}</span>
+          </div>
         </div>
-      </div>
-    {/snippet}
+      {/snippet}
 
-    {#snippet navigation()}
-      <SideNavigation ariaLabel="Workflow selection">
-        {#each artifacts.analysis.workflows as workflow (workflow.id)}
-          <SideNavigationItem
-            active={workflow.id === selectedWorkflow?.id}
-            current="true"
-            onclick={() => selectWorkflow(workflow.id)}
-          >
-            <span class="workflow-nav-item">{workflow.name}</span>
-          </SideNavigationItem>
-        {/each}
-      </SideNavigation>
-    {/snippet}
+      {#snippet navigation()}
+        <SideNavigation ariaLabel="Workflow selection">
+          {#each artifacts.analysis.workflows as workflow (workflow.id)}
+            <SideNavigationItem
+              active={workflow.id === selectedWorkflow?.id}
+              current="true"
+              onclick={() => selectWorkflow(workflow.id)}
+            >
+              <span class="workflow-nav-item">{workflow.name}</span>
+            </SideNavigationItem>
+          {/each}
+        </SideNavigation>
+      {/snippet}
 
-    {#snippet footer()}
-      <div class="artifact-footer">
-        <span>{artifacts.artifactDirectory}</span>
-        <Badge variant="info" size="sm">{artifacts.analysis.schemaVersion}</Badge>
-      </div>
-    {/snippet}
-  </Sidebar>
+      {#snippet footer()}
+        <div class="artifact-footer">
+          <span>{artifacts.artifactDirectory}</span>
+          <Badge variant="info" size="sm">{artifacts.analysis.schemaVersion}</Badge>
+        </div>
+      {/snippet}
+    </Sidebar>
+  {/if}
 
   <main class="workspace" aria-labelledby="workflow-title">
     {#if selectedWorkflow}
@@ -246,8 +254,33 @@
         <div>
           <p class="eyebrow">Workflow artifact</p>
           <h1 id="workflow-title">{selectedWorkflow.name}</h1>
-          <p class="signature">{workflowSignature(selectedWorkflow)}</p>
+          <code class="signature" aria-label={workflowSignature(selectedWorkflow)}>
+            <span class="syntax-function">{selectedWorkflow.name}</span><span
+              class="syntax-punctuation">(</span
+            >{#each workflowSignatureArguments(selectedWorkflow) as argument, index (argument.id)}
+              {#if index > 0}<span class="syntax-punctuation">, </span>{/if}<span
+                class="syntax-identifier">{argument.displayName ?? 'argument'}</span
+              ><span class="syntax-punctuation">: </span><span class="syntax-type"
+                >{argument.display}</span
+              >
+            {/each}<span class="syntax-punctuation">): </span><span class="syntax-type"
+              >{selectedWorkflow.signature.result.display}</span
+            >
+          </code>
         </div>
+        {#if embedded && artifacts.analysis.workflows.length > 1}
+          <label class="workflow-switcher">
+            <span>Workflow</span>
+            <select
+              value={selectedWorkflowId}
+              onchange={(event) => selectWorkflow(event.currentTarget.value)}
+            >
+              {#each artifacts.analysis.workflows as workflow (workflow.id)}
+                <option value={workflow.id}>{workflow.name}</option>
+              {/each}
+            </select>
+          </label>
+        {/if}
       </section>
 
       <section class="signal-strip" aria-label="Artifact summary">
@@ -558,6 +591,11 @@
     grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
   }
 
+  .explorer-shell.embedded {
+    min-height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   :global(.workflow-sidebar) {
     border-right: 1px solid #cfd8df;
     background: rgba(255, 255, 255, 0.78);
@@ -618,6 +656,10 @@
     padding: clamp(1rem, 2vw, 2rem);
   }
 
+  .embedded .workspace {
+    padding: clamp(0.7rem, 1.2vw, 1rem);
+  }
+
   .workflow-header,
   .signal-strip,
   .panel-grid {
@@ -626,9 +668,39 @@
   }
 
   .workflow-header {
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
     margin-bottom: 1rem;
+  }
+
+  .embedded .workflow-header {
+    align-items: center;
+    margin-bottom: 0.35rem;
+  }
+
+  .workflow-switcher {
+    display: grid;
+    gap: 0.35rem;
+    min-width: min(22rem, 34vw);
+  }
+
+  .workflow-switcher span {
+    color: #5d6b75;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .workflow-switcher select {
+    min-height: 2.45rem;
+    width: 100%;
+    border: 1px solid #c8d6dc;
+    border-radius: 0.5rem;
+    background: #ffffff;
+    color: #172026;
+    font: inherit;
+    font-weight: 650;
+    padding: 0 2rem 0 0.75rem;
   }
 
   h1 {
@@ -638,12 +710,42 @@
     letter-spacing: 0;
   }
 
+  .embedded h1 {
+    font-size: clamp(1.05rem, 1.25vw, 1.35rem);
+  }
+
   .signature {
-    margin: 0.65rem 0 0;
-    color: #34434f;
+    display: block;
+    margin: 0.55rem 0 0;
+    color: #40515b;
     font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
     font-size: 0.9375rem;
+    line-height: 1.55;
     overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .embedded .signature {
+    margin-top: 0.18rem;
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .syntax-function {
+    color: #8a3ffc;
+    font-weight: 720;
+  }
+
+  .syntax-identifier {
+    color: #005f73;
+  }
+
+  .syntax-type {
+    color: #0f7a55;
+  }
+
+  .syntax-punctuation {
+    color: #64717a;
   }
 
   .signal-strip {
@@ -659,11 +761,36 @@
     box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
   }
 
+  .embedded .signal-strip {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 0.35rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .embedded .signal-strip strong {
+    font-size: 0.82rem;
+  }
+
+  .embedded :global(.detail-tabs [role='tablist']) {
+    margin-bottom: 0.35rem;
+  }
+
   .signal-strip div {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     min-width: 0;
+  }
+
+  .embedded .signal-strip div {
+    flex-direction: row;
+    gap: 0.3rem;
+    align-items: baseline;
   }
 
   .signal-strip strong {
@@ -709,6 +836,10 @@
     .workflow-header,
     .panel-grid {
       grid-template-columns: 1fr;
+    }
+
+    .workflow-switcher {
+      min-width: 0;
     }
 
     .signal-strip {

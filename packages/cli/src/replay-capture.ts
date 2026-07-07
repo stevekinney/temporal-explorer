@@ -18,6 +18,19 @@ type ReplayWorker = {
   ): Promise<void>;
 };
 
+type ReplayHistoryJson = {
+  events?: Record<string, unknown>[];
+};
+
+function isReplayHistoryJson(value: unknown): value is ReplayHistoryJson {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const events: unknown = Reflect.get(value, 'events');
+  return events === undefined || Array.isArray(events);
+}
+
 async function loadReplayWorker(): Promise<ReplayWorker> {
   try {
     const worker = (await import('@temporalio/worker')) as { Worker: ReplayWorker };
@@ -59,9 +72,14 @@ export async function captureReplayCommands(options: {
       api: { history: { v1: { History: { fromObject(value: unknown): unknown } } } };
     };
   };
-  const historyJson = (await Bun.file(options.historyFile).json()) as {
-    events?: Record<string, unknown>[];
-  };
+  const historyJson: unknown = await Bun.file(options.historyFile).json();
+
+  if (!isReplayHistoryJson(historyJson)) {
+    throw new Error(
+      `Event History file is not a Temporal history JSON object: ${options.historyFile}`,
+    );
+  }
+
   const history = proto.temporal.api.history.v1.History.fromObject(toIsoEventTimes(historyJson));
   const captured: ReplayCapturedCommand[] = [];
 

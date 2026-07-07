@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'bun:test';
 
-import { loadExplorerArtifacts } from './artifacts';
+import { loadExampleArtifacts, loadExplorerArtifacts } from './artifacts';
 
 const fixtureRoot = new URL('../../../../../fixtures/basic-order/', import.meta.url).pathname;
 const analysisArtifactPath = join(fixtureRoot, '.temporal-explorer', 'analysis.json');
@@ -59,6 +59,18 @@ describe('explorer artifact loader', () => {
     ]);
     expect(artifacts.traces[0]?.execution.workflowType).toBe('basicOrderWorkflow');
     expect(artifacts.overlays[0]?.coverage.nodes.unmappedRuntimeOperations).toBe(0);
+  });
+
+  it('loads a committed example catalog for the static web app', async () => {
+    const examples = await loadExampleArtifacts();
+    const basicOrder = examples.find((example) => example.id === 'basic-order');
+    const timerRace = examples.find((example) => example.id === 'timer-race');
+
+    expect(basicOrder?.title).toBe('Basic Order');
+    expect(basicOrder?.description).toContain('1 workflow');
+    expect(basicOrder?.artifacts.analysis.workflows[0]?.name).toBe('basicOrderWorkflow');
+    expect(timerRace?.title).toBe('Timer Race');
+    expect(timerRace?.artifacts.analysis.workflows[0]?.name).toBe('timerRaceWorkflow');
   });
 
   it('loads the module-relative default fixture project', async () => {

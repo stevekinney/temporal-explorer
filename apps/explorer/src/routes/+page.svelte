@@ -1,12 +1,13 @@
 <script lang="ts">
   import ArtifactExplorer from '$lib/components/artifact-explorer.svelte';
-  import { EmptyState } from '$cinder-components/empty-state';
+  import ArtifactSourcePanel from '$lib/components/artifact-source-panel.svelte';
   import { Upload } from 'lucide-svelte';
 
   import type { ExplorerArtifacts } from '@temporal-explorer/schemas';
 
   import type { PageProps } from './$types';
 
+  type SourceMode = 'examples' | 'upload' | 'local';
   type AnalysisWorkerRequest =
     | {
         type: 'analyze';
@@ -26,13 +27,19 @@
 
   let { data }: PageProps = $props();
   let artifacts = $state.raw<ExplorerArtifacts | undefined>();
+  let loadedExampleArtifacts = $state.raw<ExplorerArtifacts | undefined>();
   let fileEntries = $state.raw<{ path: string; contents: string }[]>([]);
-  let projectName = $state('Uploaded Project');
+  let projectName = $state('Uploaded project');
+  let sourceMode = $state<SourceMode>('examples');
+  let selectedExampleId = $state('');
+  let loadedExampleId = $state('');
   let status = $state<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  let exampleStatus = $state<'idle' | 'loading' | 'error'>('idle');
   let errorMessage = $state('');
+  let exampleErrorMessage = $state('');
   let analysisRequestId = 0;
+  let exampleRequestId = 0;
 
-  const displayArtifacts = $derived(artifacts ?? data.artifacts);
   const ignoredUploadSegments = new Set([
     '.git',
     '.svelte-kit',
@@ -43,6 +50,36 @@
     'dist',
     'node_modules',
   ]);
+  const selectedExample = $derived(
+    data.examples.find((example) => example.id === selectedExampleId) ?? data.examples[0],
+  );
+  const defaultExampleId = $derived(data.examples[0]?.id ?? '');
+  const selectedExampleArtifacts = $derived.by(() => {
+    if (!selectedExample) {
+      return undefined;
+    }
+
+    if (selectedExample.id === loadedExampleId) {
+      return loadedExampleArtifacts;
+    }
+
+    if (selectedExample.id === defaultExampleId) {
+      return data.exampleArtifacts;
+    }
+
+    return undefined;
+  });
+  const isWebWorkbench = $derived(data.examples.length > 0);
+  const canImportHistory = $derived(
+    sourceMode === 'upload' && status !== 'loading' && fileEntries.length > 0 && Boolean(artifacts),
+  );
+  const canViewUploadedArtifacts = $derived(sourceMode !== 'upload' && Boolean(artifacts));
+  const uploadStatusText = $derived.by(() => {
+    if (status === 'loading') return 'Analyzing uploaded files in your browser...';
+    if (status === 'ready') return `${projectName} is loaded.`;
+    if (status === 'error') return errorMessage;
+    return 'Pick a TypeScript project directory. Event History is optional after that.';
+  });
 
   function createWorker(): Worker {
     return new Worker(new URL('$lib/analysis.worker.ts', import.meta.url), {
@@ -54,20 +91,28 @@
     return new Promise((resolve, reject) => {
       const worker = createWorker();
 
-      worker.onmessage = (event: MessageEvent<AnalysisWorkerResponse>) => {
-        worker.terminate();
+      worker.addEventListener(
+        'message',
+        (event: MessageEvent<AnalysisWorkerResponse>) => {
+          worker.terminate();
 
-        if (event.data.type === 'success') {
-          resolve(event.data.artifacts);
-        } else {
-          reject(new Error(event.data.message));
-        }
-      };
-      worker.onerror = (event) => {
-        worker.terminate();
-        reject(new Error(event.message));
-      };
-      worker.postMessage(request);
+          if (event.data.type === 'success') {
+            resolve(event.data.artifacts);
+          } else {
+            reject(new Error(event.data.message));
+          }
+        },
+        { once: true },
+      );
+      worker.addEventListener(
+        'error',
+        (event) => {
+          worker.terminate();
+          reject(new Error(event.message));
+        },
+        { once: true },
+      );
+      worker.postMessage(request, { transfer: [] });
     });
   }
 
@@ -82,6 +127,11 @@
         .split('/')
         .some((segment) => ignoredUploadSegments.has(segment))
     );
+  }
+
+  function getProjectName(files: FileList): string {
+    const firstPath = files[0] ? getRelativePath(files[0]) : '';
+    return firstPath.split('/')[0] || 'Uploaded project';
   }
 
   function getProjectRelativePath(file: File, selectedProjectName: string): string {
@@ -109,9 +159,76 @@
     return entries;
   }
 
-  function getProjectName(files: FileList): string {
-    const firstPath = files[0] ? getRelativePath(files[0]) : '';
-    return firstPath.split('/')[0] || 'Uploaded Project';
+  function selectExample(exampleId: string): void {
+    selectedExampleId = exampleId;
+    sourceMode = 'examples';
+    void loadExampleArtifacts(exampleId);
+  }
+
+  function viewUploadedArtifacts(): void {
+    if (artifacts) {
+      sourceMode = 'upload';
+    }
+  }
+
+  function hasExampleArtifacts(exampleId: string): boolean {
+    return Boolean(
+      (loadedExampleId === exampleId && loadedExampleArtifacts) ||
+      (exampleId === defaultExampleId && data.exampleArtifacts),
+    );
+  }
+
+  function isCurrentExampleRequest(requestId: number): boolean {
+    return requestId === exampleRequestId;
+  }
+
+  function recordExampleLoadError(requestId: number, error: unknown): void {
+    if (!isCurrentExampleRequest(requestId)) {
+      return;
+    }
+
+    exampleStatus = 'error';
+    exampleErrorMessage = error instanceof Error ? error.message : String(error);
+  }
+
+  async function loadExampleArtifacts(exampleId: string): Promise<void> {
+    if (!exampleId) {
+      exampleRequestId += 1;
+      exampleStatus = 'idle';
+      exampleErrorMessage = '';
+      return;
+    }
+
+    if (hasExampleArtifacts(exampleId)) {
+      exampleRequestId += 1;
+      exampleStatus = 'idle';
+      exampleErrorMessage = '';
+      return;
+    }
+
+    exampleStatus = 'loading';
+    exampleErrorMessage = '';
+    const requestId = (exampleRequestId += 1);
+
+    try {
+      const response = await fetch(`/examples/${encodeURIComponent(exampleId)}.json`);
+
+      if (!response.ok) {
+        throw new Error(`Example ${exampleId} failed to load (${response.status}).`);
+      }
+
+      const nextArtifacts = (await response.json()) as ExplorerArtifacts;
+
+      if (!isCurrentExampleRequest(requestId)) {
+        return;
+      }
+
+      loadedExampleArtifacts = nextArtifacts;
+      loadedExampleId = exampleId;
+      exampleStatus = 'idle';
+    } catch (error) {
+      recordExampleLoadError(requestId, error);
+    }
   }
 
   async function analyzeFiles(files: FileList | null): Promise<void> {
@@ -121,6 +238,7 @@
 
     status = 'loading';
     errorMessage = '';
+    sourceMode = 'upload';
     const selectedProjectName = getProjectName(files);
     projectName = selectedProjectName;
     const requestId = (analysisRequestId += 1);
@@ -160,6 +278,7 @@
 
     status = 'loading';
     errorMessage = '';
+    sourceMode = 'upload';
     const selectedProjectName = projectName;
     const requestId = (analysisRequestId += 1);
 
@@ -201,146 +320,146 @@
   }
 </script>
 
-{#if displayArtifacts}
+{#if isWebWorkbench}
+  <main class="workbench">
+    <ArtifactSourcePanel
+      examples={data.examples}
+      selectedExampleId={selectedExample?.id ?? selectedExampleId}
+      {sourceMode}
+      {status}
+      {uploadStatusText}
+      {canImportHistory}
+      {canViewUploadedArtifacts}
+      hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
+      onSelectExample={selectExample}
+      onViewUploadedArtifacts={viewUploadedArtifacts}
+      onAnalyzeFiles={analyzeFiles}
+      onAnalyzeHistory={analyzeHistory}
+      onClearHistory={clearHistory}
+    />
+
+    <section class="viewer" aria-label="Workflow explorer">
+      {#if sourceMode === 'upload' && artifacts}
+        <ArtifactExplorer
+          {artifacts}
+          embedded
+          requestedTrace={data.requestedTrace}
+          siteUrl={data.siteUrl}
+        />
+      {:else if sourceMode === 'examples' && selectedExampleArtifacts}
+        <ArtifactExplorer
+          artifacts={selectedExampleArtifacts}
+          embedded
+          requestedTrace={data.requestedTrace}
+          siteUrl={data.siteUrl}
+        />
+      {:else if sourceMode === 'examples' && exampleStatus === 'loading'}
+        <section class="empty-view">
+          <Upload size={32} aria-hidden="true" />
+          <h2>Loading example workflow</h2>
+          <p>The selected example graph is loading.</p>
+        </section>
+      {:else if sourceMode === 'examples' && exampleStatus === 'error'}
+        <section class="empty-view">
+          <Upload size={32} aria-hidden="true" />
+          <h2>Example failed to load</h2>
+          <p>{exampleErrorMessage}</p>
+        </section>
+      {:else}
+        <section class="empty-view">
+          <Upload size={32} aria-hidden="true" />
+          <h2>Choose an example or upload a project</h2>
+          <p>The graph renders as soon as Temporal Explorer has workflow definitions.</p>
+        </section>
+      {/if}
+    </section>
+  </main>
+{:else if data.artifacts}
   <ArtifactExplorer
-    artifacts={displayArtifacts}
+    artifacts={data.artifacts}
     requestedTrace={data.requestedTrace}
     siteUrl={data.siteUrl}
   />
-  {#if fileEntries.length > 0}
-    <section class="history-upload" aria-label="Optional Event History overlay">
-      <label>
-        <span>Event History JSON</span>
-        <input
-          type="file"
-          accept="application/json,.json"
-          onchange={(event) => analyzeHistory(event.currentTarget.files)}
-        />
-      </label>
-      {#if displayArtifacts.traces.length > 0}
-        <button type="button" onclick={clearHistory}>Remove history</button>
-      {/if}
-      {#if status === 'loading'}
-        <p class="status">Loading history...</p>
-      {:else if status === 'error'}
-        <EmptyState title="History import failed" description={errorMessage} headingLevel={2} />
-      {/if}
-    </section>
-  {/if}
 {:else}
-  <main class="upload-shell">
-    <section
-      class="upload-panel"
-      role="group"
-      ondragover={(event) => event.preventDefault()}
-      ondrop={(event) => {
-        event.preventDefault();
-        analyzeFiles(event.dataTransfer?.files ?? null);
-      }}
-    >
-      <Upload size={36} aria-hidden="true" />
-      <h1>Temporal Explorer</h1>
-      <p>Select a local TypeScript project directory to render its static Workflow graph.</p>
-      <label class="directory-picker">
-        <span>Choose directory</span>
-        <input
-          type="file"
-          webkitdirectory
-          multiple
-          onchange={(event) => analyzeFiles(event.currentTarget.files)}
-        />
-      </label>
-      {#if status === 'loading'}
-        <p class="status">Loading analyzer...</p>
-      {:else if status === 'error'}
-        <EmptyState title="Analysis failed" description={errorMessage} headingLevel={2} />
-      {/if}
+  <main class="workbench empty-workbench">
+    <ArtifactSourcePanel
+      examples={data.examples}
+      selectedExampleId={selectedExample?.id ?? selectedExampleId}
+      {sourceMode}
+      {status}
+      {uploadStatusText}
+      {canImportHistory}
+      {canViewUploadedArtifacts}
+      hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
+      onSelectExample={selectExample}
+      onViewUploadedArtifacts={viewUploadedArtifacts}
+      onAnalyzeFiles={analyzeFiles}
+      onAnalyzeHistory={analyzeHistory}
+      onClearHistory={clearHistory}
+    />
+    <section class="viewer" aria-label="Workflow explorer">
+      <section class="empty-view">
+        <Upload size={32} aria-hidden="true" />
+        <h2>Choose an example or upload a project</h2>
+        <p>The graph renders as soon as Temporal Explorer has workflow definitions.</p>
+      </section>
     </section>
   </main>
 {/if}
 
 <style>
-  .upload-shell {
+  :global(body) {
+    margin: 0;
+    background:
+      linear-gradient(90deg, rgba(31, 73, 92, 0.08) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(180deg, rgba(31, 73, 92, 0.06) 1px, transparent 1px) 0 0 / 48px 48px,
+      #edf3f5;
+  }
+
+  .workbench {
     min-height: 100vh;
     display: grid;
-    place-items: center;
-    padding: 2rem;
-    background: #f5f7f9;
+    grid-template-columns: minmax(14rem, 16.5rem) minmax(0, 1fr);
+    color: #172026;
   }
 
-  .upload-panel {
-    width: min(100%, 40rem);
-    display: grid;
-    gap: 1rem;
-    justify-items: center;
-    text-align: center;
-    padding: 2rem;
-    border: 1px dashed #9aa8b5;
-    border-radius: 8px;
-    background: #ffffff;
-  }
-
-  .upload-panel h1 {
+  p {
     margin: 0;
-    font-size: 2rem;
     letter-spacing: 0;
   }
 
-  .upload-panel p {
-    margin: 0;
-    color: #526170;
+  .viewer {
+    min-width: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #f8fbfc;
   }
 
-  .directory-picker,
-  .history-upload label,
-  .history-upload button {
-    min-height: 2.5rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0 1rem;
-    border: 1px solid #1f2933;
-    border-radius: 6px;
-    background: #1f2933;
-    color: #ffffff;
-    font-weight: 600;
-    cursor: pointer;
+  .viewer :global(.explorer-shell) {
+    min-height: 100vh;
   }
 
-  .directory-picker input,
-  .history-upload input {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    opacity: 0;
-    pointer-events: none;
+  .empty-view {
+    min-height: calc(100vh - 2rem);
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.75rem;
+    border: 1px dashed #a8bbc4;
+    border-radius: 0.75rem;
+    background: rgba(248, 251, 252, 0.74);
+    text-align: center;
   }
 
-  .status {
-    font-weight: 600;
+  .empty-view h2 {
+    color: #172026;
+    font-size: 1.4rem;
+    text-transform: none;
   }
 
-  .history-upload {
-    position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 20;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .history-upload label,
-  .history-upload button {
-    background: #ffffff;
-    color: #1f2933;
-  }
-
-  @media (max-width: 700px) {
-    .history-upload {
-      left: 1rem;
-      flex-wrap: wrap;
+  @media (max-width: 960px) {
+    .workbench {
+      grid-template-columns: 1fr;
     }
   }
 </style>
