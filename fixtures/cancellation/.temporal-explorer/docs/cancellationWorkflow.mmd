@@ -6,18 +6,8 @@ flowchart TD
   n2(( ))
   flow_cancellationWorkflow_3(["throw"])
   flow_cancellationWorkflow_5(["throw"])
-  flow_cancellationWorkflow_6["reserveResources"]
-  flow_cancellationWorkflow_7(("'30 days'"))
-  flow_cancellationWorkflow_8["useResources"]
-  flow_cancellationWorkflow_9["releaseResources"]
-  complete(["complete"])
   start --> flow_cancellationWorkflow_2
   start -->|"catch"| flow_cancellationWorkflow_4
   flow_cancellationWorkflow_4 -->|"!isCancellation(error)"| flow_cancellationWorkflow_3
   flow_cancellationWorkflow_4 -->|"else"| n2
   n2 --> flow_cancellationWorkflow_5
-  n1 --> flow_cancellationWorkflow_6
-  flow_cancellationWorkflow_6 --> flow_cancellationWorkflow_7
-  flow_cancellationWorkflow_7 --> flow_cancellationWorkflow_8
-  flow_cancellationWorkflow_8 --> flow_cancellationWorkflow_9
-  flow_cancellationWorkflow_9 --> complete

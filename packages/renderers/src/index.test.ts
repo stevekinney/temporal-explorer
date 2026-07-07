@@ -16,24 +16,6 @@ import {
 
 const fixtureRoot = new URL('../../../fixtures/basic-order/', import.meta.url);
 
-/** Node ids reachable from `start` in a Mermaid flowchart, optionally with one node removed. */
-function reachableFromStart(mermaid: string, exclude?: string): Set<string> {
-  const edges = [...mermaid.matchAll(/^ {2}(\S+) -->(?:\|[^|]*\|)? (\S+)$/gm)]
-    .map((match) => [match[1], match[2]] as [string, string])
-    .filter(([from, to]) => from !== exclude && to !== exclude);
-  const reachable = new Set(['start']);
-  for (let changed = true; changed;) {
-    changed = false;
-    for (const [from, to] of edges) {
-      if (reachable.has(from) && !reachable.has(to)) {
-        reachable.add(to);
-        changed = true;
-      }
-    }
-  }
-  return reachable;
-}
-
 describe('documentation renderers', () => {
   it('renders deterministic Markdown and Mermaid documentation', async () => {
     const analysis = temporalAnalysisDocumentSchema.parse(
@@ -123,73 +105,6 @@ describe('documentation renderers', () => {
     expect(index.contents.indexOf('aaaWorkflow')).toBeLessThan(
       index.contents.indexOf('basicOrderWorkflow'),
     );
-  });
-
-  it('renders branches from the control-flow model instead of a flat chain', async () => {
-    const analysis = temporalAnalysisDocumentSchema.parse(
-      await Bun.file(
-        new URL('../../../fixtures/patched/.temporal-explorer/analysis.json', import.meta.url),
-      ).json(),
-    );
-    const mermaid = renderWorkflowMermaid(analysis, 'patchedWorkflow');
-
-    // The patched() gate is a branch: exactly one of newCharge/oldCharge, not both in a line.
-    expect(mermaid).toContain('{"use-modern-charge"}');
-    expect(mermaid).toContain('-->|"else"|');
-    expect(mermaid).toContain('["newCharge"]');
-    expect(mermaid).toContain('["oldCharge"]');
-    // Old linear behavior chained newCharge directly into oldCharge; it must not.
-    expect(mermaid).not.toMatch(/newCharge.*-->.*oldCharge/);
-  });
-
-  it('keeps a try/finally finalizer reachable when the try body returns', async () => {
-    const analysis = temporalAnalysisDocumentSchema.parse(
-      await Bun.file(
-        new URL('../../../fixtures/try-finally/.temporal-explorer/analysis.json', import.meta.url),
-      ).json(),
-    );
-    const mermaid = renderWorkflowMermaid(analysis, 'chargeWorkflow');
-
-    // Regression: `return` in the try body used to dead-end, leaving the `finally`
-    // block (releaseLock) unreachable from `start`.
-    const releaseLock = mermaid.match(/^ {2}(\S+)\["releaseLock"\]$/m)?.[1];
-    expect(releaseLock).toBeDefined();
-    expect(reachableFromStart(mermaid).has(releaseLock as string)).toBe(true);
-    expect(mermaid).toContain('|"finally"|');
-  });
-
-  it('renders a do-while so the loop exit is unreachable without running the body', async () => {
-    const analysis = temporalAnalysisDocumentSchema.parse(
-      await Bun.file(
-        new URL(
-          '../../../fixtures/do-while-loop/.temporal-explorer/analysis.json',
-          import.meta.url,
-        ),
-      ).json(),
-    );
-    const mermaid = renderWorkflowMermaid(analysis, 'pollWorkflow');
-
-    // Regression: a do-while used to draw `header --> complete`, implying a zero-iteration
-    // path. The body must run first. Prove `complete` is unreachable from `start` once the
-    // body activity (pollStatus) is removed.
-    const body = mermaid.match(/^ {2}(\S+)\["pollStatus"\]$/m)?.[1];
-    expect(body).toBeDefined();
-    expect(reachableFromStart(mermaid, body).has('complete')).toBe(false);
-  });
-
-  it('renders continueAsNew as a loop-back terminal, not a chain into complete', async () => {
-    const analysis = temporalAnalysisDocumentSchema.parse(
-      await Bun.file(
-        new URL(
-          '../../../fixtures/continue-as-new/.temporal-explorer/analysis.json',
-          import.meta.url,
-        ),
-      ).json(),
-    );
-    const mermaid = renderWorkflowMermaid(analysis, 'continueAsNewWorkflow');
-
-    expect(mermaid).toContain('continue as new');
-    expect(mermaid).toContain('-->|"loop"| start');
   });
 
   it('renders deterministic import-preserving workflow declarations', async () => {

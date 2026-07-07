@@ -23,25 +23,9 @@ import {
 function buildBranch(statement: IfStatement, context: BuildContext): FlowNode {
   const source = structuralSource(context, statement);
   const testCommandId = consumeTestCommand(statement.getExpression(), context);
-  const clauses: { label: string; body: FlowNode[] }[] = [];
-  let current: IfStatement | undefined = statement;
-  let otherwise: FlowNode[] | undefined;
-
-  while (current) {
-    clauses.push({
-      label: current.getExpression().getText(),
-      body: walkStatement(current.getThenStatement(), context),
-    });
-
-    const elseStatement = current.getElseStatement();
-
-    if (elseStatement && Node.isIfStatement(elseStatement)) {
-      current = elseStatement;
-    } else {
-      otherwise = elseStatement ? walkStatement(elseStatement, context) : undefined;
-      current = undefined;
-    }
-  }
+  const body = walkStatement(statement.getThenStatement(), context);
+  const elseStatement = statement.getElseStatement();
+  const otherwise = elseStatement ? walkStatement(elseStatement, context) : undefined;
 
   return {
     type: 'branch',
@@ -49,7 +33,12 @@ function buildBranch(statement: IfStatement, context: BuildContext): FlowNode {
     branchKind: 'if',
     source,
     ...(testCommandId ? { testCommandId } : {}),
-    clauses,
+    clauses: [
+      {
+        label: statement.getExpression().getText(),
+        body,
+      },
+    ],
     ...(otherwise ? { otherwise } : {}),
   };
 }
@@ -114,6 +103,14 @@ function buildLoop(statement: Statement, context: BuildContext): FlowNode {
   };
 }
 
+function labelLoop(node: FlowNode, label: string): FlowNode {
+  if (node.type !== 'loop') {
+    return node;
+  }
+
+  return { ...node, label };
+}
+
 function buildTry(statement: TryStatement, context: BuildContext): FlowNode {
   const catchClause = statement.getCatchClause();
   const finallyBlock = statement.getFinallyBlock();
@@ -173,15 +170,24 @@ function terminalStatement(
   statement: Statement,
   context: BuildContext,
 ): FlowNode {
+  const label =
+    Node.isBreakStatement(statement) || Node.isContinueStatement(statement)
+      ? statement.getLabel()?.getText()
+      : undefined;
+
   return {
     type: 'terminal',
     id: nextId(context),
     terminalKind,
     source: structuralSource(context, statement),
+    ...(label ? { label } : {}),
   };
 }
 
-function walkStatement(statement: Statement, context: BuildContext): FlowNode[] {
+function walkStructuralStatement(
+  statement: Statement,
+  context: BuildContext,
+): FlowNode[] | undefined {
   if (Node.isBlock(statement)) {
     return walkStatements(statement.getStatements(), context);
   }
@@ -198,10 +204,23 @@ function walkStatement(statement: Statement, context: BuildContext): FlowNode[] 
     return [buildLoop(statement, context)];
   }
 
+  if (Node.isLabeledStatement(statement)) {
+    return walkStatement(statement.getStatement(), context).map((node) =>
+      labelLoop(node, statement.getLabel().getText()),
+    );
+  }
+
   if (Node.isTryStatement(statement)) {
     return [buildTry(statement, context)];
   }
 
+  return undefined;
+}
+
+function walkTerminalStatement(
+  statement: Statement,
+  context: BuildContext,
+): FlowNode[] | undefined {
   if (Node.isReturnStatement(statement)) {
     return buildReturn(statement, context);
   }
@@ -218,7 +237,15 @@ function walkStatement(statement: Statement, context: BuildContext): FlowNode[] 
     return [terminalStatement('continue', statement, context)];
   }
 
-  return inlineFlow(statement, context);
+  return undefined;
+}
+
+function walkStatement(statement: Statement, context: BuildContext): FlowNode[] {
+  return (
+    walkStructuralStatement(statement, context) ??
+    walkTerminalStatement(statement, context) ??
+    inlineFlow(statement, context)
+  );
 }
 
 function walkStatements(statements: Statement[], context: BuildContext): FlowNode[] {

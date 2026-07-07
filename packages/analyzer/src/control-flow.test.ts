@@ -95,6 +95,31 @@ export async function branchy(flag: boolean): Promise<void> {
     expect(branch.otherwise?.map((node) => node.type)).toEqual(['command']);
   });
 
+  it('preserves else-if ordering as a nested otherwise branch', async () => {
+    const nodes = await bodyOf(
+      `${header}
+export async function ordered(flag: string): Promise<void> {
+  if (flag === 'a') {
+    await a();
+  } else if (flag === 'b') {
+    await b();
+  } else {
+    await a();
+  }
+}
+`,
+      'ordered',
+    );
+
+    const branch = nodes[0];
+    if (branch?.type !== 'branch') throw new Error('Expected a branch node.');
+    expect(branch.clauses).toHaveLength(1);
+    const nested = branch.otherwise?.[0];
+    if (nested?.type !== 'branch') throw new Error('Expected a nested otherwise branch.');
+    expect(nested.clauses).toHaveLength(1);
+    expect(nested.otherwise?.map((node) => node.type)).toEqual(['command']);
+  });
+
   it('models an early return inside a branch as a terminal', async () => {
     const nodes = await bodyOf(
       `${header}
@@ -130,6 +155,32 @@ export async function looping(done: boolean): Promise<void> {
     if (loop?.type !== 'loop') throw new Error('Expected a loop node.');
     expect(loop.loopKind).toBe('while');
     expect(loop.body.map((node) => node.type)).toEqual(['command']);
+  });
+
+  it('preserves labels on loops and break terminals', async () => {
+    const nodes = await bodyOf(
+      `${header}
+export async function labeled(flag: boolean): Promise<void> {
+  outer: while (flag) {
+    switch (flag) {
+      case true:
+        break outer;
+    }
+  }
+}
+`,
+      'labeled',
+    );
+
+    const loop = nodes[0];
+    if (loop?.type !== 'loop') throw new Error('Expected a loop node.');
+    const branch = loop.body[0];
+    if (branch?.type !== 'branch') throw new Error('Expected a switch branch.');
+    const terminal = branch.clauses[0]?.body[0];
+    if (terminal?.type !== 'terminal') throw new Error('Expected a terminal node.');
+    expect(loop.label).toBe('outer');
+    expect(terminal.terminalKind).toBe('break');
+    expect(terminal.label).toBe('outer');
   });
 
   it('models continueAsNew as a loop-back terminal, not normal completion', async () => {

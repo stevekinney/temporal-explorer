@@ -7,6 +7,17 @@ import {
 import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } from './projection';
 import { createCommandGraphNode, type GraphCommand } from './projection-builders';
 
+export type LoopTarget = {
+  label: string | undefined;
+  breakTarget: string;
+  continueTarget: string;
+};
+
+export type FinallyFrame = {
+  finalizer: FlowNode[];
+  parentId: string | undefined;
+};
+
 /**
  * Shared state and the non-recursive leaves of the nested control-flow walk. The
  * recursive cluster (`walkSequence`/`walkNode` and the region-container walkers) lives
@@ -22,10 +33,9 @@ export type FlowContext = {
   trace: RuntimeTraceDocument | undefined;
   overlay: ExecutionOverlayDocument | undefined;
   projection: ProjectionBuildContext;
-  // The join node of the nearest enclosing `try` that has a `finalizer`. While set,
-  // a terminal (return/throw/…) inside the try/catch routes here instead of dead-ending,
-  // because `finally` runs on every exit from the try before the workflow continues.
-  finallyTarget: string | undefined;
+  loopTargets: LoopTarget[];
+  finallyStack: FinallyFrame[];
+  duplicateCommandNodes: boolean;
 };
 
 function nextId(context: FlowContext, prefix: string): string {
@@ -103,55 +113,11 @@ export function walkCommand(
     context.projection,
   );
   graphNode.parentId = parentId;
+  if (context.duplicateCommandNodes) {
+    graphNode.id = `${command.id}:flow:${context.counter.value + 1}`;
+  }
   context.nodes.push(graphNode);
-  pushEdge(context, entry, command.id, label);
+  pushEdge(context, entry, graphNode.id, label);
 
-  return command.id;
-}
-
-/** Renders a terminal leaf: `continue-as-new` loops back to entry; others dead-end unless a `finally` routes them. */
-export function walkTerminal(
-  node: Extract<FlowNode, { type: 'terminal' }>,
-  entry: string,
-  parentId: string | undefined,
-  context: FlowContext,
-  label: string,
-): undefined {
-  if (node.terminalKind === 'continue-as-new') {
-    const command = node.commandId ? context.commandsById.get(node.commandId) : undefined;
-
-    // Keep the continue-as-new command's id and runtime state so the overlay/timeline
-    // still resolve to a visible node, while adding the `loop` back-edge to the entry.
-    if (command) {
-      const graphNode = createCommandGraphNode(
-        command,
-        { x: 280 + context.counter.value * 48, y: 120 },
-        context.trace,
-        context.overlay,
-        context.projection,
-      );
-      graphNode.parentId = parentId;
-      context.nodes.push(graphNode);
-      pushEdge(context, entry, command.id, label);
-      pushEdge(context, command.id, context.startId, 'loop', 'loop-back');
-      return undefined;
-    }
-
-    const id = addStructural(context, 'terminal', 'continue as new', parentId);
-    pushEdge(context, entry, id, label);
-    pushEdge(context, id, context.startId, 'loop', 'loop-back');
-    return undefined;
-  }
-
-  const id = addStructural(context, 'terminal', node.terminalKind, parentId);
-  pushEdge(context, entry, id, label);
-
-  // Inside a try that has a `finally`, an abrupt exit (return/throw/break/continue)
-  // still runs the finalizer before leaving, so route the terminal into that join
-  // instead of dead-ending it as a detached node.
-  if (context.finallyTarget !== undefined) {
-    pushEdge(context, id, context.finallyTarget, '');
-  }
-
-  return undefined;
+  return graphNode.id;
 }

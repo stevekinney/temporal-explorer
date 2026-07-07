@@ -8,26 +8,9 @@ import {
 
 import type { ProjectionBuildContext, TemporalGraphEdge, TemporalGraphNode } from './projection';
 import { isGraphCommand } from './projection-builders';
-import {
-  addStructural,
-  pushEdge,
-  walkCommand,
-  walkTerminal,
-  type FlowContext,
-} from './projection-flow-core';
+import { addStructural, pushEdge, walkCommand, type FlowContext } from './projection-flow-core';
+import { walkTerminalNode } from './projection-flow-terminal';
 
-/**
- * Walks a Workflow's structured control-flow tree (`workflow.body.nodes`) into a
- * graph of nested region containers. Each `branch`/`loop`/`parallel`/`try` becomes a
- * container node whose children (command leaves, decision/join/terminal markers, and
- * further nested containers) carry its id as `parentId`, so ELK and Svelte Flow can
- * draw the regions as boxes. The flow inside a region mirrors `renderWorkflowMermaid`:
- * a decision diamond fans out to labeled clause arms that converge on a join dot,
- * loops draw a `repeat` back-edge, and `continue-as-new` loops back to the entry.
- *
- * The shared context type and the non-recursive leaves (`walkCommand`/`walkTerminal`
- * and the `addStructural`/`pushEdge` helpers) live in `projection-flow-core`.
- */
 export function buildControlFlowGraph(
   workflow: WorkflowDefinition,
   trace: RuntimeTraceDocument | undefined,
@@ -46,7 +29,9 @@ export function buildControlFlowGraph(
     trace,
     overlay,
     projection,
-    finallyTarget: undefined,
+    loopTargets: [],
+    finallyStack: [],
+    duplicateCommandNodes: false,
   };
 
   const exit = walkSequence(workflow.body.nodes, startId, undefined, context);
@@ -59,7 +44,6 @@ export function buildControlFlowGraph(
   return { nodes: context.nodes, edges: context.edges };
 }
 
-/** Walks a sequence of flow nodes from `entry`, returning the exit node id or undefined if a terminal ended the path. */
 function walkSequence(
   nodes: FlowNode[],
   entry: string,
@@ -82,7 +66,6 @@ function walkSequence(
   return cursor;
 }
 
-/** Renders one clause/branch arm into `join`; an empty arm draws a labeled edge straight to the join. */
 function walkArm(
   body: FlowNode[],
   entry: string,
@@ -114,7 +97,9 @@ function walkNode(
     case 'command':
       return walkCommand(node, entry, parentId, context, label);
     case 'terminal':
-      return walkTerminal(node, entry, parentId, context, label);
+      return walkTerminalNode(node, entry, parentId, context, label, (frame, finalizerEntry) =>
+        walkSequence(frame.finalizer, finalizerEntry, frame.parentId, context, 'finally'),
+      );
     case 'branch':
       return walkBranch(node, entry, parentId, context, label);
     case 'loop':
@@ -168,36 +153,44 @@ function walkLoop(
     true,
   );
   const header = addStructural(context, 'decision', `loop (${node.loopKind})`, container);
+  const exit = addStructural(context, 'join', '', container);
 
   if (node.loopKind === 'do-while') {
-    // A do-while runs its body before the exit condition, so the loop exit must not be
-    // reachable without an iteration. Anchor the body entry inside the region and place
-    // the condition (header) after the body: entry → body → header → (repeat) body.
     const bodyEntry = addStructural(context, 'join', '', container);
     pushEdge(context, entry, bodyEntry, label);
+    context.loopTargets.push({
+      label: node.label,
+      breakTarget: exit,
+      continueTarget: header,
+    });
     const doBodyExit = walkSequence(node.body, bodyEntry, container, context);
+    context.loopTargets.pop();
 
     if (doBodyExit !== undefined) {
       pushEdge(context, doBodyExit, header, '');
     }
 
     pushEdge(context, header, bodyEntry, 'repeat', 'loop-back');
-    return header;
+    pushEdge(context, header, exit, 'done');
+    return exit;
   }
 
   pushEdge(context, entry, header, label);
+  pushEdge(context, header, exit, 'done');
 
-  // The forward edge into the body carries no label: the container header
-  // already says "loop (...)", and for a single-node body the forward and
-  // `repeat` back-edges connect the same node pair, so a forward label would
-  // stack on top of `repeat` (the "eac repeat" overlap). Only the back-edge is labeled.
+  context.loopTargets.push({
+    label: node.label,
+    breakTarget: exit,
+    continueTarget: header,
+  });
   const bodyExit = walkSequence(node.body, header, container, context);
+  context.loopTargets.pop();
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, header, 'repeat', 'loop-back');
   }
 
-  return header;
+  return exit;
 }
 
 function walkParallel(
@@ -231,6 +224,46 @@ function walkParallel(
   return join;
 }
 
+function withFinallyFrame<T>(
+  finalizer: FlowNode[] | undefined,
+  parentId: string,
+  context: FlowContext,
+  callback: () => T,
+): T {
+  if (finalizer) {
+    context.finallyStack.push({ finalizer, parentId });
+  }
+
+  const result = callback();
+
+  if (finalizer) {
+    context.finallyStack.pop();
+  }
+
+  return result;
+}
+
+function walkTryHandler(
+  node: Extract<FlowNode, { type: 'try' }>,
+  entry: string,
+  converge: string,
+  parentId: string,
+  context: FlowContext,
+): boolean {
+  if (!node.handler) {
+    return false;
+  }
+
+  const handlerExit = walkSequence(node.handler.body, entry, parentId, context, 'catch');
+
+  if (handlerExit === undefined) {
+    return false;
+  }
+
+  pushEdge(context, handlerExit, converge, '');
+  return true;
+}
+
 function walkTry(
   node: Extract<FlowNode, { type: 'try' }>,
   entry: string,
@@ -241,34 +274,23 @@ function walkTry(
   const container = addStructural(context, 'try-region', 'try', parentId, true);
   const converge = addStructural(context, 'join', '', container);
   const finalizer = node.finalizer && node.finalizer.length > 0 ? node.finalizer : undefined;
-
-  // While a `finally` block exists, terminals inside the try/catch (return/throw/…)
-  // must route through `converge` so the finalizer runs on every exit. Save/restore
-  // makes this nesting-safe for a try nested inside another try's finalizer scope.
-  const previousFinallyTarget = context.finallyTarget;
-  if (finalizer) {
-    context.finallyTarget = converge;
-  }
-
-  const bodyExit = walkSequence(node.body, entry, container, context, label);
+  const bodyExit = withFinallyFrame(finalizer, container, context, () =>
+    walkSequence(node.body, entry, container, context, label),
+  );
 
   if (bodyExit !== undefined) {
     pushEdge(context, bodyExit, converge, '');
   }
 
-  if (node.handler) {
-    const handlerExit = walkSequence(node.handler.body, entry, container, context, 'catch');
+  const handlerEntry = bodyExit ?? entry;
+  const handlerHasNormalExit = withFinallyFrame(finalizer, container, context, () =>
+    walkTryHandler(node, handlerEntry, converge, container, context),
+  );
+  const hasNormalExit = bodyExit !== undefined || handlerHasNormalExit;
 
-    if (handlerExit !== undefined) {
-      pushEdge(context, handlerExit, converge, '');
-    }
-  }
-
-  context.finallyTarget = previousFinallyTarget;
-
-  if (finalizer) {
+  if (finalizer && hasNormalExit) {
     return walkSequence(finalizer, converge, container, context, 'finally');
   }
 
-  return converge;
+  return hasNormalExit ? converge : undefined;
 }

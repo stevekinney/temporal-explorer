@@ -66,7 +66,12 @@ export type FlowNode =
 export function switchClauseBody(body: FlowNode[], branchKind: string): FlowNode[] {
   const last = body.at(-1);
 
-  if (branchKind === 'switch' && last?.type === 'terminal' && last.terminalKind === 'break') {
+  if (
+    branchKind === 'switch' &&
+    last?.type === 'terminal' &&
+    last.terminalKind === 'break' &&
+    last.label === undefined
+  ) {
     return body.slice(0, -1);
   }
 

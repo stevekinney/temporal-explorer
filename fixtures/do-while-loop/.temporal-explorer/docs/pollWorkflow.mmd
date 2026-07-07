@@ -2,10 +2,12 @@ flowchart TD
   start(["pollWorkflow"])
   flow_pollWorkflow_2{"loop (do-while)"}
   n1(( ))
+  n2(( ))
   flow_pollWorkflow_1["pollStatus"]
   complete(["complete"])
-  start --> n1
-  n1 -->|"each"| flow_pollWorkflow_1
+  start --> n2
+  n2 -->|"each"| flow_pollWorkflow_1
   flow_pollWorkflow_1 --> flow_pollWorkflow_2
-  flow_pollWorkflow_2 -->|"repeat"| n1
-  flow_pollWorkflow_2 --> complete
+  flow_pollWorkflow_2 -->|"repeat"| n2
+  flow_pollWorkflow_2 -->|"done"| n1
+  n1 --> complete

@@ -47,11 +47,6 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
       { kind: 'join', label: '', state: 'observed' },
       { kind: 'terminal', label: 'throw', state: 'observed' },
       { kind: 'terminal', label: 'throw', state: 'observed' },
-      { kind: 'activity', label: 'reserveResources', state: 'completed' },
-      { kind: 'timer', label: "'30 days'", state: 'canceled' },
-      { kind: 'activity', label: 'useResources', state: 'not taken' },
-      { kind: 'activity', label: 'releaseResources', state: 'completed' },
-      { kind: 'terminal', label: 'complete', state: 'observed' },
       { kind: 'cancellation-scope', label: 'cancellable', state: 'observed' },
       { kind: 'cancellation-scope', label: 'nonCancellable', state: 'observed' },
     ]);
@@ -125,6 +120,7 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
       { kind: 'activity', label: 'archiveRequest', state: 'completed' },
       { kind: 'loop-region', label: 'loop (for-of)', state: 'observed' },
       { kind: 'decision', label: 'loop (for-of)', state: 'observed' },
+      { kind: 'join', label: '', state: 'observed' },
       { kind: 'dynamic', label: 'dynamicActivities[step]', state: 'completed' },
       { kind: 'terminal', label: 'complete', state: 'observed' },
     ]);

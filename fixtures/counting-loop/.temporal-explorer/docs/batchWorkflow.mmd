@@ -1,21 +1,25 @@
 flowchart TD
   start(["batchWorkflow"])
   flow_batchWorkflow_6{"loop (for)"}
-  flow_batchWorkflow_2{"if"}
   n1(( ))
+  flow_batchWorkflow_2{"if"}
+  n2(( ))
   flow_batchWorkflow_1(["continue"])
   flow_batchWorkflow_3["processItem"]
   flow_batchWorkflow_5{"if"}
-  n2(( ))
+  n3(( ))
   flow_batchWorkflow_4(["break"])
   complete(["complete"])
   start --> flow_batchWorkflow_6
   flow_batchWorkflow_6 -->|"each"| flow_batchWorkflow_2
   flow_batchWorkflow_2 -->|"index === input.skip"| flow_batchWorkflow_1
-  flow_batchWorkflow_2 -->|"else"| n1
-  n1 --> flow_batchWorkflow_3
+  flow_batchWorkflow_1 --> flow_batchWorkflow_6
+  flow_batchWorkflow_2 -->|"else"| n2
+  n2 --> flow_batchWorkflow_3
   flow_batchWorkflow_3 --> flow_batchWorkflow_5
   flow_batchWorkflow_5 -->|"index === input.stopAfter"| flow_batchWorkflow_4
-  flow_batchWorkflow_5 -->|"else"| n2
-  n2 -->|"repeat"| flow_batchWorkflow_6
-  flow_batchWorkflow_6 --> complete
+  flow_batchWorkflow_4 --> n1
+  flow_batchWorkflow_5 -->|"else"| n3
+  n3 -->|"repeat"| flow_batchWorkflow_6
+  flow_batchWorkflow_6 -->|"done"| n1
+  n1 --> complete
