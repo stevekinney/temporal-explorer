@@ -1,13 +1,5 @@
 <script lang="ts">
-  import {
-    BookOpen,
-    CheckCircle2,
-    FileJson,
-    FolderOpen,
-    History,
-    Upload,
-    XCircle,
-  } from 'lucide-svelte';
+  import { CheckCircle2, FileJson, FolderOpen, History, XCircle } from 'lucide-svelte';
 
   type SourceMode = 'examples' | 'upload' | 'local';
   type ExampleSummary = {
@@ -25,7 +17,6 @@
     canImportHistory,
     hasImportedHistory,
     onSelectExample,
-    onShowUpload,
     onAnalyzeFiles,
     onAnalyzeHistory,
     onClearHistory,
@@ -38,7 +29,6 @@
     canImportHistory: boolean;
     hasImportedHistory: boolean;
     onSelectExample: (exampleId: string) => void;
-    onShowUpload: () => void;
     onAnalyzeFiles: (files: FileList | null) => void;
     onAnalyzeHistory: (files: FileList | null) => void;
     onClearHistory: () => void;
@@ -47,38 +37,16 @@
 
 <aside class="source-panel" aria-label="Artifact sources">
   <section class="brand">
-    <div class="brand-mark" aria-hidden="true">TE</div>
     <div>
-      <h1>Temporal Explorer</h1>
-      <p>Static workflow graphs, with runtime history when you have it.</p>
+      <p>Temporal Explorer</p>
+      <h1>Examples</h1>
     </div>
   </section>
-
-  <div class="mode-switch" aria-label="Explorer source">
-    <button
-      type="button"
-      aria-pressed={sourceMode === 'examples'}
-      class:active={sourceMode === 'examples'}
-      onclick={() => onSelectExample(selectedExampleId || examples[0]?.id || '')}
-    >
-      <BookOpen size={16} aria-hidden="true" />
-      Examples
-    </button>
-    <button
-      type="button"
-      aria-pressed={sourceMode === 'upload'}
-      class:active={sourceMode === 'upload'}
-      onclick={onShowUpload}
-    >
-      <Upload size={16} aria-hidden="true" />
-      Upload
-    </button>
-  </div>
 
   {#if examples.length > 0}
     <section class="examples-section" aria-labelledby="examples-heading">
       <div class="section-heading">
-        <h2 id="examples-heading">Example workflows</h2>
+        <h2 id="examples-heading">Workflows</h2>
         <span>{examples.length}</span>
       </div>
       <div class="example-list">
@@ -106,7 +74,7 @@
     }}
   >
     <div class="section-heading">
-      <h2 id="upload-heading">Local project</h2>
+      <h2 id="upload-heading">Upload</h2>
       {#if status === 'ready'}
         <CheckCircle2 size={16} aria-label="Loaded" />
       {:else if status === 'error'}
@@ -153,9 +121,9 @@
     min-height: 0;
     box-sizing: border-box;
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
-    gap: 0.85rem;
-    padding: 0.85rem;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
     border-right: 1px solid #c8d6dc;
     background: rgba(248, 251, 252, 0.92);
     backdrop-filter: blur(16px);
@@ -164,20 +132,7 @@
 
   .brand {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .brand-mark {
-    display: grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.375rem;
-    background: #18242b;
-    color: #f8fbfc;
-    font-weight: 760;
+    gap: 0.15rem;
   }
 
   h1,
@@ -188,7 +143,7 @@
   }
 
   h1 {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     line-height: 1.05;
   }
 
@@ -198,7 +153,14 @@
     text-transform: uppercase;
   }
 
-  .brand p,
+  .brand p {
+    color: #5f6f78;
+    font-size: 0.72rem;
+    font-weight: 750;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
   .upload-section p,
   .example-list span {
     color: #5f6f78;
@@ -206,40 +168,11 @@
     line-height: 1.35;
   }
 
-  .mode-switch,
   .section-heading,
   .file-action,
   .clear-history {
     display: flex;
     align-items: center;
-  }
-
-  .mode-switch {
-    gap: 0.25rem;
-    padding: 0.25rem;
-    border: 1px solid #c8d6dc;
-    border-radius: 0.5rem;
-    background: #e7eef2;
-  }
-
-  .mode-switch button {
-    min-height: 2.25rem;
-    flex: 1;
-    justify-content: center;
-    gap: 0.45rem;
-    border: 0;
-    border-radius: 0.375rem;
-    background: transparent;
-    color: #40515b;
-    font: inherit;
-    font-weight: 650;
-    cursor: pointer;
-  }
-
-  .mode-switch button.active {
-    background: #ffffff;
-    color: #172026;
-    box-shadow: 0 1px 2px rgba(22, 32, 38, 0.08);
   }
 
   .examples-section,
@@ -297,22 +230,23 @@
   }
 
   .upload-section {
-    padding: 0.72rem;
+    padding: 0.65rem;
     border: 1px solid #c8d6dc;
-    border-radius: 0.625rem;
+    border-radius: 0.5rem;
     background: #ffffff;
   }
 
   .file-action,
   .clear-history {
-    min-height: 2.35rem;
+    min-height: 2.1rem;
     justify-content: center;
     gap: 0.5rem;
     padding: 0 0.75rem;
     border: 1px solid #c8d6dc;
-    border-radius: 0.5rem;
+    border-radius: 0.4rem;
     background: #f5f8fa;
     color: #172026;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
   }

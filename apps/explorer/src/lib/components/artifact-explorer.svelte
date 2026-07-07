@@ -180,6 +180,10 @@
     return `${workflow.name}(${args}): ${workflow.signature.result.display}`;
   }
 
+  function workflowSignatureArguments(workflow: Workflow): Workflow['signature']['args'] {
+    return workflow.signature.args;
+  }
+
   function selectWorkflow(workflowId: string): void {
     selectedWorkflowOverride = workflowId;
     activeTab = 'flow';
@@ -250,7 +254,19 @@
         <div>
           <p class="eyebrow">Workflow artifact</p>
           <h1 id="workflow-title">{selectedWorkflow.name}</h1>
-          <p class="signature">{workflowSignature(selectedWorkflow)}</p>
+          <code class="signature" aria-label={workflowSignature(selectedWorkflow)}>
+            <span class="syntax-function">{selectedWorkflow.name}</span><span
+              class="syntax-punctuation">(</span
+            >{#each workflowSignatureArguments(selectedWorkflow) as argument, index (argument.id)}
+              {#if index > 0}<span class="syntax-punctuation">, </span>{/if}<span
+                class="syntax-identifier">{argument.displayName ?? 'argument'}</span
+              ><span class="syntax-punctuation">: </span><span class="syntax-type"
+                >{argument.display}</span
+              >
+            {/each}<span class="syntax-punctuation">): </span><span class="syntax-type"
+              >{selectedWorkflow.signature.result.display}</span
+            >
+          </code>
         </div>
         {#if embedded && artifacts.analysis.workflows.length > 1}
           <label class="workflow-switcher">
@@ -658,7 +674,8 @@
   }
 
   .embedded .workflow-header {
-    margin-bottom: 0.65rem;
+    align-items: center;
+    margin-bottom: 0.35rem;
   }
 
   .workflow-switcher {
@@ -694,20 +711,41 @@
   }
 
   .embedded h1 {
-    font-size: clamp(1.35rem, 1.7vw, 1.85rem);
+    font-size: clamp(1.05rem, 1.25vw, 1.35rem);
   }
 
   .signature {
-    margin: 0.65rem 0 0;
-    color: #34434f;
+    display: block;
+    margin: 0.55rem 0 0;
+    color: #40515b;
     font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
     font-size: 0.9375rem;
+    line-height: 1.55;
     overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .embedded .signature {
-    margin-top: 0.35rem;
-    font-size: 0.82rem;
+    margin-top: 0.18rem;
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .syntax-function {
+    color: #8a3ffc;
+    font-weight: 720;
+  }
+
+  .syntax-identifier {
+    color: #005f73;
+  }
+
+  .syntax-type {
+    color: #0f7a55;
+  }
+
+  .syntax-punctuation {
+    color: #64717a;
   }
 
   .signal-strip {
@@ -724,16 +762,22 @@
   }
 
   .embedded .signal-strip {
-    padding: 0.55rem 0.75rem;
-    margin-bottom: 0.7rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0;
+    margin-bottom: 0.35rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .embedded .signal-strip strong {
-    font-size: 1rem;
+    font-size: 0.82rem;
   }
 
   .embedded :global(.detail-tabs [role='tablist']) {
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.35rem;
   }
 
   .signal-strip div {
@@ -741,6 +785,12 @@
     flex-direction: column;
     gap: 0.25rem;
     min-width: 0;
+  }
+
+  .embedded .signal-strip div {
+    flex-direction: row;
+    gap: 0.3rem;
+    align-items: baseline;
   }
 
   .signal-strip strong {

@@ -496,18 +496,18 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.85rem 0.95rem;
+    padding: 0.55rem 0.75rem;
     border-bottom: 1px solid #dde5eb;
   }
 
   .flow-toolbar h2 {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
   }
 
   .flow-toolbar span {
     color: #5d6b75;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
 
   .toolbar-actions {
@@ -519,7 +519,7 @@
   .state-filters {
     display: flex;
     gap: 0.45rem;
-    padding: 0.75rem 0.95rem;
+    padding: 0.5rem 0.75rem;
     overflow-x: auto;
     border-bottom: 1px solid #dde5eb;
   }
@@ -665,8 +665,8 @@
   }
 
   :global(.explorer-shell.embedded) .flow-stage {
-    height: clamp(40rem, calc(100vh - 14rem), 58rem);
-    min-height: 36rem;
+    height: clamp(42rem, calc(100vh - 8.5rem), 64rem);
+    min-height: 38rem;
   }
 
   :global(.explorer-shell.embedded) .flow-sidecar {

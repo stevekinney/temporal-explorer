@@ -164,10 +164,6 @@
     void loadExampleArtifacts(exampleId);
   }
 
-  function showUpload(): void {
-    sourceMode = 'upload';
-  }
-
   function hasExampleArtifacts(exampleId: string): boolean {
     return Boolean(
       (loadedExampleId === exampleId && loadedExampleArtifacts) ||
@@ -318,7 +314,6 @@
       {canImportHistory}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
-      onShowUpload={showUpload}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
       onClearHistory={clearHistory}
@@ -377,7 +372,6 @@
       {canImportHistory}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
-      onShowUpload={showUpload}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
       onClearHistory={clearHistory}
@@ -404,7 +398,7 @@
   .workbench {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(14.5rem, 17rem) minmax(0, 1fr);
+    grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
     color: #172026;
   }
 
