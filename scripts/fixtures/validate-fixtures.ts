@@ -30,7 +30,7 @@ function assertHistoryShape(value: unknown, path: string): void {
     throw new Error(`${path} must contain at least one Event History event.`);
   }
 
-  assertActivityStartedReferences(events as HistoryEvent[], path);
+  assertActivityCompletedStartedReferences(events as HistoryEvent[], path);
 }
 
 function readEventId(value: unknown): string | undefined {
@@ -44,7 +44,7 @@ function readAttributes(event: HistoryEvent, key: string): Record<string, unknow
     : undefined;
 }
 
-function assertActivityStartedReferences(events: HistoryEvent[], path: string): void {
+function assertActivityCompletedStartedReferences(events: HistoryEvent[], path: string): void {
   const eventsById = new Map<string, HistoryEvent>();
 
   for (const event of events) {
