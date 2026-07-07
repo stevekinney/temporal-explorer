@@ -26,9 +26,11 @@
     type TimelineRow,
   } from '$lib/graph/projection';
   import { compactEventSummary, operationDisplayName } from '$lib/graph/runtime-display';
-  import { Button } from '$cinder-components/button';
-  import { EmptyState } from '$cinder-components/empty-state';
-  import { Popover } from '$cinder-components/popover';
+  import { Button } from '@lostgradient/cinder/button';
+  import { EmptyState } from '@lostgradient/cinder/empty-state';
+  import { Popover } from '@lostgradient/cinder/popover';
+  import { Segment } from '@lostgradient/cinder/segment';
+  import { SegmentedControl } from '@lostgradient/cinder/segmented-control';
   import {
     Background,
     BackgroundVariant,
@@ -367,29 +369,26 @@
       </div>
 
       {#if hasRuntime && visibleFilterStates.length > 0}
-        <div class="state-filters" aria-label="Runtime state filters">
-          <button
-            type="button"
-            aria-pressed={statusFilter === 'all'}
-            data-active={statusFilter === 'all' ? 'true' : undefined}
-            onclick={() => (statusFilter = 'all')}
-          >
+        <SegmentedControl
+          id="runtime-state-filters"
+          bind:value={statusFilter}
+          label="Runtime state filters"
+          density="toolbar"
+          detached
+          fullWidth
+          class="state-filters"
+        >
+          <Segment value="all">
             All
-            <span>{filterableNodeCount}</span>
-          </button>
+            <span class="filter-count">{filterableNodeCount}</span>
+          </Segment>
           {#each visibleFilterStates as state (state)}
-            <button
-              type="button"
-              aria-pressed={statusFilter === state}
-              data-active={statusFilter === state ? 'true' : undefined}
-              data-state={runtimeStateToken(state)}
-              onclick={() => (statusFilter = state)}
-            >
+            <Segment value={state} data-state={runtimeStateToken(state)}>
               {state}
-              <span>{graphProjection.statusCounts.get(state) ?? 0}</span>
-            </button>
+              <span class="filter-count">{graphProjection.statusCounts.get(state) ?? 0}</span>
+            </Segment>
           {/each}
-        </div>
+        </SegmentedControl>
       {/if}
 
       {#if layoutStatus === 'failed'}
@@ -516,76 +515,57 @@
     gap: 0.5rem;
   }
 
-  .state-filters {
-    display: flex;
-    gap: 0.45rem;
+  :global(.state-filters) {
     padding: 0.5rem 0.75rem;
     overflow-x: auto;
     border-bottom: 1px solid #dde5eb;
   }
 
-  .state-filters button {
+  :global(.state-filters .cinder-segmented-control-option) {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    flex: 0 0 auto;
-    min-height: 2rem;
-    /* The pill radius eats the edges, so leave room for the leading dot and the
-       trailing count badge instead of jamming them against the rounded ends. */
-    padding: 0 0.4rem 0 0.75rem;
-    border: 1px solid #c7d2da;
-    border-radius: 999px;
-    background: #f7f9fb;
-    color: #34434f;
-    font-size: 0.8125rem;
-    cursor: pointer;
   }
 
-  /* The "All" chip carries no state dot, so it needs the same left inset as the label. */
-  .state-filters button:not([data-state]) {
-    padding-left: 0.85rem;
+  :global(.state-filters .filter-count) {
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    opacity: 0.78;
   }
 
-  .state-filters button[data-active='true'] {
-    border-color: #2f6fed;
-    background: #eaf1ff;
-    color: #17479b;
-  }
-
-  /* Surface the per-state color mapping (already defined for the legend) on the
-     always-visible filter chips so a failed chip reads differently from a
-     completed one at rest, not only when active. */
-  .state-filters button[data-state]::before {
+  :global(.state-filters [data-state]::before) {
     content: '';
     width: 0.5rem;
     height: 0.5rem;
+    flex: 0 0 auto;
     border-radius: 999px;
     background: #8a98a3;
   }
 
-  .state-filters button[data-state='completed']::before,
-  .state-filters button[data-state='observed']::before,
-  .state-filters button[data-state='fired']::before {
+  :global(.state-filters [data-state='completed']::before),
+  :global(.state-filters [data-state='observed']::before),
+  :global(.state-filters [data-state='fired']::before) {
     background: #18845b;
   }
 
-  .state-filters button[data-state='failed']::before,
-  .state-filters button[data-state='timed-out']::before,
-  .state-filters button[data-state='canceled']::before {
+  :global(.state-filters [data-state='failed']::before),
+  :global(.state-filters [data-state='timed-out']::before),
+  :global(.state-filters [data-state='canceled']::before) {
     background: #c94444;
   }
 
-  .state-filters button[data-state='retried']::before,
-  .state-filters button[data-state='pending']::before,
-  .state-filters button[data-state='ambiguous']::before {
+  :global(.state-filters [data-state='retried']::before),
+  :global(.state-filters [data-state='pending']::before),
+  :global(.state-filters [data-state='ambiguous']::before) {
     background: #b76b00;
   }
 
-  .state-filters button[data-state='unmapped']::before {
+  :global(.state-filters [data-state='unmapped']::before) {
     background: #7a4cc2;
   }
 
-  .state-filters span {
+  :global(.state-filters .filter-count) {
     display: inline-grid;
     place-items: center;
     min-width: 1.25rem;

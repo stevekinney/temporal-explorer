@@ -1,11 +1,6 @@
 import adapterNode from '@sveltejs/adapter-node';
 import adapterStatic from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { fileURLToPath } from 'node:url';
-
-const cinderComponentDirectory = fileURLToPath(
-  new URL('./node_modules/@lostgradient/cinder/src/components', import.meta.url),
-);
 
 // The local `temporal-explorer open` command runs the adapter-node server bundle
 // (`build/index.js`), so node stays the default. Vercel builds the fully
@@ -22,9 +17,6 @@ const adapter = isWebTarget
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    alias: {
-      '$cinder-components': cinderComponentDirectory,
-    },
     adapter,
   },
 };

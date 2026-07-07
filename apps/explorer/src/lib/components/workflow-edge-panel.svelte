@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge } from '$cinder-components/badge';
+  import { Badge } from '@lostgradient/cinder/badge';
 
   import { compactEventSummary } from '$lib/graph/runtime-display';
   import type { TemporalGraphEdge } from '$lib/graph/projection';
@@ -26,6 +26,7 @@
         type="button"
         class="edge-item"
         data-active={edge.id === selectedEdgeId ? 'true' : undefined}
+        aria-current={edge.id === selectedEdgeId ? 'true' : undefined}
         onclick={() => selectEdge(edge.id)}
       >
         <span class="edge-icon" aria-hidden="true">
