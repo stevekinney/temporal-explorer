@@ -60,6 +60,8 @@ function ownSignatures(node: FlowNode): string[] {
       return [`parallel:${node.parallelKind}:${node.cardinality}`];
     case 'try':
       return trySignatures(node);
+    case 'region':
+      return ['region'];
     case 'terminal':
       return [`terminal:${node.terminalKind}`];
   }
@@ -76,6 +78,8 @@ function childBodies(node: FlowNode): (FlowNode[] | undefined)[] {
       return [...(node.branches ?? []), node.templateBranch];
     case 'try':
       return [node.body, node.handler?.body, node.finalizer];
+    case 'region':
+      return [node.body];
     default:
       return [];
   }

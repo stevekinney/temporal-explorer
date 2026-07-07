@@ -7,6 +7,7 @@ import {
   type FinallyFrame,
   type FlowContext,
   type LoopTarget,
+  type TerminalTarget,
 } from './projection-flow-core';
 
 function matchingLoopTarget(
@@ -21,19 +22,20 @@ function matchingLoopTarget(
 function terminalTarget(
   node: Extract<FlowNode, { type: 'terminal' }>,
   context: FlowContext,
-): string | undefined {
+): TerminalTarget | undefined {
   if (node.terminalKind === 'break') {
-    if (node.label === undefined) {
-      return (
-        context.switchTargets.at(-1)?.breakTarget ?? matchingLoopTarget(node, context)?.breakTarget
-      );
-    }
+    const target =
+      node.label === undefined
+        ? context.breakTargets.at(-1)
+        : context.breakTargets.toReversed().find((candidate) => candidate.label === node.label);
 
-    return matchingLoopTarget(node, context)?.breakTarget;
+    return target ? { id: target.breakTarget, finallyDepth: target.finallyDepth } : undefined;
   }
 
   if (node.terminalKind === 'continue') {
-    return matchingLoopTarget(node, context)?.continueTarget;
+    const target = matchingLoopTarget(node, context);
+
+    return target ? { id: target.continueTarget, finallyDepth: target.finallyDepth } : undefined;
   }
 
   return undefined;
@@ -41,14 +43,15 @@ function terminalTarget(
 
 function routeAbruptExit(
   from: string,
-  target: string | undefined,
+  target: TerminalTarget | undefined,
   context: FlowContext,
   renderFinalizer: (frame: FinallyFrame, entry: string) => string | undefined,
   targetLabel = '',
 ): void {
   let cursor: string | undefined = from;
+  const targetFinallyDepth = target?.finallyDepth ?? 0;
 
-  for (let index = context.finallyStack.length - 1; index >= 0; index -= 1) {
+  for (let index = context.finallyStack.length - 1; index >= targetFinallyDepth; index -= 1) {
     const frame = context.finallyStack[index];
 
     if (!frame || cursor === undefined) {
@@ -69,7 +72,7 @@ function routeAbruptExit(
   }
 
   if (cursor !== undefined && target !== undefined) {
-    pushEdge(context, cursor, target, targetLabel);
+    pushEdge(context, cursor, target.id, targetLabel);
   }
 }
 
@@ -95,13 +98,19 @@ export function walkTerminalNode(
       graphNode.parentId = parentId;
       context.nodes.push(graphNode);
       pushEdge(context, entry, command.id, label);
-      routeAbruptExit(command.id, context.startId, context, renderFinalizer, 'loop');
+      routeAbruptExit(
+        command.id,
+        { id: context.startId, finallyDepth: 0 },
+        context,
+        renderFinalizer,
+        'loop',
+      );
       return undefined;
     }
 
     const id = addStructural(context, 'terminal', 'continue as new', parentId);
     pushEdge(context, entry, id, label);
-    routeAbruptExit(id, context.startId, context, renderFinalizer, 'loop');
+    routeAbruptExit(id, { id: context.startId, finallyDepth: 0 }, context, renderFinalizer, 'loop');
     return undefined;
   }
 

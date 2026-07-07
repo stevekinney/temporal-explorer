@@ -11,10 +11,18 @@ export type LoopTarget = {
   label: string | undefined;
   breakTarget: string;
   continueTarget: string;
+  finallyDepth: number;
 };
 
-export type SwitchTarget = {
+export type BreakTarget = {
+  label: string | undefined;
   breakTarget: string;
+  finallyDepth: number;
+};
+
+export type TerminalTarget = {
+  id: string;
+  finallyDepth: number;
 };
 
 export type FinallyFrame = {
@@ -38,7 +46,7 @@ export type FlowContext = {
   overlay: ExecutionOverlayDocument | undefined;
   projection: ProjectionBuildContext;
   loopTargets: LoopTarget[];
-  switchTargets: SwitchTarget[];
+  breakTargets: BreakTarget[];
   finallyStack: FinallyFrame[];
   duplicateCommandNodes: boolean;
   duplicateCommandPath: string | undefined;
@@ -117,10 +125,7 @@ function commandGraphNode(
     context.projection,
   );
   graphNode.parentId = parentId;
-  if (
-    context.duplicateCommandNodes &&
-    context.nodes.some((existing) => existing.id === command.id)
-  ) {
+  if (context.nodes.some((existing) => existing.id === command.id)) {
     graphNode.id = `${command.id}:flow:${context.duplicateCommandPath ?? context.counter.value + 1}`;
   }
 

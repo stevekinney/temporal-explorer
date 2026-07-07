@@ -205,9 +205,22 @@ function walkStructuralStatement(
   }
 
   if (Node.isLabeledStatement(statement)) {
-    return walkStatement(statement.getStatement(), context).map((node) =>
-      labelLoop(node, statement.getLabel().getText()),
-    );
+    const label = statement.getLabel().getText();
+    const body = walkStatement(statement.getStatement(), context);
+
+    if (body.length === 1 && body[0]?.type === 'loop') {
+      return [labelLoop(body[0], label)];
+    }
+
+    return [
+      {
+        type: 'region',
+        id: nextId(context),
+        label,
+        source: structuralSource(context, statement),
+        body,
+      },
+    ];
   }
 
   if (Node.isTryStatement(statement)) {

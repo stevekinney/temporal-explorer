@@ -7,6 +7,7 @@ import {
   terminalTarget,
   type RenderContext,
 } from './mermaid-control-context';
+import { renderRegionNode } from './mermaid-control-region';
 import { flowCommandKinds, shapeForKind, toMermaidId, toMermaidLabel } from './mermaid-format';
 import { commandDisplayName } from './shared';
 
@@ -110,7 +111,7 @@ function renderTerminalNode(
     pushEdge(context, entry, id, label);
     routeAbruptExit(
       id,
-      context.startId,
+      { id: context.startId, finallyDepth: 0 },
       context,
       (finalizer, finalizerEntry) => renderSequence(finalizer, finalizerEntry, context, 'finally'),
       'loop',
@@ -145,13 +146,17 @@ function renderBranchNode(
   const isSwitch = node.branchKind === 'switch';
 
   if (isSwitch) {
-    context.switchTargets.push({ breakTarget: join });
+    context.breakTargets.push({
+      label: undefined,
+      breakTarget: join,
+      finallyDepth: context.finallyStack.length,
+    });
   }
 
   const hasNormalExit = renderBranchArms(node, decision, join, context);
 
   if (isSwitch) {
-    context.switchTargets.pop();
+    context.breakTargets.pop();
   }
 
   return hasNormalExit ? join : undefined;
@@ -203,9 +208,20 @@ function renderLoopNode(
   if (doWhile) context.nodes.push(`  ${bodyEntry}(( ))`);
 
   pushEdge(context, entry, bodyEntry, label);
-  context.loopTargets.push({ label: node.label, breakTarget: exit, continueTarget: loop });
+  context.breakTargets.push({
+    label: node.label,
+    breakTarget: exit,
+    finallyDepth: context.finallyStack.length,
+  });
+  context.loopTargets.push({
+    label: node.label,
+    breakTarget: exit,
+    continueTarget: loop,
+    finallyDepth: context.finallyStack.length,
+  });
   const bodyExit = renderSequence(node.body, bodyEntry, context, 'each');
   context.loopTargets.pop();
+  context.breakTargets.pop();
 
   if (bodyExit !== undefined) pushEdge(context, bodyExit, loop, doWhile ? undefined : 'repeat');
   if (doWhile) pushEdge(context, loop, bodyEntry, 'repeat');
@@ -317,6 +333,8 @@ function renderNode(
       return renderParallelNode(node, entry, context, label);
     case 'try':
       return renderTryNode(node, entry, context, label);
+    case 'region':
+      return renderRegionNode(node, entry, context, label, renderSequence);
     default:
       return undefined;
   }

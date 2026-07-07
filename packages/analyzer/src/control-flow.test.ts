@@ -183,6 +183,32 @@ export async function labeled(flag: boolean): Promise<void> {
     expect(terminal.label).toBe('outer');
   });
 
+  it('preserves labels on non-loop regions', async () => {
+    const nodes = await bodyOf(
+      `${header}
+export async function labeledSwitch(flag: boolean): Promise<void> {
+  outer: switch (flag) {
+    case true:
+      break outer;
+  }
+  await a();
+}
+`,
+      'labeledSwitch',
+    );
+
+    const region = nodes[0];
+    if (region?.type !== 'region') throw new Error('Expected a labeled region node.');
+    const branch = region.body[0];
+    if (branch?.type !== 'branch') throw new Error('Expected a switch branch.');
+    const terminal = branch.clauses[0]?.body[0];
+    if (terminal?.type !== 'terminal') throw new Error('Expected a terminal node.');
+    expect(region.label).toBe('outer');
+    expect(terminal.terminalKind).toBe('break');
+    expect(terminal.label).toBe('outer');
+    expect(nodes.at(1)?.type).toBe('command');
+  });
+
   it('models continueAsNew as a loop-back terminal, not normal completion', async () => {
     const nodes = await bodyOf(
       `${header}

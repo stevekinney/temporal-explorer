@@ -49,6 +49,13 @@ export type FlowNode =
       finalizer?: FlowNode[] | undefined;
     }
   | {
+      type: 'region';
+      id: string;
+      label: string;
+      source?: SourceLocation | undefined;
+      body: FlowNode[];
+    }
+  | {
       type: 'terminal';
       id: string;
       terminalKind: 'return' | 'throw' | 'continue-as-new' | 'break' | 'continue';
@@ -153,6 +160,15 @@ export const flowNodeSchema: z.ZodType<FlowNode> = z.lazy(() =>
           .strict()
           .optional(),
         finalizer: z.array(flowNodeSchema).optional(),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal('region'),
+        id: z.string().min(1),
+        label: z.string().min(1),
+        source: sourceLocationSchema.optional(),
+        body: z.array(flowNodeSchema),
       })
       .strict(),
     z
