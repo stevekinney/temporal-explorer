@@ -794,7 +794,7 @@
       min-width: 0;
     }
 
-    :global(.artifact-summary) {
+    :global(.artifact-summary.cinder-stat-group[data-cinder-columns='auto']) {
       grid-template-columns: 1fr;
     }
   }

@@ -373,9 +373,9 @@
           id="runtime-state-filters"
           bind:value={statusFilter}
           label="Runtime state filters"
+          hideLabel
           density="toolbar"
           detached
-          fullWidth
           class="state-filters"
         >
           <Segment value="all">
@@ -523,6 +523,7 @@
 
   :global(.state-filters .cinder-segmented-control-option) {
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: 0.4rem;
   }
