@@ -239,6 +239,7 @@
     status = 'loading';
     errorMessage = '';
     sourceMode = 'upload';
+    artifacts = undefined;
     const selectedProjectName = getProjectName(files);
     projectName = selectedProjectName;
     const requestId = (analysisRequestId += 1);
