@@ -283,6 +283,12 @@ function withFinallyFrame<T>(
   return result;
 }
 
+function removeUnusedNode(context: FlowContext, id: string): void {
+  if (context.edges.some((edge) => edge.source === id || edge.target === id)) return;
+  const index = context.nodes.findIndex((node) => node.id === id);
+  if (index >= 0) context.nodes.splice(index, 1);
+}
+
 function walkTryHandler(
   node: Extract<FlowNode, { type: 'try' }>,
   entry: string,
@@ -330,6 +336,8 @@ function walkTry(
   if (finalizer && hasNormalExit) {
     return walkSequence(finalizer, converge, container, context, 'finally');
   }
+
+  removeUnusedNode(context, converge);
 
   return hasNormalExit ? converge : undefined;
 }

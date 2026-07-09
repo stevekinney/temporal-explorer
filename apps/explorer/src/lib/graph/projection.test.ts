@@ -255,4 +255,39 @@ describe('explorer graph projection', () => {
     expect(fixtureDirs.length).toBeGreaterThan(0);
     expect(offenders).toEqual([]);
   });
+
+  it('keeps visible fixture graph nodes connected when a workflow has multiple graph nodes', async () => {
+    const fixturesRoot = new URL('../../../../../fixtures/', import.meta.url).pathname;
+    const glob = new Bun.Glob('*/');
+    const scanned = await Array.fromAsync(glob.scan({ cwd: fixturesRoot, onlyFiles: false }));
+    const fixtureDirs = scanned.map((dir) => dir.replace(/\/$/, '')).toSorted();
+
+    const offenders: string[] = [];
+    for (const dir of fixtureDirs) {
+      let artifacts;
+      try {
+        artifacts = await loadExplorerArtifacts(`${fixturesRoot}${dir}`);
+      } catch {
+        continue;
+      }
+      for (const workflow of artifacts.analysis.workflows) {
+        const projection = buildGraphProjection({
+          workflow,
+          trace: artifacts.traces[0],
+          overlay: artifacts.overlays[0],
+        });
+        const contentNodes = projection.nodes.filter((node) => !node.isContainer);
+        if (contentNodes.length <= 1) continue;
+        const edgeEndpoints = new Set(
+          projection.edges.flatMap((edge) => [edge.source, edge.target]),
+        );
+        for (const node of contentNodes) {
+          if (!edgeEndpoints.has(node.id)) offenders.push(`${dir}/${workflow.name}/${node.id}`);
+        }
+      }
+    }
+
+    expect(fixtureDirs.length).toBeGreaterThan(0);
+    expect(offenders).toEqual([]);
+  });
 });

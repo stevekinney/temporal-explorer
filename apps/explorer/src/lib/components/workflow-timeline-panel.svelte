@@ -1,9 +1,15 @@
 <script lang="ts">
+  import { ActionRow } from '@lostgradient/cinder/action-row';
   import { Badge } from '@lostgradient/cinder/badge';
   import { EmptyState } from '@lostgradient/cinder/empty-state';
 
-  import { runtimeStateToken, type TimelineRow } from '$lib/graph/projection';
-  import { compactEventSummary, formatTimestamp } from '$lib/graph/runtime-display';
+  import { type TimelineRow } from '$lib/graph/projection';
+  import { runtimeStateToken } from '$lib/graph/runtime-state';
+  import {
+    compactEventSummary,
+    formatTimestamp,
+    statusBadgeVariant,
+  } from '$lib/graph/runtime-display';
 
   type Props = {
     rows: TimelineRow[];
@@ -16,40 +22,67 @@
 
 <section class="timeline-panel" aria-labelledby="timeline-title">
   <div class="panel-heading">
-    <h2 id="timeline-title">Timeline</h2>
-    <Badge variant="info" size="sm">{rows.length}</Badge>
+    <div>
+      <h2 id="timeline-title">Event History Timeline</h2>
+      <p>Runtime operations and raw Event History evidence</p>
+    </div>
+    <div class="heading-badges">
+      {#if selectedRuntimeOperationId}
+        <Badge variant="info" size="sm">Inspector selection</Badge>
+      {/if}
+      <Badge variant="neutral" size="sm">{rows.length} events</Badge>
+    </div>
   </div>
-  <div class="timeline-list">
-    {#each rows as row (row.id)}
-      <button
-        type="button"
-        class="timeline-item"
-        data-active={row.entry.operationId === selectedRuntimeOperationId ? 'true' : undefined}
-        aria-current={row.entry.operationId === selectedRuntimeOperationId ? 'true' : undefined}
-        data-state={runtimeStateToken(row.state)}
-        onclick={() => selectTimelineRow(row)}
-      >
-        <span>{formatTimestamp(row.entry.at)}</span>
-        <strong>{row.entry.label}</strong>
-        <small>
-          {row.eventReferences.length > 0
-            ? compactEventSummary(row.eventReferences)
-            : `events ${row.entry.eventIds.map((eventId) => `#${eventId}`).join(', ')}`}
-        </small>
-      </button>
-    {:else}
-      <EmptyState title="No timeline rows" headingLevel={3} />
-    {/each}
-  </div>
+
+  {#if rows.length > 0}
+    <div class="timeline-list" role="list">
+      {#each rows as row (row.id)}
+        <ActionRow
+          density="condensed"
+          selected={row.entry.operationId === selectedRuntimeOperationId}
+          selectedState="current"
+          onclick={() => selectTimelineRow(row)}
+        >
+          {#snippet leading()}
+            <span class="timeline-dot" data-state={runtimeStateToken(row.state)}></span>
+          {/snippet}
+          {#snippet title()}
+            <span class="row-title">{row.entry.label}</span>
+          {/snippet}
+          {#snippet description()}
+            <span>{row.sourceText}</span>
+          {/snippet}
+          {#snippet meta()}
+            <code>
+              {row.eventReferences.length > 0
+                ? compactEventSummary(row.eventReferences)
+                : `events ${row.entry.eventIds.map((eventId) => `#${eventId}`).join(', ')}`}
+            </code>
+          {/snippet}
+          {#snippet trailing()}
+            <span class="timeline-trailing">
+              {#if row.entry.operationId === selectedRuntimeOperationId}
+                <Badge variant="info" size="sm">selected</Badge>
+              {/if}
+              <Badge variant={statusBadgeVariant(row.state)} size="sm">{row.state}</Badge>
+              <time>{formatTimestamp(row.entry.at)}</time>
+            </span>
+          {/snippet}
+        </ActionRow>
+      {/each}
+    </div>
+  {:else}
+    <EmptyState title="No timeline rows" headingLevel={3} />
+  {/if}
 </section>
 
 <style>
   .timeline-panel {
     min-width: 0;
-    border: 1px solid #d3dde5;
-    border-radius: 0.5rem;
+    border: 1px solid #b9c8ce;
+    border-radius: 0.45rem;
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
+    box-shadow: 0 8px 18px rgba(21, 32, 39, 0.06);
   }
 
   .panel-heading {
@@ -57,71 +90,97 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.85rem 0.95rem;
-    border-bottom: 1px solid #dde5eb;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid #c3d0d5;
+    background: #f8fbfb;
+  }
+
+  .panel-heading h2,
+  .panel-heading p {
+    margin: 0;
   }
 
   .panel-heading h2 {
-    margin: 0;
     font-size: 0.95rem;
+    letter-spacing: 0;
+  }
+
+  .panel-heading p {
+    margin-top: 0.15rem;
+    color: #62727a;
+    font-size: 0.75rem;
+  }
+
+  .heading-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem;
   }
 
   .timeline-list {
     display: grid;
-    gap: 0.5rem;
-    max-height: 22rem;
-    padding: 0.75rem;
+    gap: 0.25rem;
+    max-height: 14rem;
     overflow: auto;
+    padding: 0.55rem;
   }
 
-  .timeline-item {
-    display: grid;
-    /* The timestamp is a fixed-width `HH:MM:SS.mmm` string; the column must be wide
-       enough to hold all twelve monospace characters or it overruns the label. */
-    grid-template-columns: 5.5rem minmax(0, 1fr);
-    gap: 0.15rem 0.75rem;
-    width: 100%;
-    padding: 0.6rem 0.65rem;
-    /* Borderless rows: on a white panel the per-item border + fill read as
-       nested boxes; spacing and a hover tint separate them more quietly. The
-       transparent border reserves the box so the active state adds no shift. */
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
-    background: transparent;
-    color: #172026;
-    text-align: left;
-    cursor: pointer;
-    transition:
-      background-color 120ms ease,
-      border-color 120ms ease;
+  .timeline-list :global(.cinder-action-row) {
+    border-radius: 0.4rem;
   }
 
-  .timeline-item:hover {
-    background: #f4f8fb;
+  .timeline-list :global(.cinder-action-row__layout) {
+    align-items: center;
+    gap: 0.8rem;
+    padding-block: 0.55rem;
   }
 
-  .timeline-item[data-active='true'] {
-    border-color: #2f6fed;
-    background: #f2f6ff;
-    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.16);
+  .timeline-list :global(.cinder-action-row__body) {
+    min-width: 0;
   }
 
-  .timeline-item span,
-  .timeline-item small {
-    color: #5d6b75;
+  .timeline-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: #87979f;
+  }
+
+  .timeline-dot[data-state='completed'],
+  .timeline-dot[data-state='observed'],
+  .timeline-dot[data-state='fired'] {
+    background: #0f8f83;
+  }
+
+  .timeline-dot[data-state='failed'],
+  .timeline-dot[data-state='timed-out'],
+  .timeline-dot[data-state='canceled'] {
+    background: #b84437;
+  }
+
+  .timeline-dot[data-state='retried'],
+  .timeline-dot[data-state='pending'],
+  .timeline-dot[data-state='ambiguous'] {
+    background: #c97814;
+  }
+
+  .row-title {
+    font-weight: 720;
+  }
+
+  code,
+  time {
     font-family: 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 
-  .timeline-item span {
-    white-space: nowrap;
-  }
-
-  .timeline-item small {
-    grid-column: 2;
-  }
-
-  .timeline-item strong {
-    overflow-wrap: anywhere;
+  .timeline-trailing {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    min-width: 13rem;
+    color: #62727a;
   }
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import ArtifactExplorer from '$lib/components/artifact-explorer.svelte';
   import ArtifactSourcePanel from '$lib/components/artifact-source-panel.svelte';
+  import { defaultWorkflowId as selectDefaultWorkflowId } from '$lib/components/artifact-selection';
   import { Upload } from 'lucide-svelte';
 
   import type { ExplorerArtifacts } from '@temporal-explorer/schemas';
@@ -37,6 +38,8 @@
   let exampleStatus = $state<'idle' | 'loading' | 'error'>('idle');
   let errorMessage = $state('');
   let exampleErrorMessage = $state('');
+  let sourcePanelOpen = $state(true);
+  let selectedLocalWorkflowId = $state<string | undefined>();
   let analysisRequestId = 0;
   let exampleRequestId = 0;
 
@@ -69,6 +72,20 @@
 
     return undefined;
   });
+  const localSources = $derived.by(() => {
+    const localArtifacts = data.artifacts;
+    if (!localArtifacts) return [];
+
+    return localArtifacts.analysis.workflows.map((workflow) => ({
+      id: workflow.id,
+      title: workflow.name,
+      description: `${workflow.temporalCommands.length} commands, ${localArtifacts.traces.length} trace${localArtifacts.traces.length === 1 ? '' : 's'}`,
+    }));
+  });
+  const defaultLocalWorkflowId = $derived(
+    data.artifacts ? selectDefaultWorkflowId(data.artifacts, data.requestedTrace) : undefined,
+  );
+  const selectedLocalSourceId = $derived(selectedLocalWorkflowId ?? defaultLocalWorkflowId);
   const isWebWorkbench = $derived(data.examples.length > 0);
   const canImportHistory = $derived(
     sourceMode === 'upload' && status !== 'loading' && fileEntries.length > 0 && Boolean(artifacts),
@@ -79,6 +96,12 @@
     if (status === 'ready') return `${projectName} is loaded.`;
     if (status === 'error') return errorMessage;
     return 'Pick a TypeScript project directory. Event History is optional after that.';
+  });
+
+  $effect(() => {
+    if (sourceMode === 'examples' && data.artifacts && data.examples.length === 0) {
+      sourceMode = 'local';
+    }
   });
 
   function createWorker(): Worker {
@@ -169,6 +192,11 @@
     if (artifacts) {
       sourceMode = 'upload';
     }
+  }
+
+  function selectLocalSource(sourceId: string): void {
+    selectedLocalWorkflowId = sourceId;
+    sourceMode = 'local';
   }
 
   function hasExampleArtifacts(exampleId: string): boolean {
@@ -322,10 +350,13 @@
 </script>
 
 {#if isWebWorkbench}
-  <main class="workbench">
+  <main class="workbench" class:source-panel-collapsed={!sourcePanelOpen}>
     <ArtifactSourcePanel
       examples={data.examples}
+      {localSources}
+      bind:open={sourcePanelOpen}
       selectedExampleId={selectedExample?.id ?? selectedExampleId}
+      {selectedLocalSourceId}
       {sourceMode}
       {status}
       {uploadStatusText}
@@ -333,6 +364,7 @@
       {canViewUploadedArtifacts}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
+      onSelectLocalSource={selectLocalSource}
       onViewUploadedArtifacts={viewUploadedArtifacts}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
@@ -376,16 +408,13 @@
     </section>
   </main>
 {:else if data.artifacts}
-  <ArtifactExplorer
-    artifacts={data.artifacts}
-    requestedTrace={data.requestedTrace}
-    siteUrl={data.siteUrl}
-  />
-{:else}
-  <main class="workbench empty-workbench">
+  <main class="workbench" class:source-panel-collapsed={!sourcePanelOpen}>
     <ArtifactSourcePanel
       examples={data.examples}
+      {localSources}
+      bind:open={sourcePanelOpen}
       selectedExampleId={selectedExample?.id ?? selectedExampleId}
+      {selectedLocalSourceId}
       {sourceMode}
       {status}
       {uploadStatusText}
@@ -393,6 +422,48 @@
       {canViewUploadedArtifacts}
       hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
       onSelectExample={selectExample}
+      onSelectLocalSource={selectLocalSource}
+      onViewUploadedArtifacts={viewUploadedArtifacts}
+      onAnalyzeFiles={analyzeFiles}
+      onAnalyzeHistory={analyzeHistory}
+      onClearHistory={clearHistory}
+    />
+
+    <section class="viewer" aria-label="Workflow explorer">
+      {#if sourceMode === 'upload' && artifacts}
+        <ArtifactExplorer
+          {artifacts}
+          embedded
+          requestedTrace={data.requestedTrace}
+          siteUrl={data.siteUrl}
+        />
+      {:else}
+        <ArtifactExplorer
+          artifacts={data.artifacts}
+          embedded
+          requestedTrace={data.requestedTrace}
+          bind:selectedWorkflowId={selectedLocalWorkflowId}
+          siteUrl={data.siteUrl}
+        />
+      {/if}
+    </section>
+  </main>
+{:else}
+  <main class="workbench empty-workbench" class:source-panel-collapsed={!sourcePanelOpen}>
+    <ArtifactSourcePanel
+      examples={data.examples}
+      {localSources}
+      bind:open={sourcePanelOpen}
+      selectedExampleId={selectedExample?.id ?? selectedExampleId}
+      {selectedLocalSourceId}
+      {sourceMode}
+      {status}
+      {uploadStatusText}
+      {canImportHistory}
+      {canViewUploadedArtifacts}
+      hasImportedHistory={Boolean(artifacts && artifacts.traces.length > 0)}
+      onSelectExample={selectExample}
+      onSelectLocalSource={selectLocalSource}
       onViewUploadedArtifacts={viewUploadedArtifacts}
       onAnalyzeFiles={analyzeFiles}
       onAnalyzeHistory={analyzeHistory}
@@ -412,16 +483,20 @@
   :global(body) {
     margin: 0;
     background:
-      linear-gradient(90deg, rgba(31, 73, 92, 0.08) 1px, transparent 1px) 0 0 / 48px 48px,
-      linear-gradient(180deg, rgba(31, 73, 92, 0.06) 1px, transparent 1px) 0 0 / 48px 48px,
-      #edf3f5;
+      linear-gradient(90deg, rgba(15, 143, 131, 0.08) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(180deg, rgba(52, 104, 246, 0.05) 1px, transparent 1px) 0 0 / 56px 56px,
+      #e8eef0;
   }
 
   .workbench {
     min-height: 100vh;
     display: grid;
-    grid-template-columns: minmax(14rem, 16.5rem) minmax(0, 1fr);
-    color: #172026;
+    grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
+    color: #152027;
+  }
+
+  .workbench.source-panel-collapsed {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
   }
 
   p {
@@ -433,7 +508,10 @@
     min-width: 0;
     min-height: 100vh;
     overflow: hidden;
-    background: #f8fbfc;
+    background:
+      linear-gradient(90deg, rgba(21, 32, 39, 0.04) 1px, transparent 1px) 0 0 / 3.5rem 3.5rem,
+      linear-gradient(180deg, rgba(21, 32, 39, 0.035) 1px, transparent 1px) 0 0 / 3.5rem 3.5rem,
+      #f4f7f7;
   }
 
   .viewer :global(.explorer-shell) {
@@ -446,20 +524,25 @@
     place-items: center;
     align-content: center;
     gap: 0.75rem;
-    border: 1px dashed #a8bbc4;
-    border-radius: 0.75rem;
-    background: rgba(248, 251, 252, 0.74);
+    margin: 1rem;
+    border: 1px dashed #9fb3bb;
+    border-radius: 0.5rem;
+    background: rgba(246, 248, 248, 0.78);
     text-align: center;
   }
 
   .empty-view h2 {
-    color: #172026;
+    color: #152027;
     font-size: 1.4rem;
     text-transform: none;
   }
 
   @media (max-width: 960px) {
     .workbench {
+      grid-template-columns: 1fr;
+    }
+
+    .workbench.source-panel-collapsed {
       grid-template-columns: 1fr;
     }
   }

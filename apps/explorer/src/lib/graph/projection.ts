@@ -170,7 +170,14 @@ export function buildGraphProjection({
     ...scopeNodes,
     ...unmappedRuntimeNodes,
   ];
-  const edges = createGraphEdges(workflowNode, commandEdges, messageSurfaceNodes, scopeNodes);
+  const edges = createGraphEdges(
+    workflowNode,
+    commandEdges,
+    commandNodes,
+    workflow.temporalCommands,
+    messageSurfaceNodes,
+    scopeNodes,
+  );
   const timelineRows = createTimelineRows(trace, workflow.id, nodes, context);
   const runtimeOperationRows = createRuntimeOperationRows(trace, workflow.id, nodes, context);
   const edgesById = new Map(edges.map((edge) => [edge.id, edge]));

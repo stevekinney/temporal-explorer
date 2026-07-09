@@ -123,20 +123,24 @@
 <style>
   .temporal-flow-node {
     position: relative;
+    box-sizing: border-box;
     display: grid;
-    gap: 0.5rem;
+    grid-template-rows: auto auto auto auto;
+    gap: 0.38rem;
     width: 100%;
     height: 100%;
     min-height: 6.4rem;
     padding: 0.75rem;
+    overflow: hidden;
     /* Flat-card recipe shared with every other panel on the page; a heavy
        drop shadow reads as clutter once 10-30 cards are on screen at once. */
-    border: 1px solid #d3dde5;
-    border-left: 0.25rem solid #5f6f7a;
-    border-radius: 0.5rem;
-    background: #ffffff;
-    color: #172026;
-    box-shadow: 0 1px 2px rgba(22, 32, 38, 0.05);
+    border: 1px solid #c3d0d5;
+    border-left: 0.25rem solid #62727a;
+    border-radius: 0.45rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 251, 0.98)), #ffffff;
+    color: #152027;
+    box-shadow: 0 8px 18px rgba(21, 32, 39, 0.06);
     transition:
       border-color 120ms ease,
       box-shadow 120ms ease,
@@ -144,60 +148,60 @@
   }
 
   .temporal-flow-node[data-kind='workflow'] {
-    border-left-color: #2f6fed;
+    border-left-color: #3468f6;
   }
 
   .temporal-flow-node[data-kind='activity'] {
-    border-left-color: #18845b;
+    border-left-color: #0f8f83;
   }
 
   .temporal-flow-node[data-kind='timer'] {
-    border-left-color: #b76b00;
+    border-left-color: #c97814;
   }
 
   .temporal-flow-node[data-kind='condition'] {
-    border-left-color: #0f7a8c;
+    border-left-color: #0f8f83;
   }
 
   .temporal-flow-node[data-kind='signal'] {
-    border-left-color: #c9436e;
+    border-left-color: #3468f6;
   }
 
   .temporal-flow-node[data-kind='query'] {
-    border-left-color: #a13d8f;
+    border-left-color: #0f8f83;
   }
 
   .temporal-flow-node[data-kind='update'] {
-    border-left-color: #d9668a;
+    border-left-color: #c97814;
   }
 
   .temporal-flow-node[data-kind='child-workflow'],
   .temporal-flow-node[data-kind='external-workflow'] {
-    border-left-color: #1f8fce;
+    border-left-color: #3468f6;
   }
 
   .temporal-flow-node[data-kind='continue-as-new'] {
-    border-left-color: #3f5b73;
+    border-left-color: #2d474f;
   }
 
   .temporal-flow-node[data-kind='patch'] {
-    border-left-color: #c98a1d;
+    border-left-color: #c97814;
   }
 
   .temporal-flow-node[data-kind='cancellation-scope'] {
-    border-left-color: #8a98a3;
+    border-left-color: #87979f;
   }
 
   .temporal-flow-node[data-kind='dynamic'],
   .temporal-flow-node[data-kind='runtime'] {
-    border-left-color: #7a4cc2;
+    border-left-color: #3468f6;
   }
 
   .temporal-flow-node[data-active='true'] {
-    border-color: #2f6fed;
+    border-color: #3468f6;
     box-shadow:
-      0 0 0 3px rgba(47, 111, 237, 0.24),
-      0 4px 10px rgba(23, 32, 38, 0.1);
+      0 0 0 3px rgba(52, 104, 246, 0.22),
+      0 12px 22px rgba(21, 32, 39, 0.12);
   }
 
   .temporal-flow-node[data-muted='true'] {
@@ -215,28 +219,28 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    border: 1px solid #6a8fae;
-    border-radius: 0.75rem;
-    background: rgba(240, 244, 248, 0.92);
+    border: 1px solid #8fb1b4;
+    border-radius: 0.5rem;
+    background: rgba(238, 245, 245, 0.92);
   }
 
   .region-container[data-kind='loop-region'] {
-    border-color: #b78a3a;
-    background: rgba(249, 242, 227, 0.92);
+    border-color: #d1a45f;
+    background: rgba(250, 242, 230, 0.92);
   }
 
   .region-container[data-kind='parallel-region'] {
-    border-color: #4c8fb5;
-    background: rgba(225, 239, 248, 0.92);
+    border-color: #779cda;
+    background: rgba(231, 239, 252, 0.92);
   }
 
   .region-container[data-kind='try-region'] {
-    border-color: #b56a6a;
-    background: rgba(250, 234, 234, 0.92);
+    border-color: #c58f83;
+    background: rgba(250, 237, 234, 0.92);
   }
 
   .region-container[data-active='true'] {
-    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.18);
+    box-shadow: 0 0 0 3px rgba(52, 104, 246, 0.18);
   }
 
   .region-header {
@@ -249,7 +253,7 @@
     padding: 0 0.75rem;
     background: rgba(255, 255, 255, 0.68);
     border-bottom: 1px solid rgba(106, 143, 174, 0.4);
-    color: #34434f;
+    color: #2d3d45;
     font-size: 0.6875rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -271,12 +275,13 @@
   /* Markers: decision diamonds, parallel-fork hexagons, join dots, terminal stadiums. */
   .flow-marker {
     position: relative;
+    box-sizing: border-box;
     display: grid;
     place-items: center;
     width: 100%;
     height: 100%;
     padding: 0.35rem 0.6rem;
-    color: #172026;
+    color: #152027;
     font-size: 0.8rem;
     font-weight: 600;
     text-align: center;
@@ -302,18 +307,18 @@
      against a region container's tinted body instead of blending into it. */
   .marker-shape polygon {
     fill: #ffffff;
-    stroke: #5d6b75;
+    stroke: #62727a;
     stroke-width: 1.5;
   }
 
   .flow-marker[data-kind='parallel-fork'] .marker-shape polygon {
-    fill: #dceef7;
-    stroke: #4c8fb5;
+    fill: #e7effc;
+    stroke: #779cda;
   }
 
   .flow-marker[data-active='true'] .marker-shape polygon {
-    fill: #eaf1ff;
-    stroke: #2f6fed;
+    fill: #eaf0ff;
+    stroke: #3468f6;
     stroke-width: 2;
   }
 
@@ -334,9 +339,9 @@
   }
 
   .flow-marker[data-kind='join'] {
-    border: 1.5px solid #55636d;
+    border: 1.5px solid #62727a;
     border-radius: 999px;
-    background: #73838f;
+    background: #87979f;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
   }
 
@@ -344,33 +349,33 @@
      counterpart of the hexagon fork; branch/try joins stay neutral to match
      their neutral decision markers. The active-state rule below still wins. */
   .flow-marker[data-kind='join'][data-region='parallel-region'] {
-    border-color: #3f82aa;
-    background: #4c8fb5;
+    border-color: #3468f6;
+    background: #779cda;
   }
 
   .flow-marker[data-kind='terminal'] {
-    border: 1.5px solid #3f5b73;
+    border: 1.5px solid #2d474f;
     border-radius: 999px;
     background: #eef2f7;
   }
 
   .flow-marker[data-kind='terminal'][data-terminal-kind='throw'] {
-    border-color: #c94444;
+    border-color: #b84437;
     background: #fdecec;
-    color: #8b2626;
+    color: #8d351f;
   }
 
   /* Only the bordered markers (join/terminal) get a focus ring; the diamond and
      hexagon carry their selection state through the SVG stroke rule above. */
   .flow-marker[data-kind='join'][data-active='true'] {
-    border-color: #2f6fed;
-    background: #2f6fed;
-    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.22);
+    border-color: #3468f6;
+    background: #3468f6;
+    box-shadow: 0 0 0 3px rgba(52, 104, 246, 0.22);
   }
 
   .flow-marker[data-kind='terminal'][data-active='true'] {
-    border-color: #2f6fed;
-    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.22);
+    border-color: #3468f6;
+    box-shadow: 0 0 0 3px rgba(52, 104, 246, 0.22);
   }
 
   .node-kicker {
@@ -384,11 +389,15 @@
   .node-kicker span:first-child,
   .node-source,
   .node-events {
-    color: #5d6b75;
+    color: #62727a;
     font-size: 0.75rem;
+    min-width: 0;
   }
 
   .node-kicker span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     text-transform: uppercase;
     font-size: 0.6875rem;
     font-weight: 600;
@@ -396,13 +405,32 @@
   }
 
   strong {
+    display: -webkit-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    color: #152027;
     font-size: 0.96rem;
+    line-height: 1.2;
     overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   .node-source,
   .node-events {
-    overflow-wrap: anywhere;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .node-events {
@@ -410,9 +438,9 @@
   }
 
   :global(.temporal-handle) {
-    width: 0.55rem;
-    height: 0.55rem;
-    border: 2px solid #ffffff;
-    background: #73838f;
+    width: 0.35rem;
+    height: 0.35rem;
+    border: 0;
+    background: transparent;
   }
 </style>
