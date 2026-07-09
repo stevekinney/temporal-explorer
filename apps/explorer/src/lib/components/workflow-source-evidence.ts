@@ -72,13 +72,18 @@ export function sourceExcerpt(
     return excerptWindow(knownSource, selectedLine);
   }
 
-  const startLine = Math.max(1, selectedLine - 2);
-  const lines = ['// Source text was not included in this artifact.', selectedLineText];
+  const lines =
+    selectedLine > 1
+      ? [
+          { line: selectedLine - 1, text: '// Source text was not included in this artifact.' },
+          { line: selectedLine, text: selectedLineText },
+        ]
+      : [{ line: selectedLine, text: selectedLineText }];
 
-  return lines.map((text, index) => ({
-    line: startLine + index,
+  return lines.map(({ line, text }) => ({
+    line,
     text,
-    selected: startLine + index === selectedLine,
+    selected: line === selectedLine,
   }));
 }
 

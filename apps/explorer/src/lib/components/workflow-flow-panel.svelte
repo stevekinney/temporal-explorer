@@ -65,7 +65,7 @@
   let layoutPositions = $state.raw<LayoutPositions>({});
   let layoutStatus = $state<LayoutStatus>('idle');
   let layoutError = $state<string | undefined>();
-  let autoSelectedTraceArtifactId = $state<string | undefined>();
+  let autoSelectedProjectionKey = $state<string | undefined>();
   let flowInstanceKey = $state(0);
 
   const selectionDetail = $derived(
@@ -85,6 +85,16 @@
   );
   const flowNodes = $derived(graphProjection?.nodes.map<TemporalFlowNode>(createFlowNode) ?? []);
   const flowEdges = $derived(graphProjection?.edges.map<TemporalFlowEdge>(createFlowEdge) ?? []);
+  const projectionKey = $derived(
+    graphProjection
+      ? [
+          traceArtifactId ?? 'static',
+          graphProjection.nodes[0]?.id ?? 'unknown-workflow',
+          graphProjection.nodes.length,
+          graphProjection.edges.length,
+        ].join(':')
+      : undefined,
+  );
   const filterableNodeCount = $derived(
     graphProjection
       ? [...graphProjection.statusCounts.values()].reduce((sum, count) => sum + count, 0)
@@ -126,7 +136,8 @@
 
   $effect(() => {
     const projection = graphProjection;
-    if (!projection || autoSelectedTraceArtifactId === traceArtifactId) return;
+    const selectionKey = projectionKey;
+    if (!projection || !selectionKey || autoSelectedProjectionKey === selectionKey) return;
 
     const initialRow =
       projection.runtimeOperationRows.find((row) => row.operation.kind === 'activity') ??
@@ -135,7 +146,7 @@
     selection = initialRow
       ? { kind: 'operation', operationId: initialRow.operation.id }
       : { kind: 'none' };
-    autoSelectedTraceArtifactId = traceArtifactId;
+    autoSelectedProjectionKey = selectionKey;
   });
 
   onDestroy(terminateGraphLayoutWorker);

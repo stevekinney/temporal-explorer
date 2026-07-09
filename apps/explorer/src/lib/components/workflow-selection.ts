@@ -6,12 +6,7 @@ import {
   type TemporalGraphNode,
   type TimelineRow,
 } from '$lib/graph/projection';
-import {
-  formatDuration,
-  formatTimestamp,
-  operationDisplayName,
-  operationKindLabel,
-} from '$lib/graph/runtime-display';
+import { operationDisplayName, operationKindLabel } from '$lib/graph/runtime-display';
 
 import type {
   EventReference,
@@ -20,6 +15,7 @@ import type {
   SourceLocation,
 } from '@temporal-explorer/schemas';
 
+import { runtimeFacts } from './workflow-runtime-facts';
 import { sourceExcerpt, sourceLineText, type SourceExcerptLine } from './workflow-source-evidence';
 
 export type WorkflowSelection =
@@ -279,50 +275,5 @@ function mappingTone(confidence: RuntimeNodeMapping['confidence']): SelectionFac
   if (confidence === 'exact') return 'success';
   if (confidence === 'ambiguous' || confidence === 'partial') return 'warning';
   if (confidence === 'unknown') return 'info';
-  return 'neutral';
-}
-
-function runtimeFacts(operation: RuntimeOperation | undefined): SelectionFact[] {
-  if (!operation) return [];
-
-  if (operation.kind === 'activity') {
-    return [
-      { label: 'Status', value: operation.status, tone: statusTone(operation.status) },
-      {
-        label: 'Attempt',
-        value: String(operation.attempts.at(-1)?.attempt ?? operation.attempts.length),
-      },
-      { label: 'Duration', value: formatDuration(operation.durationMs) },
-      { label: 'Scheduled', value: formatTimestamp(operation.firstScheduledAt) },
-    ];
-  }
-
-  if (operation.kind === 'timer') {
-    return [
-      { label: 'Status', value: operation.status, tone: statusTone(operation.status) },
-      { label: 'Duration', value: operation.durationText ?? 'pending' },
-      { label: 'Started', value: formatTimestamp(operation.startedAt) },
-    ];
-  }
-
-  if (operation.kind === 'signal') {
-    return [{ label: 'Received', value: formatTimestamp(operation.receivedAt) }];
-  }
-
-  if ('status' in operation) {
-    return [{ label: 'Status', value: operation.status, tone: statusTone(operation.status) }];
-  }
-
-  if (operation.kind === 'unmapped') {
-    return [{ label: 'Reason', value: operation.reason, tone: 'warning' }];
-  }
-
-  return [];
-}
-
-function statusTone(status: string): SelectionFact['tone'] {
-  if (status === 'completed' || status === 'fired' || status === 'signaled') return 'success';
-  if (status === 'failed' || status === 'timedOut' || status === 'canceled') return 'danger';
-  if (status === 'pending' || status === 'initiated') return 'warning';
   return 'neutral';
 }
