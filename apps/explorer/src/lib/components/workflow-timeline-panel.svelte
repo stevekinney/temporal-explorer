@@ -4,6 +4,7 @@
   import { EmptyState } from '@lostgradient/cinder/empty-state';
 
   import { type TimelineRow } from '$lib/graph/projection';
+  import { runtimeStateToken } from '$lib/graph/runtime-state';
   import {
     compactEventSummary,
     formatTimestamp,
@@ -43,7 +44,7 @@
           onclick={() => selectTimelineRow(row)}
         >
           {#snippet leading()}
-            <span class="timeline-dot" data-state={row.state}></span>
+            <span class="timeline-dot" data-state={runtimeStateToken(row.state)}></span>
           {/snippet}
           {#snippet title()}
             <span class="row-title">{row.entry.label}</span>

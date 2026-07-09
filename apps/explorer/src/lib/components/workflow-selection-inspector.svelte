@@ -21,6 +21,13 @@
   const eventIdText = $derived(
     detail.eventReferences.map((reference) => `#${reference.eventId}`).join(', '),
   );
+  const timelineRowsByEventId = $derived(
+    new Map(
+      detail.timelineRows.flatMap((row) =>
+        row.entry.eventIds.map((eventId) => [eventId, row] as const),
+      ),
+    ),
+  );
 
   function factTone(fact: SelectionFact): string {
     return fact.tone ?? 'neutral';
@@ -82,11 +89,12 @@
         {#if detail.eventLedger.length > 0}
           <ol class="event-ledger">
             {#each detail.eventLedger as reference (reference.eventId)}
+              {@const timelineRow = timelineRowsByEventId.get(reference.eventId)}
               <li>
                 <span>#{reference.eventId}</span>
                 <span class="event-type">{readableEventType(reference.eventType)}</span>
-                {#if detail.timelineRows[0]}
-                  <time>{formatTimestamp(detail.timelineRows[0].entry.at)}</time>
+                {#if timelineRow}
+                  <time>{formatTimestamp(timelineRow.entry.at)}</time>
                 {/if}
               </li>
             {/each}
@@ -98,7 +106,7 @@
 
       <AccordionItem id="actions" title="Actions">
         <div class="inspector-actions">
-          <CopyButton value={eventIdText || detail.title} label="Copy event IDs">
+          <CopyButton value={eventIdText} label="Copy event IDs" disabled={!eventIdText}>
             <ClipboardCopy size={15} aria-hidden="true" />
             Copy event IDs
           </CopyButton>

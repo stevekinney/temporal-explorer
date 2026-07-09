@@ -66,6 +66,7 @@
   let layoutStatus = $state<LayoutStatus>('idle');
   let layoutError = $state<string | undefined>();
   let autoSelectedTraceArtifactId = $state<string | undefined>();
+  let flowInstanceKey = $state(0);
 
   const selectionDetail = $derived(
     graphProjection ? detailForSelection(graphProjection, selection) : undefined,
@@ -255,9 +256,7 @@
   }
 
   function fitGraph(): void {
-    document
-      .querySelector<HTMLButtonElement>('.temporal-flow .svelte-flow__controls-fitview')
-      ?.click();
+    flowInstanceKey += 1;
   }
 </script>
 
@@ -294,41 +293,43 @@
                 {layoutStatus === 'failed' ? 'Graph layout failed.' : 'Laying out graph…'}
               </div>
             {:else}
-              <SvelteFlow
-                id="temporal-flow"
-                class="temporal-flow"
-                nodes={flowNodes}
-                edges={flowEdges}
-                {nodeTypes}
-                {edgeTypes}
-                fitView
-                fitViewOptions={{ padding: 0.02, maxZoom: 1.8 }}
-                nodesDraggable={false}
-                nodesConnectable={false}
-                elementsSelectable
-                minZoom={0.02}
-                maxZoom={2}
-                colorMode="light"
-                colorModeSSR="light"
-                onnodeclick={({ node }) => selectGraphNode(node.id)}
-                onedgeclick={({ edge }) => selectEdge(edge.id)}
-                aria-label="Workflow execution graph"
-              >
-                <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
-                <MiniMap
-                  ariaLabel="Workflow graph minimap"
-                  width={136}
-                  height={84}
-                  bgColor="#f7f9fb"
-                  maskColor="rgba(23, 32, 38, 0.06)"
-                  nodeColor="#b7c6d1"
-                  nodeStrokeColor="#ffffff"
-                  nodeBorderRadius={6}
-                  pannable
-                  zoomable
-                />
-                <Controls showLock={false} />
-              </SvelteFlow>
+              {#key flowInstanceKey}
+                <SvelteFlow
+                  id="temporal-flow"
+                  class="temporal-flow"
+                  nodes={flowNodes}
+                  edges={flowEdges}
+                  {nodeTypes}
+                  {edgeTypes}
+                  fitView
+                  fitViewOptions={{ padding: 0.02, maxZoom: 1.8 }}
+                  nodesDraggable={false}
+                  nodesConnectable={false}
+                  elementsSelectable
+                  minZoom={0.02}
+                  maxZoom={2}
+                  colorMode="light"
+                  colorModeSSR="light"
+                  onnodeclick={({ node }) => selectGraphNode(node.id)}
+                  onedgeclick={({ edge }) => selectEdge(edge.id)}
+                  aria-label="Workflow execution graph"
+                >
+                  <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
+                  <MiniMap
+                    ariaLabel="Workflow graph minimap"
+                    width={136}
+                    height={84}
+                    bgColor="#f7f9fb"
+                    maskColor="rgba(23, 32, 38, 0.06)"
+                    nodeColor="#b7c6d1"
+                    nodeStrokeColor="#ffffff"
+                    nodeBorderRadius={6}
+                    pannable
+                    zoomable
+                  />
+                  <Controls showLock={false} />
+                </SvelteFlow>
+              {/key}
             {/if}
           </div>
         </div>
