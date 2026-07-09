@@ -1,5 +1,17 @@
 <script lang="ts">
-  import { CheckCircle2, FileJson, FolderOpen, History, XCircle } from 'lucide-svelte';
+  import { ActionRow } from '@lostgradient/cinder/action-row';
+  import { Badge } from '@lostgradient/cinder/badge';
+  import { Button } from '@lostgradient/cinder/button';
+  import { SearchField } from '@lostgradient/cinder/search-field';
+  import {
+    CheckCircle2,
+    FileJson,
+    FolderOpen,
+    History,
+    PanelLeftClose,
+    PanelLeftOpen,
+    XCircle,
+  } from 'lucide-svelte';
 
   type SourceMode = 'examples' | 'upload' | 'local';
   type ExampleSummary = {
@@ -7,123 +19,225 @@
     title: string;
     description: string;
   };
+  type LocalSourceSummary = {
+    id: string;
+    title: string;
+    description: string;
+  };
 
   let {
     examples,
+    localSources = [],
     selectedExampleId,
+    selectedLocalSourceId,
     sourceMode,
+    open = $bindable(true),
     status,
     uploadStatusText,
     canImportHistory,
     canViewUploadedArtifacts,
     hasImportedHistory,
     onSelectExample,
+    onSelectLocalSource,
     onViewUploadedArtifacts,
     onAnalyzeFiles,
     onAnalyzeHistory,
     onClearHistory,
   }: {
     examples: ExampleSummary[];
+    localSources?: LocalSourceSummary[];
     selectedExampleId: string;
+    selectedLocalSourceId?: string | undefined;
     sourceMode: SourceMode;
+    open?: boolean;
     status: 'idle' | 'loading' | 'ready' | 'error';
     uploadStatusText: string;
     canImportHistory: boolean;
     canViewUploadedArtifacts: boolean;
     hasImportedHistory: boolean;
     onSelectExample: (exampleId: string) => void;
+    onSelectLocalSource: (sourceId: string) => void;
     onViewUploadedArtifacts: () => void;
     onAnalyzeFiles: (files: FileList | null) => void;
     onAnalyzeHistory: (files: FileList | null) => void;
     onClearHistory: () => void;
   } = $props();
+
+  let searchQuery = $state('');
+
+  const filteredExamples = $derived.by(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return examples;
+
+    return examples.filter((example) =>
+      `${example.title} ${example.description}`.toLowerCase().includes(query),
+    );
+  });
 </script>
 
-<aside class="source-panel" aria-label="Artifact sources">
-  <section class="brand">
-    <div>
-      <p>Temporal Explorer</p>
-      <h1>Examples</h1>
-    </div>
-  </section>
-
-  {#if examples.length > 0}
-    <section class="examples-section" aria-labelledby="examples-heading">
-      <div class="section-heading">
-        <h2 id="examples-heading">Workflows</h2>
-        <span>{examples.length}</span>
-      </div>
-      <div class="example-list">
-        {#each examples as example (example.id)}
-          <button
-            type="button"
-            class:active={sourceMode === 'examples' && selectedExampleId === example.id}
-            onclick={() => onSelectExample(example.id)}
-          >
-            <strong>{example.title}</strong>
-            <span>{example.description}</span>
-          </button>
-        {/each}
-      </div>
+<aside
+  class="source-panel"
+  class:local-only={examples.length === 0}
+  class:collapsed={!open}
+  aria-label="Artifact sources"
+>
+  {#if !open}
+    <Button
+      variant="secondary"
+      size="sm"
+      iconOnly
+      aria-label="Show source panel"
+      title="Show source panel"
+      onclick={() => (open = true)}
+      class="panel-toggle collapsed-toggle"
+    >
+      <PanelLeftOpen size={16} aria-hidden="true" />
+    </Button>
+  {:else}
+    <section class="panel-controls">
+      <Button
+        variant="secondary"
+        size="sm"
+        iconOnly
+        aria-label="Hide source panel"
+        title="Hide source panel"
+        onclick={() => (open = false)}
+        class="panel-toggle"
+      >
+        <PanelLeftClose size={16} aria-hidden="true" />
+      </Button>
     </section>
-  {/if}
 
-  <section
-    class="upload-section"
-    aria-labelledby="upload-heading"
-    ondragover={(event) => event.preventDefault()}
-    ondrop={(event) => {
-      event.preventDefault();
-      onAnalyzeFiles(event.dataTransfer?.files ?? null);
-    }}
-  >
-    <div class="section-heading">
-      <h2 id="upload-heading">Upload</h2>
-      {#if status === 'ready'}
-        <CheckCircle2 size={16} aria-label="Loaded" />
-      {:else if status === 'error'}
-        <XCircle size={16} aria-label="Error" />
-      {/if}
-    </div>
+    <section
+      class="upload-section"
+      aria-labelledby="upload-heading"
+      ondragover={(event) => event.preventDefault()}
+      ondrop={(event) => {
+        event.preventDefault();
+        onAnalyzeFiles(event.dataTransfer?.files ?? null);
+      }}
+    >
+      <div class="section-heading">
+        <h2 id="upload-heading">Upload</h2>
+        {#if status === 'ready'}
+          <CheckCircle2 size={16} aria-label="Loaded" />
+        {:else if status === 'error'}
+          <XCircle size={16} aria-label="Error" />
+        {/if}
+      </div>
 
-    <label class="file-action primary">
-      <FolderOpen size={16} aria-hidden="true" />
-      <span>Choose workflow directory</span>
-      <input
-        type="file"
-        webkitdirectory
-        multiple
-        onchange={(event) => onAnalyzeFiles(event.currentTarget.files)}
-      />
-    </label>
-
-    <label class="file-action" class:disabled={!canImportHistory}>
-      <FileJson size={16} aria-hidden="true" />
-      <span>Import Event History JSON</span>
-      <input
-        type="file"
-        accept="application/json,.json"
-        disabled={!canImportHistory}
-        onchange={(event) => onAnalyzeHistory(event.currentTarget.files)}
-      />
-    </label>
-
-    {#if canViewUploadedArtifacts}
-      <button class="clear-history" type="button" onclick={onViewUploadedArtifacts}>
+      <label class="file-action primary">
         <FolderOpen size={16} aria-hidden="true" />
-        View uploaded project
-      </button>
-    {/if}
+        <span>Choose directory</span>
+        <input
+          type="file"
+          webkitdirectory
+          multiple
+          onchange={(event) => onAnalyzeFiles(event.currentTarget.files)}
+        />
+      </label>
 
-    {#if hasImportedHistory}
-      <button class="clear-history" type="button" onclick={onClearHistory}>
-        <History size={16} aria-hidden="true" />
-        Remove history
-      </button>
-    {/if}
+      <label class="file-action" class:disabled={!canImportHistory}>
+        <FileJson size={16} aria-hidden="true" />
+        <span>Import history JSON</span>
+        <input
+          type="file"
+          accept="application/json,.json"
+          disabled={!canImportHistory}
+          onchange={(event) => onAnalyzeHistory(event.currentTarget.files)}
+        />
+      </label>
 
-    <p class:error={status === 'error'}>{uploadStatusText}</p>
-  </section>
+      {#if canViewUploadedArtifacts || hasImportedHistory}
+        <div class="upload-actions">
+          {#if canViewUploadedArtifacts}
+            <Button variant="secondary" size="sm" fullWidth onclick={onViewUploadedArtifacts}>
+              {#snippet leadingIcon()}
+                <FolderOpen size={16} />
+              {/snippet}
+              View project
+            </Button>
+          {/if}
+
+          {#if hasImportedHistory}
+            <Button variant="secondary" size="sm" fullWidth onclick={onClearHistory}>
+              {#snippet leadingIcon()}
+                <History size={16} />
+              {/snippet}
+              Remove history
+            </Button>
+          {/if}
+        </div>
+      {/if}
+
+      <p class:error={status === 'error'}>{uploadStatusText}</p>
+    </section>
+
+    {#if examples.length > 0}
+      <section class="examples-section" aria-labelledby="examples-heading">
+        <div class="section-heading">
+          <h2 id="examples-heading">Examples</h2>
+          <Badge variant="neutral" size="sm">{examples.length}</Badge>
+        </div>
+        <SearchField
+          value={searchQuery}
+          placeholder="Search examples..."
+          shortcut="/"
+          oninput={(value) => (searchQuery = value)}
+          onclear={() => (searchQuery = '')}
+        />
+        <div class="example-list">
+          {#each filteredExamples as example (example.id)}
+            <ActionRow
+              density="condensed"
+              selected={sourceMode === 'examples' && selectedExampleId === example.id}
+              selectedState="current"
+              class="example-action"
+              onclick={() => onSelectExample(example.id)}
+            >
+              {#snippet leading()}
+                <span class="trace-dot" aria-hidden="true"></span>
+              {/snippet}
+              {#snippet title()}
+                {example.title}
+              {/snippet}
+              {#snippet description()}
+                {example.description}
+              {/snippet}
+            </ActionRow>
+          {/each}
+        </div>
+      </section>
+    {:else if localSources.length > 0}
+      <section class="examples-section" aria-labelledby="project-heading">
+        <div class="section-heading">
+          <h2 id="project-heading">Workflows</h2>
+          <Badge variant="neutral" size="sm">{localSources.length}</Badge>
+        </div>
+        <div class="example-list">
+          {#each localSources as source (source.id)}
+            <ActionRow
+              density="condensed"
+              selected={sourceMode === 'local' && selectedLocalSourceId === source.id}
+              selectedState="current"
+              class="example-action"
+              onclick={() => onSelectLocalSource(source.id)}
+            >
+              {#snippet leading()}
+                <span class="trace-dot" aria-hidden="true"></span>
+              {/snippet}
+              {#snippet title()}
+                {source.title}
+              {/snippet}
+              {#snippet description()}
+                {source.description}
+              {/snippet}
+            </ActionRow>
+          {/each}
+        </div>
+      </section>
+    {/if}
+  {/if}
 </aside>
 
 <style>
@@ -132,30 +246,48 @@
     min-height: 0;
     box-sizing: border-box;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: 0.6rem;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 0.65rem;
     padding: 0.75rem;
-    border-right: 1px solid #c8d6dc;
-    background: rgba(248, 251, 252, 0.92);
-    backdrop-filter: blur(16px);
+    border-right: 1px solid #b9c8ce;
+    background:
+      linear-gradient(90deg, rgba(15, 143, 131, 0.07) 1px, transparent 1px) 0 0 / 2.5rem 2.5rem,
+      rgba(245, 248, 249, 0.94);
+    backdrop-filter: blur(18px);
     overflow: hidden;
   }
 
-  .brand {
-    display: grid;
-    gap: 0.15rem;
+  .source-panel.collapsed {
+    grid-template-rows: auto;
+    justify-items: center;
+    padding: 0.6rem 0.45rem;
+    overflow: visible;
   }
 
-  h1,
+  .panel-controls {
+    display: flex;
+    align-items: start;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    min-width: 0;
+    padding-block: 0.05rem 0.15rem;
+  }
+
+  :global(.panel-toggle.cinder-button) {
+    width: 1.95rem;
+    min-width: 1.95rem;
+    height: 1.95rem;
+    padding-inline: 0;
+  }
+
+  :global(.collapsed-toggle.cinder-button) {
+    margin-top: 0.1rem;
+  }
+
   h2,
   p {
     margin: 0;
     letter-spacing: 0;
-  }
-
-  h1 {
-    font-size: 1.35rem;
-    line-height: 1.05;
   }
 
   h2 {
@@ -164,24 +296,15 @@
     text-transform: uppercase;
   }
 
-  .brand p {
-    color: #5f6f78;
-    font-size: 0.72rem;
-    font-weight: 750;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
   .upload-section p,
-  .example-list span {
-    color: #5f6f78;
+  :global(.example-action .cinder-action-row__description) {
+    color: #62727a;
     font-size: 0.72rem;
     line-height: 1.2;
   }
 
   .section-heading,
-  .file-action,
-  .clear-history {
+  .file-action {
     display: flex;
     align-items: center;
   }
@@ -190,81 +313,72 @@
   .upload-section {
     min-width: 0;
     display: grid;
-    gap: 0.75rem;
+    gap: 0.45rem;
   }
 
   .examples-section {
     min-height: 0;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
     overflow: hidden;
+  }
+
+  .examples-section:empty {
+    display: none;
   }
 
   .section-heading {
     justify-content: space-between;
-    color: #5f6f78;
-  }
-
-  .section-heading span {
-    font-size: 0.8rem;
-    font-weight: 700;
+    color: #62727a;
   }
 
   .example-list {
     min-height: 0;
     display: grid;
-    gap: 0.15rem;
+    gap: 0.2rem;
     overflow: auto;
-    padding-right: 0.25rem;
+    padding: 0 0.25rem 0.2rem 0;
   }
 
-  .example-list button {
-    display: grid;
-    gap: 0.1rem;
-    padding: 0.35rem 0.55rem;
-    border: 1px solid transparent;
-    border-radius: 0.4rem;
-    background: transparent;
-    color: #172026;
-    text-align: left;
-    cursor: pointer;
+  :global(.example-action) {
+    justify-content: stretch;
+    width: 100%;
+    border-radius: 0.35rem;
+    color: #152027;
   }
 
-  .example-list button:hover,
-  .example-list button.active {
-    border-color: #b7c9d1;
-    background: #ffffff;
-  }
-
-  .example-list strong {
-    font-size: 0.8rem;
-    line-height: 1.1;
+  .trace-dot {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 999px;
+    background: #0f8f83;
+    box-shadow: 0 0 0 3px rgba(15, 143, 131, 0.12);
   }
 
   .upload-section {
-    padding: 0.65rem;
-    border: 1px solid #c8d6dc;
-    border-radius: 0.5rem;
-    background: #ffffff;
+    padding: 0.5rem;
+    border: 1px solid #b9c8ce;
+    border-radius: 0.45rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(246, 248, 248, 0.94)), #ffffff;
   }
 
-  .file-action,
-  .clear-history {
-    min-height: 2.1rem;
+  .file-action {
+    min-height: 1.95rem;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0 0.75rem;
-    border: 1px solid #c8d6dc;
-    border-radius: 0.4rem;
-    background: #f5f8fa;
-    color: #172026;
+    gap: 0.4rem;
+    padding: 0 0.55rem;
+    border: 1px solid #b9c8ce;
+    border-radius: 0.35rem;
+    background: #f7fafa;
+    color: #152027;
     font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
   }
 
   .file-action.primary {
-    border-color: #172026;
-    background: #172026;
+    border-color: #152027;
+    background: #152027;
     color: #ffffff;
   }
 
@@ -281,8 +395,10 @@
     pointer-events: none;
   }
 
-  .clear-history {
-    width: 100%;
+  .upload-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
   }
 
   .upload-section p.error {
@@ -291,6 +407,14 @@
   }
 
   @media (max-width: 960px) {
+    .source-panel.collapsed {
+      height: auto;
+      min-height: 3rem;
+      justify-items: start;
+      border-right: 0;
+      border-bottom: 1px solid #c8d6dc;
+    }
+
     .source-panel {
       height: auto;
       min-height: auto;

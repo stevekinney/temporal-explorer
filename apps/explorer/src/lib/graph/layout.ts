@@ -1,4 +1,4 @@
-import type { ELK as ElkInstance, ElkLabel, ElkNode } from 'elkjs/lib/elk-api.js';
+import type { ELK as ElkInstance, ElkNode } from 'elkjs/lib/elk-api.js';
 import ELK from 'elkjs/lib/elk-api.js';
 import elkWorkerUrl from 'elkjs/lib/elk-worker.min.js?url';
 
@@ -7,27 +7,17 @@ import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 export type LayoutPosition = { x: number; y: number; width: number; height: number };
 export type LayoutPositions = Record<string, LayoutPosition>;
 export type LayoutStatus = 'idle' | 'running' | 'ready' | 'failed';
-
-export type LayoutPoint = { x: number; y: number };
-/**
- * ELK's computed orthogonal route for an edge: the polyline waypoints from
- * source to target (in absolute flow coordinates) plus the center of its label.
- * Rendering these instead of letting Svelte Flow re-route keeps edges inside the
- * region containers ELK routed them around.
- */
-export type EdgeRoute = { points: LayoutPoint[]; labelX?: number; labelY?: number };
-export type EdgeRoutes = Record<string, EdgeRoute>;
-export type GraphLayout = { positions: LayoutPositions; edgeRoutes: EdgeRoutes };
+export type GraphLayout = { positions: LayoutPositions };
 
 let elk: ElkInstance | undefined;
 
 /** Fixed sizes fed to ELK so the computed layout matches the rendered node dimensions. */
 function nodeSize(node: TemporalGraphNode): { width: number; height: number } {
-  if (node.kind === 'decision' || node.kind === 'parallel-fork') return { width: 208, height: 76 };
+  if (node.kind === 'decision' || node.kind === 'parallel-fork') return { width: 180, height: 64 };
   if (node.kind === 'join') return { width: 44, height: 44 };
-  if (node.kind === 'terminal') return { width: 168, height: 60 };
+  if (node.kind === 'terminal') return { width: 132, height: 48 };
 
-  return { width: 256, height: 132 };
+  return { width: 220, height: 112 };
 }
 
 /**
@@ -52,6 +42,7 @@ export async function layoutGraph(
   edges: TemporalGraphEdge[],
 ): Promise<GraphLayout> {
   const childrenByParent = new Map<string | undefined, TemporalGraphNode[]>();
+  const shouldWrap = nodes.filter((node) => !node.isContainer).length > 24;
 
   for (const node of nodes) {
     const siblings = childrenByParent.get(node.parentId) ?? [];
@@ -76,6 +67,16 @@ export async function layoutGraph(
 
   const graph: ElkNode = {
     id: 'temporal-explorer-flow',
+    ...(shouldWrap
+      ? {
+          layoutOptions: {
+            'elk.aspectRatio': '1.65',
+            'elk.layered.wrapping.strategy': 'SINGLE_EDGE',
+            'elk.layered.wrapping.correctionFactor': '1',
+            'elk.layered.wrapping.additionalEdgeSpacing': '44',
+          },
+        }
+      : {}),
     children: (childrenByParent.get(undefined) ?? []).map(toElkNode),
     edges: edges.map((edge) => ({
       id: edge.id,
@@ -87,102 +88,22 @@ export async function layoutGraph(
   };
   const layout = await getElk().layout(graph);
   const positions: LayoutPositions = {};
-  // Absolute top-left of every node, needed to place edges: ELK returns node child
-  // coordinates relative to their parent, so absolute = parent absolute + local.
-  const absolute = new Map<string, LayoutPoint>();
 
-  const collect = (elkNode: ElkNode, offsetX: number, offsetY: number): void => {
+  const collect = (elkNode: ElkNode): void => {
     const x = elkNode.x ?? 0;
     const y = elkNode.y ?? 0;
     positions[elkNode.id] = { x, y, width: elkNode.width ?? 256, height: elkNode.height ?? 132 };
-    absolute.set(elkNode.id, { x: offsetX + x, y: offsetY + y });
 
     for (const child of elkNode.children ?? []) {
-      collect(child, offsetX + x, offsetY + y);
+      collect(child);
     }
   };
 
   for (const child of layout.children ?? []) {
-    collect(child, 0, 0);
+    collect(child);
   }
 
-  const parentOf = new Map(nodes.map((node) => [node.id, node.parentId]));
-  return { positions, edgeRoutes: extractEdgeRoutes(layout.edges, parentOf, absolute) };
-}
-
-type ParentMap = Map<string, string | undefined>;
-
-/**
- * Reads ELK's routing sections into {@link EdgeRoute}s. ELK returns each edge's
- * coordinates relative to the edge's container — the lowest common ancestor of its
- * source and target — so a route inside a region container is offset by that
- * container's absolute position to land in Svelte Flow's absolute coordinate space.
- */
-function extractEdgeRoutes(
-  elkEdges: ElkNode['edges'],
-  parentOf: ParentMap,
-  absolute: Map<string, LayoutPoint>,
-): EdgeRoutes {
-  const edgeRoutes: EdgeRoutes = {};
-
-  for (const elkEdge of elkEdges ?? []) {
-    const route = buildEdgeRoute(elkEdge, parentOf, absolute);
-    if (route) edgeRoutes[elkEdge.id] = route;
-  }
-
-  return edgeRoutes;
-}
-
-/** Builds one edge's route, shifting ELK's container-relative section into absolute space. */
-function buildEdgeRoute(
-  elkEdge: NonNullable<ElkNode['edges']>[number],
-  parentOf: ParentMap,
-  absolute: Map<string, LayoutPoint>,
-): EdgeRoute | undefined {
-  const section = elkEdge.sections?.[0];
-  if (!section) return undefined;
-
-  const container = edgeContainer(elkEdge.sources?.[0], elkEdge.targets?.[0], parentOf);
-  const origin = (container && absolute.get(container)) || { x: 0, y: 0 };
-  const shift = (point: LayoutPoint): LayoutPoint => ({
-    x: point.x + origin.x,
-    y: point.y + origin.y,
-  });
-
-  return {
-    points: [section.startPoint, ...(section.bendPoints ?? []), section.endPoint].map(shift),
-    ...labelCenter(elkEdge.labels?.[0], origin),
-  };
-}
-
-/** The lowest common ancestor container of an edge's endpoints, or undefined for the root. */
-function edgeContainer(
-  source: string | undefined,
-  target: string | undefined,
-  parentOf: ParentMap,
-): string | undefined {
-  if (!source || !target) return undefined;
-
-  const sourceAncestors = new Set<string>();
-  for (let node = parentOf.get(source); node; node = parentOf.get(node)) sourceAncestors.add(node);
-
-  for (let node = parentOf.get(target); node; node = parentOf.get(node)) {
-    if (sourceAncestors.has(node)) return node;
-  }
-
-  return undefined;
-}
-
-/** Center of an ELK edge label, shifted from its container-relative box into absolute space. */
-function labelCenter(
-  label: ElkLabel | undefined,
-  origin: LayoutPoint,
-): Pick<EdgeRoute, 'labelX' | 'labelY'> {
-  if (label?.x === undefined || label.y === undefined) return {};
-  return {
-    labelX: origin.x + label.x + (label.width ?? 0) / 2,
-    labelY: origin.y + label.y + (label.height ?? 0) / 2,
-  };
+  return { positions };
 }
 
 export function terminateGraphLayoutWorker(): void {
@@ -199,8 +120,8 @@ function getElk(): ElkInstance {
       'elk.hierarchyHandling': 'INCLUDE_CHILDREN',
       // GREEDY (the default) flips loop-back edges; DEPTH_FIRST keeps `repeat` edges pointing back.
       'elk.layered.cycleBreaking.strategy': 'DEPTH_FIRST',
-      'elk.layered.spacing.nodeNodeBetweenLayers': '96',
-      'elk.spacing.nodeNode': '48',
+      'elk.layered.spacing.nodeNodeBetweenLayers': '70',
+      'elk.spacing.nodeNode': '34',
       // Center-place edge labels and give them breathing room so they never sit on a node.
       'elk.edgeLabels.placement': 'CENTER',
       'elk.spacing.edgeLabel': '8',

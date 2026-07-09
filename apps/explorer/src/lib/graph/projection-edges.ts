@@ -1,3 +1,5 @@
+import type { TemporalCommand } from '@temporal-explorer/schemas';
+
 import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 
 /**
@@ -9,11 +11,14 @@ import type { TemporalGraphEdge, TemporalGraphNode } from './projection';
 export function createGraphEdges(
   workflowNode: TemporalGraphNode,
   commandEdges: TemporalGraphEdge[],
+  commandNodes: TemporalGraphNode[],
+  temporalCommands: TemporalCommand[],
   messageSurfaceNodes: TemporalGraphNode[],
   scopeNodes: TemporalGraphNode[],
 ): TemporalGraphEdge[] {
   return [
     ...commandEdges,
+    ...createScopeContainmentEdges(commandNodes, temporalCommands, scopeNodes),
     ...createNodeToWorkflowEdges(workflowNode, messageSurfaceNodes, (node) => node.kind),
     ...createNodeToWorkflowEdges(workflowNode, scopeNodes, () => 'scope'),
   ];
@@ -58,6 +63,51 @@ function createNodeToWorkflowEdges(
     runtimeOperationIds: node.runtimeOperationIds,
     eventReferences: node.eventReferences,
   }));
+}
+
+function createScopeContainmentEdges(
+  commandNodes: TemporalGraphNode[],
+  commands: TemporalCommand[],
+  scopeNodes: TemporalGraphNode[],
+): TemporalGraphEdge[] {
+  const commandById = new Map(commands.map((command) => [command.id, command]));
+  const edges: TemporalGraphEdge[] = [];
+
+  for (const scope of scopeNodes) {
+    const children = commandNodes
+      .filter((node) => node.id !== scope.id && isInsideSourceSpan(node, scope))
+      .toSorted(
+        (left, right) =>
+          (commandById.get(left.id)?.staticOrder ?? Number.POSITIVE_INFINITY) -
+          (commandById.get(right.id)?.staticOrder ?? Number.POSITIVE_INFINITY),
+      );
+
+    for (const [index, child] of children.entries()) {
+      const source = index === 0 ? scope : children[index - 1];
+      if (!source) continue;
+      edges.push({
+        id: `edge:scope:${scope.id}:${index}:${source.id}->${child.id}`,
+        source: source.id,
+        target: child.id,
+        label: index === 0 ? 'contains' : '',
+        state: child.state,
+        runtimeOperationIds: child.runtimeOperationIds,
+        eventReferences: child.eventReferences,
+      });
+    }
+  }
+
+  return edges;
+}
+
+function isInsideSourceSpan(node: TemporalGraphNode, parent: TemporalGraphNode): boolean {
+  return (
+    node.source !== undefined &&
+    parent.source !== undefined &&
+    node.source.path === parent.source.path &&
+    node.source.start.offset >= parent.source.start.offset &&
+    node.source.end.offset <= parent.source.end.offset
+  );
 }
 
 const sequentialEdgeLabelPrefixes: Partial<Record<TemporalGraphNode['kind'], string>> = {

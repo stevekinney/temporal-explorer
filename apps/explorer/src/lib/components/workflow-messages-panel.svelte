@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Badge } from '@lostgradient/cinder/badge';
-  import { Card } from '@lostgradient/cinder/card';
   import { EmptyState } from '@lostgradient/cinder/empty-state';
+  import { Stat } from '@lostgradient/cinder/stat';
+  import { StatGroup } from '@lostgradient/cinder/stat-group';
   import { Table } from '@lostgradient/cinder/table';
   import { TableBody } from '@lostgradient/cinder/table-body';
   import { TableCell } from '@lostgradient/cinder/table-cell';
@@ -43,177 +44,162 @@
   function liveState(id: string): GraphProjection['nodes'][number]['state'] | undefined {
     return graphProjection?.nodesById.get(id)?.state;
   }
+
+  const messageCount = $derived(signals.length + queries.length + updates.length);
 </script>
 
-<div class="message-grid">
-  <Card title="Signals" headingLevel={2}>
-    <strong>{signals.length}</strong>
-    <span>static signals</span>
-  </Card>
-  <Card title="Queries" headingLevel={2}>
-    <strong>{queries.length}</strong>
-    <span>static queries</span>
-  </Card>
-  <Card title="Updates" headingLevel={2}>
-    <strong>{updates.length}</strong>
-    <span>static updates</span>
-  </Card>
-</div>
+<StatGroup
+  label="Message surface summary"
+  columns={3}
+  variant="shared-borders"
+  class="message-summary"
+>
+  <Stat label="Signals" value={signals.length} />
+  <Stat label="Queries" value={queries.length} />
+  <Stat label="Updates" value={updates.length} />
+</StatGroup>
 
-{#if signals.length > 0}
-  <div class="table-panel">
-    <Table caption="Signal handlers" density="condensed">
-      <TableHeader>
-        <TableRow>
-          <TableHeaderCell>Signal</TableHeaderCell>
-          <TableHeaderCell>Payload type</TableHeaderCell>
-          <TableHeaderCell>Handler source</TableHeaderCell>
-          <TableHeaderCell>State</TableHeaderCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {#each signals as signal (signal.id)}
+{#if messageCount > 0}
+  {#if signals.length > 0}
+    <div class="table-panel">
+      <Table caption="Signal handlers" density="condensed">
+        <TableHeader>
           <TableRow>
-            <TableCell as="th">{signal.name}</TableCell>
-            <TableCell>{payloadTypeText(signal)}</TableCell>
-            <TableCell>{sourceText(signal.handlerSource)}</TableCell>
-            <TableCell>
-              <Badge variant={statusBadgeVariant(liveState(signal.id))} size="sm">
-                {liveState(signal.id) ?? 'not observed'}
-              </Badge>
-            </TableCell>
+            <TableHeaderCell>Signal</TableHeaderCell>
+            <TableHeaderCell>Payload type</TableHeaderCell>
+            <TableHeaderCell>Handler source</TableHeaderCell>
+            <TableHeaderCell>State</TableHeaderCell>
           </TableRow>
-        {/each}
-      </TableBody>
-    </Table>
-  </div>
+        </TableHeader>
+        <TableBody>
+          {#each signals as signal (signal.id)}
+            <TableRow>
+              <TableCell as="th">{signal.name}</TableCell>
+              <TableCell>{payloadTypeText(signal)}</TableCell>
+              <TableCell>{sourceText(signal.handlerSource)}</TableCell>
+              <TableCell>
+                <Badge variant={statusBadgeVariant(liveState(signal.id))} size="sm">
+                  {liveState(signal.id) ?? 'not observed'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          {/each}
+        </TableBody>
+      </Table>
+    </div>
+  {/if}
+
+  {#if queries.length > 0}
+    <div class="table-panel">
+      <Table caption="Query handlers" density="condensed">
+        <TableHeader>
+          <TableRow>
+            <TableHeaderCell>Query</TableHeaderCell>
+            <TableHeaderCell>Payload type</TableHeaderCell>
+            <TableHeaderCell>Result type</TableHeaderCell>
+            <TableHeaderCell>Handler source</TableHeaderCell>
+            <TableHeaderCell>State</TableHeaderCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {#each queries as query (query.id)}
+            <TableRow>
+              <TableCell as="th">{query.name}</TableCell>
+              <TableCell>{payloadTypeText(query)}</TableCell>
+              <TableCell>{resultTypeText(query)}</TableCell>
+              <TableCell>{sourceText(query.handlerSource)}</TableCell>
+              <TableCell>
+                <Badge variant={statusBadgeVariant(liveState(query.id))} size="sm">
+                  {liveState(query.id) ?? 'not observed'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          {/each}
+        </TableBody>
+      </Table>
+      <p class="message-note">
+        Queries never appear in Event History. They read Workflow state directly, so there is no
+        runtime event evidence to map.
+      </p>
+    </div>
+  {/if}
+
+  {#if updates.length > 0}
+    <div class="table-panel">
+      <Table caption="Update handlers" density="condensed">
+        <TableHeader>
+          <TableRow>
+            <TableHeaderCell>Update</TableHeaderCell>
+            <TableHeaderCell>Payload type</TableHeaderCell>
+            <TableHeaderCell>Result type</TableHeaderCell>
+            <TableHeaderCell>Handler source</TableHeaderCell>
+            <TableHeaderCell>Validator source</TableHeaderCell>
+            <TableHeaderCell>State</TableHeaderCell>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {#each updates as update (update.id)}
+            <TableRow>
+              <TableCell as="th">{update.name}</TableCell>
+              <TableCell>{payloadTypeText(update)}</TableCell>
+              <TableCell>{resultTypeText(update)}</TableCell>
+              <TableCell>{sourceText(update.handlerSource)}</TableCell>
+              <TableCell>{sourceText(update.validatorSource)}</TableCell>
+              <TableCell>
+                <Badge variant={statusBadgeVariant(liveState(update.id))} size="sm">
+                  {liveState(update.id) ?? 'not observed'}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          {/each}
+        </TableBody>
+      </Table>
+    </div>
+  {/if}
 {:else}
   <EmptyState
-    title="No signals"
-    description="This Workflow does not declare any signal handlers."
-    headingLevel={2}
-  />
-{/if}
-
-{#if queries.length > 0}
-  <div class="table-panel">
-    <Table caption="Query handlers" density="condensed">
-      <TableHeader>
-        <TableRow>
-          <TableHeaderCell>Query</TableHeaderCell>
-          <TableHeaderCell>Payload type</TableHeaderCell>
-          <TableHeaderCell>Result type</TableHeaderCell>
-          <TableHeaderCell>Handler source</TableHeaderCell>
-          <TableHeaderCell>State</TableHeaderCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {#each queries as query (query.id)}
-          <TableRow>
-            <TableCell as="th">{query.name}</TableCell>
-            <TableCell>{payloadTypeText(query)}</TableCell>
-            <TableCell>{resultTypeText(query)}</TableCell>
-            <TableCell>{sourceText(query.handlerSource)}</TableCell>
-            <TableCell>
-              <Badge variant={statusBadgeVariant(liveState(query.id))} size="sm">
-                {liveState(query.id) ?? 'not observed'}
-              </Badge>
-            </TableCell>
-          </TableRow>
-        {/each}
-      </TableBody>
-    </Table>
-    <p class="message-note">
-      Queries never appear in Event History — they read Workflow state directly, so there is no
-      runtime evidence to observe beyond static analysis.
-    </p>
-  </div>
-{:else}
-  <EmptyState
-    title="No queries"
-    description="This Workflow does not declare any query handlers."
-    headingLevel={2}
-  />
-{/if}
-
-{#if updates.length > 0}
-  <div class="table-panel">
-    <Table caption="Update handlers" density="condensed">
-      <TableHeader>
-        <TableRow>
-          <TableHeaderCell>Update</TableHeaderCell>
-          <TableHeaderCell>Payload type</TableHeaderCell>
-          <TableHeaderCell>Result type</TableHeaderCell>
-          <TableHeaderCell>Handler source</TableHeaderCell>
-          <TableHeaderCell>Validator source</TableHeaderCell>
-          <TableHeaderCell>State</TableHeaderCell>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {#each updates as update (update.id)}
-          <TableRow>
-            <TableCell as="th">{update.name}</TableCell>
-            <TableCell>{payloadTypeText(update)}</TableCell>
-            <TableCell>{resultTypeText(update)}</TableCell>
-            <TableCell>{sourceText(update.handlerSource)}</TableCell>
-            <TableCell>{sourceText(update.validatorSource)}</TableCell>
-            <TableCell>
-              <Badge variant={statusBadgeVariant(liveState(update.id))} size="sm">
-                {liveState(update.id) ?? 'not observed'}
-              </Badge>
-            </TableCell>
-          </TableRow>
-        {/each}
-      </TableBody>
-    </Table>
-  </div>
-{:else}
-  <EmptyState
-    title="No updates"
-    description="This Workflow does not declare any update handlers."
+    title="No messages"
+    description="This Workflow does not declare signal, query, or update handlers."
     headingLevel={2}
   />
 {/if}
 
 <style>
-  .message-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
+  :global(.message-summary) {
+    margin-bottom: 0.7rem;
+    border-color: #c3d0d5;
+    border-radius: 0.4rem;
+    background: #ffffff;
   }
 
-  .message-grid strong {
-    display: block;
-    color: #2f6fed;
-    font-size: 2rem;
-    line-height: 1;
+  :global(.message-summary .cinder-stat) {
+    padding: 0.45rem 0.7rem;
   }
 
-  .message-grid span {
-    color: #5d6b75;
-    font-size: 0.875rem;
+  :global(.message-summary .cinder-stat__label) {
+    font-size: 0.7rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  :global(.message-summary .cinder-stat__value) {
+    font-size: 1rem;
+    line-height: 1.1;
   }
 
   .table-panel {
     margin-bottom: 1rem;
     overflow-x: auto;
-    border: 1px solid #d3dde5;
-    border-radius: 0.5rem;
+    border: 1px solid #c3d0d5;
+    border-radius: 0.45rem;
     background: #ffffff;
   }
 
   .message-note {
     margin: 0;
     padding: 0.75rem 0.95rem;
-    border-top: 1px solid #dde5eb;
-    color: #5d6b75;
+    border-top: 1px solid #c3d0d5;
+    color: #62727a;
     font-size: 0.8125rem;
-  }
-
-  @media (max-width: 840px) {
-    .message-grid {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import cinderStylesheetUrl from '@lostgradient/cinder/styles?url';
+  import cinderStylesheetUrl from '@lostgradient/cinder/styles/all?url';
   import svelteFlowStylesheetUrl from '@xyflow/svelte/dist/style.css?url';
   import type { Snippet } from 'svelte';
 
@@ -16,9 +16,9 @@
 <style>
   :global(html) {
     color-scheme: light;
-    background: #eef2f5;
+    background: #e8eef0;
     font-family:
-      Inter,
+      'Inter',
       ui-sans-serif,
       system-ui,
       -apple-system,
@@ -31,12 +31,16 @@
     margin: 0;
     min-width: 320px;
     background:
-      linear-gradient(90deg, rgba(47, 111, 237, 0.08) 1px, transparent 1px),
-      linear-gradient(180deg, #f7f9fb 0%, #edf2f5 100%);
+      linear-gradient(90deg, rgba(15, 143, 131, 0.09) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(52, 104, 246, 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 0 0, rgba(15, 143, 131, 0.08), transparent 26rem),
+      linear-gradient(180deg, #f6f8f8 0%, #e8eef0 100%);
     background-size:
-      64px 64px,
+      56px 56px,
+      56px 56px,
+      auto,
       auto;
-    color: #172026;
+    color: #152027;
   }
 
   :global(button),

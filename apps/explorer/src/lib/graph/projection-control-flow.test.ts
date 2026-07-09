@@ -40,7 +40,6 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
     expect(shape(projection)).toEqual([
       { kind: 'workflow', label: 'cancellationWorkflow', state: 'canceled' },
       { kind: 'try-region', label: 'try', state: 'observed' },
-      { kind: 'join', label: '', state: 'observed' },
       { kind: 'terminal', label: 'return', state: 'observed' },
       { kind: 'branch-region', label: 'if', state: 'observed' },
       { kind: 'decision', label: 'if', state: 'observed' },
@@ -59,7 +58,33 @@ describe('cancellation scope, patch, and dynamic dispatch projection', () => {
     const tryRegion = projection.nodes.find((node) => node.kind === 'try-region');
     expect(
       projection.nodes.filter((node) => node.parentId === tryRegion?.id).map((node) => node.kind),
-    ).toEqual(['join', 'terminal', 'branch-region', 'terminal']);
+    ).toEqual(['terminal', 'branch-region', 'terminal']);
+    expect(
+      projection.edges
+        .filter((edge) => edge.id.startsWith('edge:scope:'))
+        .map((edge) => ({ source: edge.source, target: edge.target, label: edge.label })),
+    ).toEqual([
+      {
+        source: 'cancellation-scope:cancellationWorkflow:0',
+        target: 'activity-call:cancellationWorkflow:reserveResources:1',
+        label: 'contains',
+      },
+      {
+        source: 'activity-call:cancellationWorkflow:reserveResources:1',
+        target: 'timer:cancellationWorkflow:2',
+        label: '',
+      },
+      {
+        source: 'timer:cancellationWorkflow:2',
+        target: 'activity-call:cancellationWorkflow:useResources:3',
+        label: '',
+      },
+      {
+        source: 'cancellation-scope:cancellationWorkflow:4',
+        target: 'activity-call:cancellationWorkflow:releaseResources:5',
+        label: 'contains',
+      },
+    ]);
     expect(
       projection.edges
         .filter((edge) => edge.target === 'workflow:cancellationWorkflow')
