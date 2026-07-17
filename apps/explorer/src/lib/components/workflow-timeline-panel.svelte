@@ -39,6 +39,7 @@
       {#each rows as row (row.id)}
         <ActionRow
           density="condensed"
+          class="timeline-row"
           selected={row.entry.operationId === selectedRuntimeOperationId}
           selectedState="current"
           onclick={() => selectTimelineRow(row)}
@@ -126,18 +127,10 @@
     padding: 0.55rem;
   }
 
-  .timeline-list :global(.cinder-action-row) {
+  .timeline-list :global(.timeline-row) {
+    --cinder-action-row-layout-column-gap: 0.8rem;
+    --cinder-action-row-padding-block: 0.55rem;
     border-radius: 0.4rem;
-  }
-
-  .timeline-list :global(.cinder-action-row__layout) {
-    align-items: center;
-    gap: 0.8rem;
-    padding-block: 0.55rem;
-  }
-
-  .timeline-list :global(.cinder-action-row__body) {
-    min-width: 0;
   }
 
   .timeline-dot {

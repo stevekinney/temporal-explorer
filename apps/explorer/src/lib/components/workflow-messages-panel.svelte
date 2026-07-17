@@ -54,9 +54,9 @@
   variant="shared-borders"
   class="message-summary"
 >
-  <Stat label="Signals" value={signals.length} />
-  <Stat label="Queries" value={queries.length} />
-  <Stat label="Updates" value={updates.length} />
+  <Stat label="Signals" value={signals.length} class="message-summary-stat" />
+  <Stat label="Queries" value={queries.length} class="message-summary-stat" />
+  <Stat label="Updates" value={updates.length} class="message-summary-stat" />
 </StatGroup>
 
 {#if messageCount > 0}
@@ -172,19 +172,11 @@
     background: #ffffff;
   }
 
-  :global(.message-summary .cinder-stat) {
+  :global(.message-summary-stat) {
+    --cinder-stat-label-font-size: 0.7rem;
+    --cinder-stat-value-font-size: 1rem;
+    --cinder-stat-value-line-height: 1.1;
     padding: 0.45rem 0.7rem;
-  }
-
-  :global(.message-summary .cinder-stat__label) {
-    font-size: 0.7rem;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  :global(.message-summary .cinder-stat__value) {
-    font-size: 1rem;
-    line-height: 1.1;
   }
 
   .table-panel {

@@ -39,7 +39,7 @@
 </script>
 
 <aside class="selection-inspector" aria-label="Selection evidence">
-  <Card padding="none">
+  <Card padding="none" class="selection-inspector-card">
     {#snippet header()}
       <div class="inspector-hero">
         <div class="accent" aria-hidden="true"></div>
@@ -56,12 +56,12 @@
     {/snippet}
 
     <Accordion multiple bind:expandedIds={expandedSections} class="inspector-sections">
-      <AccordionItem id="source" title="Source">
+      <AccordionItem id="source" title="Source" class="inspector-section">
         <code class="source-path">{detail.sourceText}</code>
         <code class="source-line">{detail.sourceLineText}</code>
       </AccordionItem>
 
-      <AccordionItem id="mapping" title="Mapping">
+      <AccordionItem id="mapping" title="Mapping" class="inspector-section">
         <div class="fact-stack">
           {#each detail.mappingFacts as fact (fact.label)}
             <div class="fact-row" data-tone={factTone(fact)}>
@@ -73,7 +73,7 @@
       </AccordionItem>
 
       {#if detail.runtimeFacts.length > 0}
-        <AccordionItem id="runtime" title="Runtime outcome">
+        <AccordionItem id="runtime" title="Runtime outcome" class="inspector-section">
           <div class="fact-grid">
             {#each detail.runtimeFacts as fact (fact.label)}
               <div data-tone={factTone(fact)}>
@@ -85,7 +85,7 @@
         </AccordionItem>
       {/if}
 
-      <AccordionItem id="events" title="Event History">
+      <AccordionItem id="events" title="Event History" class="inspector-section">
         {#if detail.eventLedger.length > 0}
           <ol class="event-ledger">
             {#each detail.eventLedger as reference (reference.eventId)}
@@ -104,9 +104,14 @@
         {/if}
       </AccordionItem>
 
-      <AccordionItem id="actions" title="Actions">
+      <AccordionItem id="actions" title="Actions" class="inspector-section">
         <div class="inspector-actions">
-          <CopyButton value={eventIdText} label="Copy event IDs" disabled={!eventIdText}>
+          <CopyButton
+            class="inspector-copy-button"
+            value={eventIdText}
+            label="Copy event IDs"
+            disabled={!eventIdText}
+          >
             <ClipboardCopy size={15} aria-hidden="true" />
             Copy event IDs
           </CopyButton>
@@ -162,39 +167,31 @@
     font-size: 0.76rem;
   }
 
-  :global(.selection-inspector > .cinder-card) {
+  :global(.selection-inspector-card) {
     background: #ffffff;
   }
 
-  :global(.inspector-sections.cinder-accordion) {
+  :global(.inspector-sections) {
     border: 0;
     border-radius: 0;
     background: #ffffff;
   }
 
-  :global(.inspector-sections .cinder-accordion-item) {
+  :global(.inspector-section) {
+    --cinder-accordion-item-trigger-padding-block: 0.7rem;
+    --cinder-accordion-item-trigger-padding-inline: 0.9rem;
+    --cinder-accordion-item-trigger-font-size: 0.78rem;
+    --cinder-accordion-item-trigger-font-weight: 650;
+    --cinder-accordion-item-panel-inner-padding-block-start: 0.35rem;
+    --cinder-accordion-item-panel-inner-padding-block-end: 0.95rem;
+    --cinder-accordion-item-panel-inner-padding-inline: 0.9rem;
+    --cinder-accordion-item-panel-font-size: 0.8rem;
     border-bottom: 1px solid #d5e0e4;
     background: #ffffff;
   }
 
-  :global(.inspector-sections .cinder-accordion-item:last-child) {
+  :global(.inspector-section:last-child) {
     border-bottom: 0;
-  }
-
-  :global(.inspector-sections .cinder-accordion-item__trigger) {
-    min-height: 2.45rem;
-    padding: 0 0.9rem;
-    font-size: 0.78rem;
-    font-weight: 650;
-  }
-
-  :global(.inspector-sections .cinder-accordion-item__panel) {
-    background: #ffffff;
-  }
-
-  :global(.inspector-sections .cinder-accordion-item__panel-inner) {
-    padding: 0.35rem 0.9rem 0.95rem;
-    background: #ffffff;
   }
 
   .source-path,
@@ -314,7 +311,7 @@
     gap: 0.55rem;
   }
 
-  :global(.inspector-actions .cinder-copy-button) {
+  :global(.inspector-copy-button) {
     display: inline-flex;
     align-items: center;
     justify-content: center;

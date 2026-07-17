@@ -22,7 +22,7 @@
 </script>
 
 <section class="source-panel" aria-labelledby="source-panel-title">
-  <Card padding="none">
+  <Card padding="none" class="source-panel-card">
     <div class="source-heading">
       <h2 id="source-panel-title">{detail?.title ?? 'No command selected'}</h2>
       {#if detail}
@@ -115,7 +115,7 @@
     padding: 0.8rem;
   }
 
-  :global(.source-panel > .cinder-card) {
+  :global(.source-panel-card) {
     height: 100%;
     min-height: clamp(31rem, calc(100vh - 17rem), 43rem);
     display: flex;
@@ -149,33 +149,18 @@
     pointer-events: none;
   }
 
-  :global(.source-code-block.cinder-code-block) {
+  :global(.source-code-block) {
+    --cinder-code-block-background: #ffffff;
+    --cinder-code-block-height: 100%;
+    --cinder-code-block-padding: 1rem 0.8rem;
+    --cinder-code-block-font-size: 0.72rem;
+    --cinder-code-block-line-height: var(--source-code-line-height);
     position: relative;
     z-index: 1;
     height: 100%;
     border: 0;
     border-radius: 0;
     background: #ffffff;
-  }
-
-  :global(.source-code-block .cinder-code-block__viewport) {
-    height: 100%;
-    background: #ffffff;
-  }
-
-  :global(.source-code-block .cinder-code-block__pre),
-  :global(.source-code-block .cinder-code-block__highlighted pre.shiki) {
-    position: relative;
-    font-size: 0.72rem;
-    line-height: var(--source-code-line-height);
-    background: transparent !important;
-  }
-
-  :global(.source-code-block .cinder-code-block__code),
-  :global(.source-code-block .cinder-code-block__highlighted code),
-  :global(.source-code-block .cinder-code-block__highlighted span) {
-    font-size: inherit;
-    line-height: inherit;
   }
 
   .source-context {
@@ -222,7 +207,7 @@
   }
 
   @media (max-width: 840px) {
-    :global(.source-panel > .cinder-card) {
+    :global(.source-panel-card) {
       min-height: 0;
     }
   }

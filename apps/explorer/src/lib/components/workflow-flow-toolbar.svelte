@@ -71,6 +71,7 @@
         variant="secondary"
         size="sm"
         iconOnly
+        class="graph-fit-button"
         aria-label="Fit graph"
         title="Fit graph"
         onclick={fitGraph}
@@ -157,11 +158,11 @@
     gap: 0.3rem;
   }
 
-  :global(.graph-action-group.cinder-button-group) {
+  :global(.graph-action-group) {
     align-items: center;
   }
 
-  :global(.graph-action-group.cinder-button-group .cinder-button:first-child) {
+  :global(.graph-fit-button) {
     border-start-end-radius: 0;
     border-end-end-radius: 0;
   }
@@ -184,7 +185,7 @@
     line-height: 1;
   }
 
-  :global(.toolbar-actions .cinder-button[aria-label]) {
+  :global(.toolbar-actions button[aria-label]) {
     width: 2rem;
     min-width: 2rem;
     padding-inline: 0;

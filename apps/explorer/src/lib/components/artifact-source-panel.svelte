@@ -273,14 +273,14 @@
     padding-block: 0.05rem 0.15rem;
   }
 
-  :global(.panel-toggle.cinder-button) {
+  :global(.panel-toggle) {
     width: 1.95rem;
     min-width: 1.95rem;
     height: 1.95rem;
     padding-inline: 0;
   }
 
-  :global(.collapsed-toggle.cinder-button) {
+  :global(.collapsed-toggle) {
     margin-top: 0.1rem;
   }
 
@@ -297,7 +297,8 @@
   }
 
   .upload-section p,
-  :global(.example-action .cinder-action-row__description) {
+  :global(.example-action) {
+    --cinder-action-row-description-font-size: 0.72rem;
     color: #62727a;
     font-size: 0.72rem;
     line-height: 1.2;
