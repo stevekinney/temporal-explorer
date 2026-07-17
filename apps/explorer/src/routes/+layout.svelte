@@ -1,5 +1,6 @@
 <script lang="ts">
-  import cinderStylesheetUrl from '@lostgradient/cinder/styles/all?url';
+  // oxlint-disable-next-line import/no-unassigned-import -- Cinder's stylesheet entrypoint is intentionally side-effect-only.
+  import '@lostgradient/cinder/styles/all';
   import svelteFlowStylesheetUrl from '@xyflow/svelte/dist/style.css?url';
   import type { Snippet } from 'svelte';
 
@@ -7,7 +8,6 @@
 </script>
 
 <svelte:head>
-  <link rel="stylesheet" href={cinderStylesheetUrl} />
   <link rel="stylesheet" href={svelteFlowStylesheetUrl} />
 </svelte:head>
 
