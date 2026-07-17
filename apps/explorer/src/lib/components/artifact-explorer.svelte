@@ -205,11 +205,12 @@
       </div>
 
       <nav class="workflow-sidebar-navigation" aria-label="Workflow selection">
-        <SideNavigation ariaLabel="Workflow selection">
+        <SideNavigation ariaLabel="Workflow selection" class="workflow-side-navigation">
           {#each artifacts.analysis.workflows as workflow (workflow.id)}
             <SideNavigationItem
               active={workflow.id === selectedWorkflow?.id}
               current="true"
+              listItemClass="workflow-nav-list-item"
               onclick={() => selectWorkflow(workflow.id)}
             >
               <span class="workflow-nav-item">{workflow.name}</span>
@@ -598,13 +599,18 @@
     padding: 0.45rem 0.5rem 0.45rem 0.75rem;
   }
 
-  :global(.workflow-sidebar .cinder-side-navigation__list) {
-    gap: 0.1rem;
+  :global(.workflow-side-navigation) {
+    --cinder-side-navigation-list-gap: 0.1rem;
   }
 
-  :global(.workflow-sidebar .cinder-navigation-item) {
+  :global(.workflow-nav-list-item) {
     min-height: 2.15rem;
     border-radius: 0.3rem;
+  }
+
+  /* Keep the selector scoped to the app-owned navigation root. */
+  :global(.workflow-sidebar .workflow-side-navigation) {
+    gap: 0.1rem;
   }
 
   .brand-lockup {
@@ -833,17 +839,13 @@
     background: #ffffff;
   }
 
-  :global(.type-code-block.cinder-code-block) {
+  :global(.type-code-block) {
+    --cinder-code-block-padding: 0.65rem 0.75rem;
+    --cinder-code-block-font-size: 0.78rem;
+    --cinder-code-block-line-height: 1.45;
     margin-top: 0.45rem;
     border-color: #d5e0e4;
     border-radius: 0.35rem;
-  }
-
-  :global(.type-code-block .cinder-code-block__pre),
-  :global(.type-code-block .cinder-code-block__highlighted pre.shiki) {
-    padding: 0.65rem 0.75rem !important;
-    font-size: 0.78rem;
-    line-height: 1.45;
   }
 
   @media (max-width: 840px) {
@@ -874,7 +876,7 @@
       min-width: 0;
     }
 
-    .artifact-summary {
+    :global(.artifact-summary) {
       justify-content: flex-start;
     }
   }
