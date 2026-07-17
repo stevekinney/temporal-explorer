@@ -53,12 +53,12 @@
       detached
       class="state-filters"
     >
-      <Segment value="all">
+      <Segment class="state-filter-option" value="all">
         All
         <span class="filter-count">{filterableNodeCount}</span>
       </Segment>
       {#each visibleFilterStates as state (state)}
-        <Segment value={state} data-state={runtimeStateToken(state)}>
+        <Segment class="state-filter-option" value={state} data-state={runtimeStateToken(state)}>
           {state}
           <span class="filter-count">{statusCounts.get(state) ?? 0}</span>
         </Segment>
@@ -197,17 +197,15 @@
     gap: 0.35rem;
   }
 
-  :global(.state-filters .cinder-segmented-control-option) {
+  :global(.state-filters .state-filter-option) {
     position: relative;
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     gap: 0.4rem;
-    border-color: #b9c8ce;
-    background: #ffffff;
   }
 
-  :global(.state-filters .cinder-segmented-control-option[data-cinder-selected]) {
+  :global(.state-filters .state-filter-option[aria-pressed='true']) {
     z-index: 1;
     border-color: #3468f6;
     background: #3468f6;
